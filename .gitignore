@@ -1,0 +1,7 @@
+.Rproj.user
+.Rhistory
+.RData
+*.sublime-workspace
+*.sublime-project
+Thumbs.db
+.setwd

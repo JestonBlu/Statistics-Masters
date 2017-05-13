@@ -1,0 +1,329 @@
+---
+output:
+  pdf_document:
+    fig_height: 4
+    highlight: pygments
+    latex_engine: xelatex
+mainfont: Calibri Light
+sansfont: Calibri Light
+fontsize: 12pt
+geometry: margin=1in
+---
+
+
+**Homework 07**  
+**Joseph Blubaugh**  
+jblubau1@tamu.edu  
+**STAT 642-720**  
+
+\newpage
+
+
+
+1.  
+  1) Design - $2^{6-2}$
+    a) Fraction of Full Design: $\frac{1}{2}^2 = \frac{1}{4}$
+    b) 2 Generators Required
+    c) Generalized Interactions: $2^6 - 6 - 1 = 57$
+    d) Alias for each effect:  $2^2 = 4$
+    e) Number of Runs: $2^{6-2} = 16$
+  2) Design - $2^{7-3}$
+    a) Fraction of Full Design: $\frac{1}{2}^3 = \frac{1}{8}$
+    b) 3 Generators Required
+    c) Generalized Interactions: $2^7 - 7 - 1 = 120$
+    d) Alias for each effect: $2^3 = 8$
+    e) Number of Runs: $2^{7-3} = 16$
+  3) Design - $2^{7-4}$
+    a) Fraction of Full Design: $\frac{1}{2}^4 = \frac{1}{16}$
+    b) 4 Generators Required
+    c) Generalized Interactions: $2^7 - 7 - 1 = 120$
+    d) Alias for each effect: $2^4 = 16$
+    e) Number of Runs: $2^{7-4} = 8$
+
+
+2. $2^{7-3}$
+
+```{r q2, comment=NA}
+
+suppressPackageStartupMessages(library(FrF2))
+
+dsgn = FrF2(nruns = 16, nfactors = 7, generators = c('ABC', 'BCD', 'ACD'))
+dsgn = cbind(y = 1:nrow(dsgn), dsgn)
+alias.sets = aliases(lm(y ~ (.)^4, data = dsgn))
+
+cat('Alias Sets \n'); alias.sets 
+
+cat('Treatment Design \n'); dsgn
+
+```
+
+
+ 
+3. Fractional Factorial $2^{5-2}$
+  i. $\frac{2^3}{2^5} = \frac{1}{4}$
+  ii. $I = AE$ is the preferred generating relationship although neither design is good because the max resolution for $AE$ is 2 which means some main effects will be confounding.
+  \begin{align*}
+    I = ABCD = BCE = A B^2 C^2 E = AE        \\
+    I = ABCDE = ABCD = A^2 B^2 C^2 D^2 E = E \\
+  \end{align*}
+
+
+
+
+4. 
+  a) Resolution 4
+  b) 
+      
+    | Run | A  | B  | C  | D  | ABCD = E           |
+    |:----|:---|:---|:---|:---|:-------------------|
+    | 1   | -1 | -1 | -1 | 1  | ABCD = -1, E = 1   |
+    | 2   | 1  | -1 | 1  | 1  | ABCD = -1, E = 1   |
+    | 3   | 1  | 1  | -1 | -1 | ABCD = 1, E =  -1  |
+    | 4   | 1  | -1 | 1  | -1 | ABCD = 1, E =  -1  |
+    | 5   | -1 | 1  | -1 | -1 | ABCD = -1, E = 1   |
+    | 6   | -1 | -1 | 1  | -1 | ABCD = -1, E = 1   |
+    | 7   | -1 | 1  | -1 | 1  | ABCD = 1, E =  -1  |
+    | 8   | 1  | 1  | 1  | 1  | ABCD = 1, E =   -1 |
+    | 9   | -1 | 1  | 1  | 1  | ABCD = -1, E = 1   |
+    | 10  | 1  | 1  | -1 | 1  | ABCD = -1, E = 1   |
+    | 11  | -1 | -1 | 1  | 1  | ABCD = 1, E =  -1  |
+    | 12  | -1 | -1 | -1 | -1 | ABCD = 1, E =  -1  |
+    | 13  | 1  | -1 | -1 | -1 | ABCD = -1, E = 1   |
+    | 14  | 1  | 1  | 1  | -1 | ABCD = -1, E = 1   |
+    | 15  | 1  | -1 | -1 | 1  | ABCD = 1, E =  -1  |
+    | 16  | -1 | 1  | 1  | -1 | ABCD = 1, E =  -1  |
+      
+  
+  c) Alias Sets
+```{r q4, comment=NA}
+mdl = FrF2(nruns = 16, nfactors = 5)
+mdl$y = 1:nrow(mdl)
+aliases(lm(y ~ (.)^4, data = mdl))
+
+```
+
+  d) All higher order effects are equal to 0  
+  e) 
+  
+```{r q4e, comment=NA, echo=FALSE}
+
+dt = data.frame(
+ A = c(0, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0),
+ B = c(1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0),
+ C = c(0 , 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0),
+ D = c(0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 1),
+ E = c(0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0,  1, 1, 0),
+ y = c(.78, 1.10, 1.7, 1.28, .97, 1.47, 1.85, 2.1, .76, .62, 1.09, 1.13, 
+       1.25, .98, 1.36, 1.18))
+
+mdl = aov(y ~ A*B + A*C + A*D + A*E + B*C + B*D + B*E + C*D + C*E + D*E, data = dt)
+
+SS = sum(c(0.0676, 0.0361, 0.0870, 0.0144, 0.4761, 0.0012, 0.8100,
+           0.0156, 0.0020, 0.0036, 0.2652, 0.6006, 0.0001, 0.0001, 0.0342))
+
+data.frame(
+  Variation = c("A", "B" , "C" , "D", "E", "A:B", "A:C", "A:D", 
+                "A:E", "B:C", "B:D", "B:E", "C:D", "C:E", "D:E"), 
+  SS.Sq = c(0.0676, 0.0361, 0.0870, 0.0144, 0.4761, 0.0012, 0.8100, 
+            0.0156, 0.0020, 0.0036, 0.2652, 0.6006, 0.0001, 0.0001, 0.0342),
+  Var.Prop = c(0.02801, 0.01496, 0.03604, 0.00597, 0.19724, 0.00050, 0.33557, 
+               0.00646, 0.00083, 0.00149, 0.10987, 0.24882, 0.00004, 0.00004, 0.01417)
+)
+
+
+```
+  
+  f) Effects E, A:C, D:B, B:E make up 88% of the total variaion on the model. Significance cannot be tested because we are using up all of the degrees of freedom in the model by testing every combination of main effect and 2-way treatment.
+  
+  g) 
+```{r q4g, comment=NA}
+mdl = FrF2(nruns = 8, nfactors = 5)
+mdl$y = 1:nrow(mdl)
+summary(mdl)
+aliases(lm(y ~ (.)^4, data = mdl))
+
+```
+
+
+
+5.  
+
+  a) Hypothesis testing shows that the Carry Over term is not significant
+  
+```{r q5, echo=FALSE, comment=NA, warning=FALSE}
+
+suppressPackageStartupMessages(library(plyr))
+suppressPackageStartupMessages(library(reshape2))
+suppressPackageStartupMessages(library(lme4))
+suppressPackageStartupMessages(library(lmerTest))
+
+dt = 
+  data.frame(
+    Sequence = c(rep('ABC', 4), rep('ACB', 4), rep('BAC', 4), 
+                 rep('BCA', 4), rep('CAB', 4), rep('CBA', 4)),
+    Subject = 1:24,
+    Seq.I = c(rep('A', 4), rep('A', 4), rep('B', 4), 
+              rep('B', 4), rep('C', 4), rep('C', 4)),
+    Seq.II = c(rep('B', 4), rep('C', 4), rep('A', 4), 
+               rep('C', 4), rep('A', 4), rep('B', 4)),
+    Seq.III = c(rep('C', 4), rep('B', 4), rep('C', 4), 
+                rep('A', 4), rep('B', 4), rep('A', 4)),
+    Period.I = c(174, 145, 230, 240, 192, 194, 175, 202, 184, 140, 155, 180, 
+                 136, 145, 194, 180, 206, 160, 188, 185, 180, 210, 185, 190),
+    Period.II = c(146, 125, 174, 130, 150, 208, 152, 160, 192, 150, 230, 185, 
+                  132, 154, 210, 180, 220, 180, 200, 197, 180, 160, 180, 145),
+    Period.III = c(164, 130, 200, 195, 160, 160, 175, 180, 176, 150, 226, 190, 
+                   138, 166, 190, 190, 210, 145, 190, 182, 208, 226, 200, 160),
+    Carry.Over.I = rep('N', 24),
+    Carry.Over.II = c('A','A','A','A','A','A','A','A',
+                      'B','B','B','B','B','B','B','B',
+                      'C','C','C','C','C','C','C','C'),
+    Carry.Over.III = c('B','B','B','B','C','C','C','C',
+                       'A','A','A','A','C','C','C','C',
+                       'A','A','A','A','B','B','B','B')
+    )
+
+tmp = melt(dt, id.vars = c("Sequence", "Subject"), 
+           measure.vars = c("Seq.I", "Seq.II", "Seq.III"), 
+           value.name = "Drug", variable.name = "Se")
+tmp2 = melt(dt, id.vars = c("Sequence", "Subject"), 
+            measure.vars = c("Period.I", "Period.II", "Period.III"), 
+            value.name = "Blood.Pressure", variable.name = "Period")
+tmp3 = melt(dt, id.vars = c("Sequence", "Subject"),
+            measure.vars = c("Carry.Over.I", "Carry.Over.II", "Carry.Over.III"),
+            value.name = "Carry.Over", variable.name = "Carry")
+
+tbl = cbind(tmp, tmp2, tmp3)
+
+tbl = arrange(
+  tbl[, c("Sequence", "Subject", "Drug", "Period", "Blood.Pressure", "Carry.Over")], 
+  Subject, Period)
+
+tbl$Subject = factor(tbl$Subject)
+tbl$Drug = factor(tbl$Drug)
+tbl$Carry.Over = factor(tbl$Carry.Over)
+
+
+```
+
+```{r q5a, comment=NA, warning=FALSE}
+head(tbl, 3)
+
+mdl = lmer(Blood.Pressure ~ Sequence + Drug + Period + Carry.Over + (1 | Sequence:Subject),
+           data = tbl)
+anova(mdl)
+```
+
+b. to extract the LSE contrasts we have to drop the carry over term from the model and rerun the analysis.
+
+```{r q5b, comment=NA, warning=FALSE, echo=FALSE}
+mdl = lmer(Blood.Pressure ~ Sequence + Drug + Period + (1 | Sequence:Subject),
+           data = tbl)
+
+results = lsmeans(mdl)
+
+data.frame(row.names = row.names(results$lsmeans.table),
+  Estimates = results$lsmeans.table$Estimate,
+  Std.Error = results$lsmeans.table$`Standard Error`
+)
+
+```
+
+
+
+6.
+
+```{r q6, echo=FALSE}
+
+dt = data.frame(
+  Alloy = c(1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3),
+  Weld.Dia = c(12.5, 14, 16, 15, 18, 19.5, 16.5, 17.5, 19, 19.5, 
+               24, 22.5, 15.5, 16, 19, 18, 19, 20.5),
+  Weld.Str = c(37.5, 40.5, 49, 51, 61.5, 63, 57.5, 69.5, 87, 92, 
+               107, 119.5, 38, 44.5, 53, 55, 58.5, 60)
+)
+
+dt$Alloy = factor(dt$Alloy)
+
+```
+
+b) The covariate weld diameter is shown to be very significant as is the interaction between weld diameter and alloy. The adjusted means are significantly different as well.
+
+```{r q6b, comment=NA}
+suppressPackageStartupMessages(library(ggplot2))
+
+mdl = lm(Weld.Str ~ Weld.Dia * Alloy, data = dt)
+anova(mdl)
+
+ggplot(dt, aes(x = Weld.Dia, y = Weld.Str, color = factor(Alloy))) + 
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
+
+```
+
+
+c) 
+
+```{r q3c, comment=NA, echo=FALSE}
+data.frame(predict(mdl, newdata = data.frame(Alloy = c("1","2","3"), Weld.Dia = 18), 
+                   se.fit = TRUE))[, 1:3]
+
+data.frame(
+  Difference = c("T1.T2", "T1.T3", "T2.T3"),
+  Diff.mu = c(abs(58.9100-75.2739), 58.9100-51.5000, 75.2739-51.5000),
+  Diff.se = c(sqrt(3.425444^2/12 + 3.070105^2/12), 
+              sqrt(3.425444^2/12 + 2.521846^2/12), 
+              sqrt(3.070105^2/12 + 2.521846^2/12))
+)
+
+```
+
+**Adjusted Means**
+
+| T | Y LSMEAN   | Standard Error | Pr > t | LSMEAN Number |
+|:-:|:----------:|:--------------:|:------:|:-------------:|
+| 1 | 58.4744444 | 3.3461353      | <.0001 | 1             | 
+| 2 | 74.4571713 | 3.1318402      | <.0001 | 2             | 
+| 3 | 51.0345345 | 2.5268901      | <.0001 | 3             | 
+
+
+d)
+
+```{r q4d, comment=NA}
+
+t1 = function(x) {-47.59608541 + 10.84489917 + x*5.50533808}
+t2 = function(x) {-47.59608541 + 27.15688019 + x*5.50533808}
+t3 = function(x) {-47.59608541 + x*5.50533808}
+
+ggplot(dt, aes(x = Weld.Dia, y = Weld.Str, color = Alloy)) + 
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  stat_function(fun = t1, color = "red", linetype = 2) +
+  stat_function(fun = t2, color = "green", linetype = 2) +
+  stat_function(fun = t3, color = "blue", linetype = 2) +
+  ggtitle("Marginal Means (dotted) vs. Regression Means (solid)")
+
+```
+
+
+f) We can conclude from the bartlett test that we have homogeneity of variance with an alpha of .05
+
+```{r q4f, comment=NA}
+bartlett.test(Weld.Str ~ Alloy, data = dt)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

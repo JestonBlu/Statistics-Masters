@@ -1,0 +1,140 @@
+---
+output:
+  pdf_document:
+    latex_engine: xelatex
+    highlight: pygments
+mainfont: Calibri Light
+sansfont: Calibri Light
+fontsize: 11pt
+geometry: margin=1in
+---
+
+**Homework 08**  
+**Joseph Blubaugh**  
+jblubau1@tamu.edu  
+**STAT 641-720**  
+
+\newpage
+
+1) Type I Error: $P(z > \frac{\sqrt{10} 500}{1000}) = P(z > \frac{\sqrt{10}}{2}) = .056$  
+Type II Error: $P(z \le \frac{-200 \sqrt(10)}{1000}) = P(z \le \frac{-\sqrt{10}}{5}) = .263$
+
+2) 
+    a)  Decision Rule $Z = \frac{\sqrt{n} (\bar{Y} - \mu_0)}{\sigma} > Z_{1 - \alpha} = \frac{\sqrt{10} (\bar{Y} - 10500)}{1000} > 2.326$  
+    We reject the null hypothesis when $\bar{Y} > 11235.65$> 
+    b)  
+
+```{r q2b, comment=NA}
+alpha = qnorm(.99)
+mu = 10500 + alpha * 1000/sqrt(10)
+x = c(10600, 10800, 11000, 11500)
+pnorm((sqrt(10) * (x - mu))/1000)
+```
+
+3) 
+    a) p-value: `r pnorm((sqrt(15) * (8.7 - 10))/2)`, we conclude that there is sufficient evidence to reject the null hypothesis because the pvalue is less than .01
+\begin{align*}
+    H_o: \mu \ge 10, H_1: \mu < 10 \\
+    \operatorname{reject} H_o: \operatorname{when} \bar{y} < 10 - Z_{.01} \frac{2}{\sqrt{15}} = 8.79 \\
+    \bar{Y} = 8.7 \\
+    \operatorname{}
+\end{align*}
+    b)$H_o: \mu > 8.5, H_1: \mu \le 8.5$
+
+```{r q3b, comment=NA}
+alpha = -qt(.99, 14)
+delta = (sqrt(15)*(.2))/2
+pt(alpha, 14, delta)
+```
+
+    c)
+
+
+4)
+
+```{r q4, comment=NA}
+dt = c(125,123,117,123,115,112,128,118,124,
+       111,116,109,125,120,113,123,112,118,
+       121,118,122,115,105,118,131)
+
+# a)
+(t = 5 * (10 - sd(dt)) / 10); pnorm(t)
+
+# b)
+sigma = c(5, 6, 7, 8, 9, 10)
+pnorm(qnorm(.9) + (5 * (sigma - sd(dt)) / sigma))
+
+# c) This is consistent with the results from a), we will reject the null
+(T = qt(.9, 24))
+
+```
+
+5)
+
+```{r q5, comment=NA}
+# a) There sufficient evidence to support the alternative hypothesis that the median is less than 120
+alpha = .05
+n = 21
+Splus = qbinom(alpha, n, .5)
+pbinom(Splus, n, .5)
+
+# b) There is not significant evidence that the true median is less than 120
+wilcox.test(x = dt, y = rep(120, 25), paired = TRUE,
+            alternative = "less", conf.level = .95)
+
+# c) lower bound with alpha = .05
+qbinom(.05, 21, .5)
+
+```
+
+6)
+
+```{r q6, comment=NA}
+# a)
+binom.test(46, 50, p = .8, alternative = "greater", conf.level = .95)
+
+# b) There is substantial evidence that the improved method has increased the accuracy over the current method
+
+# c) The accuracy is 90%
+Y = qbinom(.95, 50, .8)
+1 - pbinom(Y-1, 50, .92)
+
+# d) n = 49 would result in a power of 80%
+
+```
+
+
+MC1) C
+
+MC2) C
+
+```{r mc2, comment=NA}
+n = c(140, 100, 98, 35)
+pnorm(sqrt(n)*(1.5)/9)
+```
+
+MC3) A
+
+```{r mc3, comment=NA}
+# sigma can be any number
+sigma = 3; delta = 17 + .5*sigma
+((sigma * (qnorm(.05) + qnorm(.1)))/(17 - delta))^2
+```
+
+MC4) C
+
+MC5) A
+
+```{r mc5, comment=NA}
+1 - pt(qt(.95, 9), 9, 0)
+```
+
+MC6) C
+
+MC7) C
+
+MC8) B
+
+MC9) B
+
+MC10) C

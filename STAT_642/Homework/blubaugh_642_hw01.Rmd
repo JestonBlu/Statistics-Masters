@@ -1,0 +1,167 @@
+---
+output:
+  pdf_document:
+    latex_engine: xelatex
+    highlight: pygments
+mainfont: Calibri Light
+sansfont: Calibri Light
+fontsize: 11pt
+geometry: margin=1in
+---
+
+**Homework 01**  
+**Joseph Blubaugh**  
+jblubau1@tamu.edu  
+**STAT 642-720**  
+
+\newpage
+
+1)  
+  a.  I would group the individuals by sex and I would create an age group for individuals older than 38 and younger than 39  
+  
+  b.  Grouping only by sex leaves a lot of variation because age ranges between 18 and 74 and there will be clear differences in the athletic abilities based on age. Creating groups for individuals older and younger than 38 significantly reduces the variation in age and provides a near equal number of individuals in each of the 4 segments.  
+
+```{r q1, echo=FALSE}
+library(plyr)
+library(knitr)
+
+dt = data.frame(
+  sex = c('M', 'M', 'F', 'F', 'F', 'F', 'M', 'F', 'M', 'M', 'M', 'F', 
+          'M', 'M', 'F', 'F', 'M', 'M', 'F'),
+  age = c(54, 38, 41, 18, 19, 39, 51, 44, 62, 18, 31, 18, 58, 74, 58, 
+          21, 35, 34, 38))
+
+dt$over_38 = 'Over 38'
+dt$over_38[dt$age < 39] = 'Under 38'
+
+kable(ddply(dt, .(sex), summarize, mean = round(mean(age),1) , var = round(var(age),1)))
+kable(ddply(dt, .(over_38, sex), summarize, mean = round(mean(age),1) , var = round(var(age),1)))
+kable(table(dt[,c("over_38", "sex")]))
+
+```
+
+  c. My final assessment would be to randomly assign the individuals in the 4 distinct groups to the two training regiments
+
+
+|      | Over 38   | Under 38   |
+|------|-----------|------------|
+|Male  | A: 3, B:2 | A: 2, B: 3 |
+|Female| A: 2, B:2 | A: 2, B: 3 |
+
+2)
+
+  a.  Method II  
+    
+  b.  Since the shirts will not interfere with each other it would be a good idea to have each washing simulation to contain one of each shirt because this would reduce the varition of getting different qualities of washes in the simulation. Also applying the treatment to each shirt individually gives you more reps.  
+    
+  c.  Method one applies one treatment to all 3 shirts and does not take advantage of being able to have more reps.  Also since the 4 shirts with the same treatment are washed together treatment is confounding with the washing machine simulation since you have no way to tell if one wash cycle is better than another.  Method 3 has the same issue as method one except for the treatments are done individually to each shirt.  
+
+3) 
+
+  a.  The main problem with the design of this experiment is that a different instructor is being used for each method and classroom and so the instructor, method, and classroom are all confounding. There is no way to measure the variation for any single factor.  
+  
+  b.  A way to improve the design of this experiment would to randomly assign the method that each teacher teaches each classroom so that each classroom experiences each method, but all 3 classes are not taught the same method by the same teacher. This would ensure that teacher, method, and classroom are not confounding.
+
+4)  r14 has the same response as in the book (A, B, B, A, A, B) and $\bar{Y_A} - \bar{Y_B}$ has the 3rd lowest average difference between the two treatments. There are 6 records with an absolute mean difference of 3 or greater so the p-value = 6/20 = .3. We reject the null hypothesis. 
+
+\begin{align*}
+    H_o: \bar{Y_A} =& \bar{Y_B} \\
+    H_a: \bar{Y_B} >& \bar{Y_A} \\
+\end{align*}
+
+```{r q4, echo=FALSE, comment=NA, warning=FALSE, message=FALSE}
+library(reshape2)
+
+dt = data.frame(
+  Unit = 1:6,
+  Response = c(7, 10, 9, 5, 10, 12),
+  r1 = c('A', 'A', 'A', 'B', 'B', 'B'),
+  r2 = c('A', 'A', 'B', 'A', 'B', 'B'),
+  r3 = c('A', 'B', 'A', 'A', 'B', 'B'),
+  r4 = c('B', 'A', 'A', 'A', 'B', 'B'),
+  r5 = c('B', 'A', 'A', 'B', 'A', 'B'),
+  r6 = c('B', 'A', 'B', 'A', 'A', 'B'),
+  r7 = c('B', 'A', 'B', 'A', 'B', 'A'),
+  r8 = c('B', 'B', 'A', 'A', 'B', 'A'),
+  r9 = c('B', 'B', 'A', 'B', 'A', 'A'),
+  r10 = c('B', 'B', 'B', 'A', 'A', 'A'),
+  r11 = c('A', 'A', 'B', 'B', 'A', 'B'),
+  r12 = c('A', 'A', 'B', 'B', 'B', 'A'),
+  r13 = c('A', 'B', 'A', 'B', 'B', 'A'),
+  r14 = c('A', 'B', 'B', 'A', 'A', 'B'),
+  r15 = c('A', 'B', 'B', 'A', 'B', 'A'),
+  r16 = c('A', 'B', 'B', 'B', 'A', 'A'),
+  r17 = c('B', 'A', 'B', 'B', 'A', 'A'),
+  r18 = c('B', 'B', 'A', 'A', 'A', 'B'),
+  r19 = c('B', 'B', 'A', 'A', 'B', 'A'),
+  r20 = c('B', 'B', 'A', 'B', 'A', 'A')
+  )
+
+
+
+dt2 = melt(dt, id.vars = c('Unit', 'Response'), variable.name = 'Arrangement', 
+           value.name = 'Treatment')
+dt3 = ddply(dt2, .(Arrangement, Treatment), summarize, mean = round(mean(Response),2))
+dt4 = dcast(data = dt3, formula = Arrangement ~ Treatment)
+dt4$Diff_A_B = with(dt4, A - B)
+dt4 = arrange(dt4, Diff_A_B)
+colnames(dt4) = c('Arrangement', 'A', 'B', "ybar_A - ybar_B")
+kable(dt4)
+
+
+```
+
+5)
+
+  a.  $\frac{21!}{7! 7! 7!} = 399,072,960$
+  b.  $\frac{21!}{6! 6! 9!} = 271,591,320$
+
+6)  
+  1. Factor(s): 
+    - Brand 
+    - Material
+    - Thickness
+  2. Factor Levels:
+    - Brand: 4 Fixed (B1, B2, B3, B4)
+    - Material: 2 Fixed (M1, M2)
+    - Thickness: 3 Fixed (T1, T2, T3)
+  3. Treatments:
+    - 6 Treatments (M1T1, M1T2, M1T3, M2T1, M2T2, M2T3)
+  4. Response:
+    - Strength measurement of the cover of a golf ball
+  5. Experimental Units:
+    - Golf Ball
+  6. Measurement Units:
+    - 1 of 5 random locations on each golf ball
+  7. Replications:
+    - none
+  8. Subsampling:
+    - 5 subsamples per golf ball
+  9. Covariates:
+    - none
+  10. Blocking: 
+    - Facility
+  11. Confounding:
+    - none
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,179 @@
+---
+title: "STAT626 HW01 BLUBAUGH"
+output: pdf_document
+---
+
+### 1.2
+
+```{r a, echo=FALSE, fig.height=4}
+
+## a)
+n = 200
+t = 1:n
+w.t = rnorm(n)
+
+s.t = 0
+
+for (i in t) {
+  s.t[i] = 
+    if (i <= 100) {
+      0 + w.t[i] 
+    } else {
+      10 * exp(- (t[i] - 100)/20) * cos((2 * pi * t[i])/4) + w.t[i]
+    }
+}
+
+plot.ts(s.t, main = "a)")
+
+## b)
+s.t = 0
+
+for (i in t) {
+  s.t[i] = 
+    if (i <= 100) {
+      0 + w.t[i] 
+    } else {
+      10 * exp(- (t[i] - 100)/200) * cos((2 * pi * t[i])/4) + w.t[i]
+    }
+}
+
+plot.ts(s.t, main = "b)")
+
+```
+
+c) Both models are made up of white noise for the first 100 observations. The second model has a larger amplitude than the first model, but the first model has a much faster rate of decay than the second model and shown by looking at a plot of the signal modulators below.
+
+```{r b, echo=FALSE}
+
+## a)
+n = 100
+t = 1:n
+w.t = rnorm(n)
+
+s.t1 = 0; s.t2 = 0;
+
+for (i in t) {
+  s.t1[i] = exp(- t[i]/20)
+  s.t2[i] = exp(- t[i]/200)
+}
+
+plot.ts(s.t1, col = "blue", main = "c)"); lines(s.t2, col = "red")
+legend(x = 60, y = .4, legend = c("Mdl1: exp(-t/20)", "Mdl2: exp(-t/200)"), col = c("blue", "red"), lty = 1)
+
+```
+
+
+
+### 1.4
+
+\begin{align*}
+  \gamma(s,t) = & E[(s - \mu_s)(t - \mu_t)] \\
+              = & E[st - \mu_t s - \mu_s t + \mu_s \mu_t] \\
+              = & E[st] - \mu_t E[s] - \mu_s E[t] + E[s] E[t] \\
+              = & E[st] - \mu_t \mu_s \\
+\end{align*}
+
+
+### 1.6
+
+a) $x_t = \beta_1 + \beta_2 t + w_t$ is stationary because $\beta_1$ does not depend on t.
+
+b) $y_t = x_t - x_{t - 1} \rightarrow \gamma_x(t-1, t) \rightarrow cov(t - 1 - t, t - 1 - t) \rightarrow \sigma_x^2$
+
+c) 
+
+\begin{align*}
+  v_t = & \frac{1}{2q + 1} \sum_{i=-q}^q x_{t-q} \\
+  = & \frac{x_{t + q}}{2q + 1} \\ 
+  = & \bar{x_t} \\
+  \text{ACF Function} = & \sigma_t^2 \\
+\end{align*}
+
+
+### 1.7
+
+\begin{align*}
+  \text{Autocovariance Function} & \\ 
+  x_t = & w_{t - 1} + 2w_t + w_{t + 1} \\
+  \gamma_x(t,t) = & var(x_t) = (1 + 2^2 + 1^2)\sigma_w^2 \\
+  = & 6 \sigma_w^2 \\
+  \gamma_x(s-t, t) = & cov(x_{s-t}, x_t) =  cov(x_{s-t-1} + 2x_{s-t} + x_{s-t+1}, x_{t-1} + 2x_t + x_{t+1}) \\
+  \text{Autocorrelation Function} & \\
+  h = & s - t \\
+  \rho(h,t) = & \gamma(h,t) / \sqrt{\gamma(h,h) \gamma(t,t)} = \gamma(h,t) / 6 \sigma_w^2 \\
+  \\
+  \gamma_x(h=0, t) = & (1 + 2^2 + 1^2) \sigma_w^2 = 6 \sigma_w^2 \\
+  \gamma_x(h=1, t) = & (2 + 2) \sigma_w^2 = 4 \sigma_w^2 \\
+  \gamma_x(h=2, t) = & 1 \sigma_w^2 \\
+  \gamma_x(h=3, t) = & 0 \\
+\end{align*}
+
+```{r c, echo=FALSE}
+dta = data.frame(h = 0:3, rho = c(1, .66, .16, 0))
+plot(x = factor(dta$h), y = dta$rho, pch = 16, main = "Correlogram",
+     xlab = "lag (h)", ylab = "rho")
+```
+
+\newpage
+
+### 1
+
+\begin{align*}
+  \sum_{i=1}^n &  (x_i - \bar{x}) = 0 \\
+  \sum_{i=1}^n & x_i - \bar{x}n = 0 \\
+  \sum_{i=1}^n & x_i = \bar{x}n \\
+  \sum_{i=1}^n & x _i / n = \bar{x} \\
+  \\
+  \sum_{i=1}^n & (x_i - \bar{x})(y_i - \bar{y}) \\
+  \frac{d}{d\bar{x}} = & x_iy_i - \bar{x}y_i - x_i\bar{y} + \bar{x}n\bar{y} \\
+  = & \sum_{i=1}^n (x_i - \bar{x})y_i - \sum_{i=1}^n x_i \bar{y} +\bar{x}n\bar{y} \\
+  = & \sum_{i=1}^n (x_i - \bar{x})y_i \\
+\end{align*}
+
+
+### 2
+
+\begin{align*}
+  S_x^{2} = & SXX \\
+  c = & \frac{(x_i - \bar{x}}{SXX} \\
+  \sum_{i=1}^n (x_i - \bar{x})(y_i - \bar{y}) = & SXY  = \sum_{i=1}^n (x_i - \bar{x})y_i\\
+  \frac{SXY}{SXX} = & \frac{(x_i - \bar{x})y_i}{SXX} \\
+\end{align*}
+
+
+\newpage
+
+### 3
+
+a)
+
+\begin{align*}
+  R(\beta_0, \beta_1) = &\sum (y_i - (\beta_0 + \beta_1 x_i))^2 \\
+  \frac{dR(\beta_0, \beta_1)}{d\beta_0} = & - \sum 2(y_i - \beta_0 - \beta_xi) \\
+  0 = & \sum y_i - n\beta_0 - \beta_1 \sum x_i \\
+  n \beta_0 = & \sum y_i - \beta_1 \sum x_i \\
+  \beta_0 = & \bar{y} - \beta_1 \bar{x} \\
+  \\
+  \frac{dR(\beta_0, \beta_1)}{d\beta_1} = & - \sum 2(y_i - \beta_0 - \beta_xi)x_i \\
+  0 = & \sum y_i x_i \beta_0 \sum x_i - \beta_1 \sum x_i^2 \\
+  0 = & \sum y_i x_i - (\bar{y} - \beta_1 \bar{x}) \sum x_i - \beta_1 \sum x_i^2 \\
+  0 = & y_i x_i - \frac{\sum y_i \sum x_i}{n} + \beta_1 \frac{(\sum x_i)^2}{n} - \beta_1 \sum x_i^2 \\
+  \beta_1 (\sum x_i^2 - \frac{(\sum x_i)^2}{n}) = & \sum y_i x_i - \frac{\sum y_i \sum x_i}{n} \\
+  \beta_1 = & \frac{\sum (y_i - \bar{y})(x_i - \bar{x})}{\sum(x_i - \bar{x})^2} \\
+  = & \frac{SXY}{SXX} \\
+\end{align*}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

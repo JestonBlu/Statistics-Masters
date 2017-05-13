@@ -1,0 +1,5 @@
+ods html file='.workshop.report(p111s16)';
+proc print data=orion.customer_type;
+   title 'Customer Type Definitions';
+run;
+ods html close;

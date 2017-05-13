@@ -1,0 +1,328 @@
+---
+output:
+  pdf_document:
+    latex_engine: xelatex
+    highlight: pygments
+mainfont: Calibri Light
+sansfont: Calibri Light
+fontsize: 11pt
+geometry: margin=1in
+---
+
+**Homework 02**  
+**Joseph Blubaugh**  
+jblubau1@tamu.edu  
+**STAT 659-700**  
+
+#### 1.6
+
+a) If $n = 3$ and $n_1 + n_2 + n_3 = 3$, then $n_1 = 3 - n_2 - n_1$ If $n_1, n_2$ are known then the sum of those two components minus $n$ is $n_1$.
+
+b) For $(n_1, n_2, n_3)$, There are 9 total possible combinations with $n = 3$. $(3,0,0), (2,1,0), (1,1,1), \\
+(0,1,2), (0,0,3), (1,2,1), (1,0,2), (2,0,1), (0,3,0)$
+
+c) 
+
+```{r a, results='asis', echo=FALSE}
+library(pander)
+
+tbl = data.frame(
+  n.1 = c(1, .25, .75),
+  n.2 = c(2, .5, 1.5),
+  n.3 = c(.0, .25, .75),
+  Total = c(3, 1, 3),
+  row.names = c("n", "pi", "e")
+)
+
+pandoc.table(tbl)
+```
+
+$X^2 = \frac{(1 - .75)^2}{.75} + \frac{(2 - 1.5)^2}{1.5} + \frac{(0 - .75)^2}{.75} = 1$
+
+```{r b, comment=NA}
+1 - pchisq(1, 2)
+```
+
+The multinomial probability that $(n_1, n_2, n_3) = (1, 2, 0) = .6$
+
+d) $n_1 = N(.75, .43)$
+
+\newpage
+
+#### 1.20
+
+a)
+
+```{r c, comment=NA}
+
+A = c(8, 7, 6, 6, 3, 4, 7, 2, 3, 4); B = c(9, 9, 8, 14, 8, 13, 11, 5, 7, 6)
+
+## A
+(wald.a = mean(A) + c(-1, 1) * 1.96 * sqrt(mean(A)/10))
+(score.a = mean(A) + (1.96^2 / (2*10)) + c(-1, 1) * 1.96/sqrt(10) * 
+  sqrt(mean(A) + (1.96^2 / (4*10))))
+
+## B
+(wald.b = mean(B) + c(-1, 1) * 1.96 * sqrt(mean(B)/10))
+(score.b = mean(B) + (1.96^2 / (2*10)) + c(-1, 1) * 1.96/sqrt(10) * 
+  sqrt(mean(B) + (1.96^2 / (4*10))))
+```
+
+b)
+
+```{r d, comment=NA}
+## A
+mean(A); var(A)
+
+## B
+mean(B); var(B)
+```
+
+The poisson distribution has a mean and variance that are equal and both treatments have a variance that is relatively close to the treatment mean.
+
+```{r e, comment=NA}
+Z.a = (var(A)/mean(A) - 1) * sqrt(9 / 2)
+Z.b = (var(B)/mean(B) - 1) * sqrt(9 / 2)
+
+1 - pnorm(Z.a); 1 - pnorm(Z.b)
+```
+
+Both Z statistics are reasonably close to zero so we do not reject that the treatments are from the poisson distribution.
+
+#### 1.21
+
+```{r f, comment=NA, results='asis', echo=FALSE}
+lotto = data.frame(
+  N = c(0:9),
+  Y = c(15, 18 , 8, 22, 10, 19, 14, 14, 18, 12),
+  E = .1 * sum(c(15, 18 , 8, 22, 10, 19, 14, 14, 18, 12))
+)
+
+lotto$X.2 = with(lotto, (Y - E)^2 / E)
+lotto2 = t(lotto)
+pandoc.table(lotto2)
+```
+
+Because our pvalue is greater than .05, we do not reject that the probabilities are equal.
+
+```{r g, comment=NA}
+Chi.Sq = sum(lotto$X.2)
+1 - pchisq(Chi.Sq, 9)
+```
+
+#### 1.22
+
+```{r h, comment=NA, results='asis', echo=FALSE}
+
+maize = data.frame(
+  Maize = c("Green", "Golden", "Green-Striped", "Golden-Green-Striped"),
+  Count = c(773, 221, 238, 69),
+  Pi = round(c(9/16, 3/16, 3/16, 1/16), 4),
+  Expected = round(c(1301 * (9/16), 1301 * (3/16), 1301 * (3/16), 1301 * (1/16)), 1)
+)
+
+maize$Chi.Sq = round(with(maize, (Count - Expected)^2 / Expected), 3)
+
+maize2 = t(maize)
+pandoc.table(maize2)
+
+```
+
+Because our pvalue is greater than .05, we do not reject that the probabilities are different than specified.
+
+```{r i, comment=NA}
+Chi.Sq = sum(maize$Chi.Sq)
+1 - pchisq(Chi.Sq, 3)
+```
+
+\newpage
+
+#### 1.23
+
+Because the parameter of $\pi$ is estimated we lose an additional degree of freedom, however we still do not reject that probabilities are different than stated because our pvalue is greater than .05
+
+```{r j, comment=NA, results='asis'}
+
+mle = .0357
+
+plant = data.frame(
+  Type.of.Plant = c("Starchy green", "Starchy white", "Sugary green", "Sugary white"),
+  Number = c(1997, 906, 904, 32),
+  Pi = round(c(.25*(2 + mle), .25*(1 - mle), .25*(1 - mle), .25*mle), 3)
+  )
+
+plant$Expected = round(with(plant, sum(Number) * Pi), 1)
+plant$Chi.Sq = round(with(plant, (Number - Expected)^2 / Expected), 3)
+
+pandoc.table(t(plant))
+
+Chi.Sq = sum(plant$Chi.Sq)
+
+1 - pchisq(Chi.Sq, 2)
+```
+
+#### 2.1
+
+a) $P(C|-) = 1/4$, $P(+|\bar{C}) = 2/3$
+b) sensivity = $1/3$, specificity = $3/4$
+c) Cell joint probabilities
+
+```{r k, echo=FALSE, results='asis'}
+
+pandoc.table(
+  data.frame(C = round(c(1/3 * .01, .01 - (1/3 * .01), .01), 4),
+           C.bar = round(c((.01 - (1/3 * .01))/.25, .99 - (.01 - (1/3 * .01))/.25, .99), 4),
+           Total = c(.0033+.0267, .0067+.9633, 1),
+           row.names = c("Test +", "Test -", "Total"))
+)
+
+```
+
+d) The marginal probablity of testing positive is .03
+e) The probablity of having the disease conditional have testing positive is .11
+
+\newpage
+
+#### 2.2
+
+a) Sensitivity is the probability of correctly testing positive, $P(Y = 1 | X = 1)$ and specificity is the opposite, $P(Y = 2 | X = 2)$ so $\pi_i = P(Y = 1 | X = 1) = 1 - \pi_2$
+
+c) $.86 * .01 = .0086$
+
+d) The chances of having the disease is very small and sense the sensitivity and specificity are relatively high, the join probabilities are essentially equal to the margin probabilities
+
+```{r l, echo=FALSE, results='asis'}
+pandoc.table(
+  data.frame(
+    C = c(.0086, .0014, .01),
+    C.bar = c(.12, .87, .99),
+    Total = c(.1286, .8714, 1),
+    row.names = c("Test +", "Test -", "Total")
+  )
+)
+```
+
+#### 2.7
+
+a) The odds ratio is not a probability. The correct interpretation is the odds of survival for females is 11.4 times greater than males where the odds ratio is equal to $\frac{(P(Female Surival)/(1 - P(Female Survival)))}{P(Male Survival) / (1 - P(Male Survival))} = 11.4$
+
+b)
+$$FemaleOdds / MaleOdds = 11.4 \rightarrow 2.9 / x = 11.4 \rightarrow MaleOdds = .254$$
+$$FemaleOdds = 2.9 = x / (1 - x) \rightarrow 2.9 / (1 + 2.9) \rightarrow  P(Female Survival) = .743$$
+$$MaleOdds = .254 = x / (1 - x) \rightarrow .254 / (1 + .254) \rightarrow P(Male Survival) = .202$$
+
+c) $.743 / .202 = 3.68$
+
+
+#### 2.8
+
+a) $(.847 / (1 - .847)) / (.906 / (1 - .906)) = .57$
+b) $.906 - .847 = .059$ The difference is 6%, not 60%
+
+\newpage
+
+#### 2.11
+
+a)
+```{r m, echo=FALSE, results='asis'}
+pandoc.table(
+  data.frame(
+    "Lung Cancer" = c(.0014, .0001),
+    "Heart Disease" = c(.00669, .00413),
+    row.names = c("Smoker", "Non-Smoker")
+  )
+)
+```
+
+a) The odds of dieing from either Lung Cancer or Heart Disease are lower for Non-Smokers. Also the odds ratio of dieing from lung cancer is much higher for smokers than it is for non-smokers. 
+  i. Difference in proportions of Smokers who died from Lung Cancer or Heart Disease: $.0014 - .00669 = -.00529$  
+  Difference between non-smokers: $.0001 - .00413 = -.00403$
+  ii. Relative Risk of dieing of a smoker dieing from lung cancer compared to heart disease: $.0014 / .00669 = .209$  
+  For a non-smoker: $.0014 / .00413 = .338$
+  iii. Odds Ratio of a smoker dieing from lung cancer to heart disease: $\frac{(.0014 / (1 - .0014))}{(.0069 / (1 - .0069))} = .201$  
+  Odds ratio for non-smoker: $\frac{(.0001 / (1 - .0001)}{(.00413 / (1 - .00413)))} = .0241$
+
+b) Lung Cancer: $1 / (.0014 - .0001) = 770$, Heart Disease: $1 / (.00669 - .00413) = 391$ Lung Cancer has the more significant reduction even though the probability of dieing from Heart Disease is higher.
+
+#### 2.12
+
+a) 
+
+```{r n, echo=FALSE, results='asis'}
+
+pandoc.table(
+  data.frame(
+    "Aspirin" = c(198, 19736, 19934),
+    "Placebo" = c(193, 19749, 19942),
+    "Total" = c(391, 39485, 39876),
+    row.names = c("Heart Attack", "No Heart Attack", "Total")
+  )
+)
+
+```
+
+b) P(Heart Attack on Aspirin) = $198 / 19934 = .00993$  
+P(Heart Attack on Placebo) = $193 / 19942 = .00967$  
+Odds Ratio: $(.00993 / (1 - .00993) / (.00967 / (1 - .00967))) = 1.027$
+
+c) Because the 95% Confidence Interval crosses one we can conclude that there is not enough evidence that the odds differe for the treatments.  
+
+$log(1.027) \pm 1.96 \sqrt{ \frac{1}{198} + \frac{1}{19736} + \frac{1}{193} + \frac{1}{19749}} \rightarrow .0266 \pm 1.96 (.101) = (-.171, .224)$  
+$exp(-.171, .224) = (.842, 1.25)$
+
+\newpage
+
+#### 2.15
+
+a) 
+
+```{r o, comment=NA}
+exp(
+log(.0094 / .0171) + c(-1, 1) * 1.96 * 
+  sqrt( ((1 - .0094)/(11037*.0094)) + ((1 - .0171)/(11034*.0171)) )
+)
+
+```
+
+b) The Wald interval is slightly wider and shifted to the right compared to the Agresti-Caffo and Newcombe intervals.
+
+```sas
+data heart;
+input group $ attack $ count;
+cards;
+placebo yes 185
+placebo no 10845
+aspirin yes 104
+aspirin no 10933
+;
+
+proc freq order=data data=heart; weight count;
+tables group*attack/nocol nopct relrisk riskdiff(cl=(newcombe ac wald));
+title "Heart Attack and Aspirin";
+run;
+
+```
+
+```{r p, comment=NA, results='asis', echo=FALSE}
+pandoc.table(
+  data.frame(
+    lwr = c(.0043, .0044, .005),
+    upr = c(.0104, .0104, .011),
+    row.names = c("Agresti-Caffo", "Newcombe", "Wald")
+  )
+)
+```
+
+c) 1 / (.0171 - .0094) = 130
+
+
+#### 1.23b
+
+```{r q, comment=NA}
+((1997 * .509) + (906 * .241) + (904 * .241) + (32 * .009)) / (1997 + 906 + 904 + 32)
+
+```
+
+#### 2.2b 
+$(.86 * .01) / (.86 * .01  + .88*(1 - .01)) = .0097$
+

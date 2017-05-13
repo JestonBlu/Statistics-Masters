@@ -1,0 +1,297 @@
+---
+output:
+  pdf_document:
+    latex_engine: xelatex
+    highlight: pygments
+mainfont: DejaVu Sans Mono
+sansfont: DejaVu Sans Mono
+fontsize: 11pt
+geometry: margin=1in
+---
+
+Homework 02   
+Joseph Blubaugh    
+jblubau1@tamu.edu  
+
+```{r a, echo=FALSE, results='hide'}
+library(knitr)
+library(scales)
+library(ggplot2)
+```
+
+
+
+### 3.1
+
+a) $P(Y_1 ... Y_{100} | \theta) \backsim Binomial(100, \theta)$  
+  $P(\sum_{i=1}^{100} Y_i | \theta) \backsim \theta^{\sum_{i=1}^{100} Y_i} (1 - \theta)^{100 - \sum_{i=1}^{100} Y_i}$
+b)  dbinom(x = 57, size = 100, prob = seq(0, 1, .1))
+c)  $1/11 \int_0^1 \theta^{57} (1 - \theta)^{43}$
+d)  dbinom(x = 57, size = 100, prob = seq(0, 1, .001))
+e)  dbeta(x = seq(0, 1, .001), shape1 = 58, shape2 = 43)
+
+B and C both have the same shape and scale because both use equivalent information in the Y is known. D and E have the same shape but different scale. D doesn't using any prior information $p(\theta) = 1$, but E uses the uniform prior and so the posterior bayes estimate ends up being between .57 and .6  
+
+
+```{r b, echo=FALSE, fig.height=5}
+
+par(mfrow = c(2,2))
+
+plot(x = seq(0, 1, .1), y = dbinom(x = 57, size = 100, prob = seq(0, 1, .1)), type = "h",
+     xlab = expression(theta), ylab = expression(paste("Pr(Y = 57 |", theta, ")")), 
+     main = expression(paste("Pr(Y = 57 |", theta, ")")))
+points(x = seq(0, 1, .1), y = dbinom(x = 57, size = 100, prob = seq(0, 1, .1)), pch = 16)
+legend(x = 0, y = .06, legend = "b)")
+
+plot(x = seq(0, 1, .1), y = 1/11 * seq(0, 1, .1)^57 * (1 - seq(0, 1, .1))^43, type = "h",
+     xlab = expression(theta), ylab = "Pr(theta | Y = 57)", main = "Pr(theta | Y = 57)")
+points(x = seq(0, 1, .1), y = 1/11 * seq(0, 1, .1)^57 * (1 - seq(0, 1, .1))^43, pch = 16)
+legend(x = 0, y = .06, legend = "c)")
+
+plot(x = seq(0, 1, .001), y = dbinom(x = 57, size = 100, prob = seq(0, 1, .001)), type = "l",
+     xlab = expression(theta), ylab = "Pr(theta) * Pr(Y = 57 | theta)", main = "Pr(theta) * Pr(Y = 57 | theta)")
+legend(x = 0, y = 6, legend = "d)")
+
+plot(x = seq(0, 1, .001), y = dbeta(x = seq(0, 1, .001), shape1 = 58, shape2 = 43), type = "l",
+     xlab = expression(theta), ylab = "Pr(Y) * Pr(Y = 57 | theta)", main = "Pr(Y) * Pr(Y = 57 | theta)")
+legend(x = 0, y = 6, legend = "e)")
+
+
+```
+
+\newpage
+
+## 3.3
+
+### a) 
+
+##### Posterior Distributions
+
+  * $\theta_A$: $gamma(120 + 10, 10 + 1)$
+  * $\theta_B$: $gamma(12 + 13, 1 + 1)$
+ 
+##### Posterior Mean
+
+  * $\theta_A$: $130 / 11 = 11.81$
+  * $\theta_B$: $25 / 2 = 12.5$
+
+##### Posterior Variance
+
+  * $\theta_A$: $130 / 11^2 = 1.07$
+  * $\theta_B$: $25 / 2^2 = 6.25$
+
+##### Posterior 95% Quantile
+  
+  * qgamma(p = c(.025, .975), shape = 130, rate = 11) = [9.87, 13.93]
+  * qgamma(p = c(.025, .975), shape = 25, rate = 2) = [8.08, 17.85]
+
+### b)
+
+The expected value of the posterior distributions using $n_0$ decays towards 12 as n increases. N would have to be very large in order for the posterior mean to actually converge on 12. There would have to be extremely high belief in the prior in order for $\theta_B$ to get very close to $\theta_A$  
+
+```{r c, echo=FALSE, fig.height=2.5}
+
+Y.a = c(12, 9, 12, 14, 13, 13, 15, 8, 15, 6)
+Y.b = c(11, 11, 10, 9, 9, 8, 7, 10, 6, 8, 8, 9, 7)
+
+ex.y = c()
+
+for (i in 1:50) {
+  y = (12 * i + 13) / (i + 1)
+  ex.y = c(ex.y, y)
+}
+
+plot(x = 1:50, y = ex.y, type = "h", xlab = expression(n[0]), ylab = "Expected Value", ylim = c(12, 12.5))
+points(x = 1:50, y = ex.y, pch = 16)
+
+```
+
+### c)
+
+$p(\theta_A, \theta_B) = p(\theta_A) * p(\theta_B)$ indicates that $\theta_A$ and $\theta_B$ are independent events. The description in the question states that mice B are related to mice A so they cannot be completely independent. It would make sense to use some prior knowledge of A for B since they are related.
+
+\newpage
+
+## 3.4
+
+### a)
+
+```{r d, echo=FALSE, fig.height=3.5}
+
+plot(x = seq(0, 1, .01), y = dbeta(x = seq(0, 1, .01), shape1 = 2, shape2 = 8), type = "l", lty = 2, ylim = c(0, 8),
+     ylab = "", xlab = expression(theta)) # p(theta)
+lines(x = seq(0, 43, 1)/43, y = dbinom(x = seq(0, 43, 1), size = 43, prob = .348)*20, col = "blue") # p(y | theta)
+lines(x = seq(0, 1, .01), y = dbeta(x = seq(0, 1, .01), shape1 = 17, 36), col = "red") # p(theta | y)
+legend(x = .55, y = 8, 
+       legend = c(
+         expression(paste("P(", theta, ")")),
+         expression(paste("P(y | ", theta, ") (x20 for scale)")),
+         expression(paste("P(", theta, " | y)"))),
+       lty = c(2, 1, 1), col = c("black", "blue", "red")
+       )
+```
+
+**Posterior Mean**: (15 + 2) / (43 + 2 + 8) = .32  
+**Posterior Mode**: (15 + 2 - 1) / (43 + 2 + 8 - 2) = .313  
+**Standard Dev**:  sqrt((2 * 8) / ((2 + 8)^2 * (2 + 8 + 1))) = .1206  
+**95% CI**: qbeta(p = c(.025, .975), shape1 = 17, shape2 = 36) = [.203, .451]  
+
+
+
+### b)
+
+```{r e, echo=FALSE, fig.height=3.5}
+
+plot(x = seq(0, 1, .01), y = dbeta(x = seq(0, 1, .01), shape1 = 8, shape2 = 2), type = "l", lty = 2, ylim = c(0, 8),
+     ylab = "", xlab = expression(theta)) # p(theta)
+lines(x = seq(0, 43, 1)/43, y = dbinom(x = seq(0, 43, 1), size = 43, prob = .348)*20, col = "blue") # p(y | theta)
+lines(x = seq(0, 1, .01), y = dbeta(x = seq(0, 1, .01), shape1 = 8+15, 43-15+2), col = "red") # p(theta | y)
+legend(x = .55, y = 8, 
+       legend = c(
+         expression(paste("P(", theta, ")")),
+         expression(paste("P(y | ", theta, ") (x20 for scale)")),
+         expression(paste("P(", theta, " | y)"))),
+       lty = c(2, 1, 1), col = c("black", "blue", "red")
+       )
+```
+
+**Posterior Mean**: (15 + 8) / (43 + 2 + 8) = .434  
+**Posterior Mode**: (15 + 8 - 1) / (43 + 2 + 8 - 2) = .431  
+**Standard Dev**:  sqrt((2 * 8) / ((2 + 8)^2 * (2 + 8 + 1))) = .1206  
+**95% CI**: qbeta(p = c(.025, .975), shape1 = 8+15, shape2 = 43-15+2) = [.305, .568]  
+
+### c)
+
+The two priors used in A and B have a single maximum at opposites ends of the graph. The mixture distribution is mainly centered around .1, but there is also noticeable density near .9. This prior may represent differing rates of recidivism for different groups of people, possible by race or gender.
+
+```{r f, echo=FALSE, fig.height=3.5}
+mix = function(theta) {
+  y = .25 * (gamma(10)/(gamma(2)*gamma(8))) * (3 * theta * (1 - theta)^7 + theta^7 * (1 - theta))
+  return(y)
+  }
+
+plot(x = seq(0, 1, .01), y = mix(seq(0, 1, .01)), type = "l", ylim = c(0, 5), xlab = expression(theta), ylab = "", 
+     main = "Prior Distributions")
+lines(x = seq(0, 1, .01), y = dbeta(x = seq(0, 1, .01), shape1 = 2, shape2 = 8), type = "l", lty = 2, col = "red")
+lines(x = seq(0, 1, .01), y = dbeta(x = seq(0, 1, .01), shape1 = 8, shape2 = 2), type = "l", lty = 2, col = "blue")
+legend(x = .4, y = 5, legend = c("Mix Prior", "beta(2,8)", "beta(8,2)"), lty = c(1, 2, 2), col = c("black", "red", "blue"))
+
+```
+
+### d)
+
+#### i) 
+$$\frac{1}{4} \frac{\gamma(10)}{\gamma(2) \gamma(8)} (3 \theta (1 - \theta)^7 + \theta^7 (1 - \theta)) (\theta^15 (1 - \theta)^{43})$$
+$$3 \theta (1 - \theta)^7 + \theta^7 (1 - \theta) \theta^{15} (1 - \theta)^{43}$$
+$$3 \theta (1 - \theta)^7 + \theta^{22} (1 - \theta)^{44}$$
+
+#### ii)
+
+The posterior distribution is a mixture of two binomial distributions: binom(8, 1/8) and binom(66, 1/3)
+
+\newpage
+
+#### iii)
+
+**Posterior Mode**: (.75 * (8+1)*(1/8)) + (.25 * (66+1)*(1/3)) = 6.42
+
+```{r g, echo=FALSE, fig.height=3.5}
+mix = function(x) {
+  y = (3 * x * (1 - x)^7) + (x^22 * (1 - x)^44)
+  return(y)
+}
+
+plot(x = seq(0, 1, .01), y = mix(seq(0, 1, .01)), type = "l", xlab = expression(theta), ylab = "", 
+     main = "")
+
+```
+
+### e)
+
+$(\alpha) binom(8, 1/8) + (\beta) binom(66, 1/3)$  In this case $\alpha$ is 3 and $\beta$ is 1 which gives the binom(8, 1/8) 3 times the weight of the binom(66, 1/3) in the mixture distribution.
+
+\newpage
+
+## 3.7
+
+### a)
+
+  * Posterior Distribution: Beta(3, 14)
+  * Posterior Mean: (2 + 1) / (15 + 1 + 1) = .176
+  * Posterior Mode: (2 + 1 - 1) / (15 + 1 + 1 - 2) = .133
+  * Posterior Std: sqrt(1 / ((1 + 1)^2 * (1 + 1 + 1))) = .288
+
+```{r h, echo=FALSE, fig.height=3.5}
+
+plot(x = seq(0, 1, .01), y = dbeta(seq(0, 1, .01), 3, 14), type = "l",
+     xlab = expression(theta), ylab = "")
+
+```
+
+#### b)
+
+i) $Y_1 = 2$ and $Y_2 = y2$ have to be conditionally independent given $\theta$
+
+ii) $Pr(Y_2 = y2 | Y_1 = 2) = \int_0^1 \theta^Y (1 - \theta)^{278 - Y} \frac{\gamma(17)}{\gamma(3) \gamma(14)} \theta^2 (1 - \theta)^{13} = \frac{\gamma(17)}{\gamma(3) \gamma(14)} \int_0^1 \theta^{(Y + 2)} (1 - \theta)^{(291 - Y)} d\theta$
+
+iii) $beta(Y + 3, 292 + Y)$
+
+#### c)
+
+```{r i, echo=FALSE, fig.height=3}
+plot(x = seq(0, 1, .001), y = dbeta(x = seq(0, 1, .001), shape1 = 3 + (.133*278), shape2 = 292 + (.133*278)), xlab = expression(theta), ylab = "", type = "l")
+```
+
+  * Posterior Mean: (37 + 3) / (278 + 40 + 292 + 37) = .061
+  * Posterior Std: sqrt((37+3)*(292+37) / ((40 + 329)^2 * (40 + 329 + 1))) = .0161
+
+
+\newpage
+
+### 3.12
+
+### a)
+
+\begin{align*}
+  p(y|\theta) =  & {n \choose y} \theta^y (1 - \theta)^{n - y} \\
+  log(p(y|\theta)) = & y log(\theta) + (n - y) log(1 - \theta) \\
+  \frac{d}{d \theta} log(p(y | \theta)) = & \frac{y}{\theta} - \frac{n - y}{1 - \theta} \\
+  \frac{d^2}{d \theta^2} log(p(y | \theta)) = & \frac{y}{\theta^2} - \frac{n - y}{(1 - \theta)^2} \\
+  E[\frac{d^2}{d \theta^2} log(p(y | \theta))] = & \frac{n \theta}{\theta} - \frac{n - n \theta}{(1 - \theta)^2} \\
+   = & \frac{n}{\theta} + \frac{n}{1 - \theta} \\
+   = & \frac{n}{\theta (1 - \theta)} \\
+\end{align*}
+
+### b)
+
+\begin{align*}
+  exp(\psi) = & log \frac{\theta}{1 - \theta} = \frac{1}{1/\theta - 1} = \frac{1}{\theta} - 1 = exp(\psi) + 1 \\
+  \\
+  \theta = & [1 + exp(-\psi)] \\
+  \\
+  E[p_j(\psi)] = & \frac{n}{[1 + exp(\psi)]} + \frac{n}{1 - [1 + exp(-\psi)]} \\
+  = & \frac{n}{exp(-\psi)(1 - exp(-\psi))} \\
+\end{align*}
+
+### c)
+
+\begin{align*}
+  E[p(\theta)] = & \frac{n}{h(g(\theta))} + \frac{n}{1 - h(g(\theta))} \\
+  = & \frac{n}{h(g(\theta)) (1 - h(g(\theta)))} \\
+\end{align*}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

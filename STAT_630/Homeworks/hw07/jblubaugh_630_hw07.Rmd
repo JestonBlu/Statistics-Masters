@@ -1,0 +1,205 @@
+---
+title: ''
+output:
+  pdf_document: default
+---
+
+Joseph Blubaugh  
+Stat 630  
+Hw07  
+  
+#### 1) 4.6.1  
+  \begin{align*}
+    Let X_1 &= N(3, 2^2), X_2 =N(-8, 5^2) \\
+    \\
+    U &= x_1 - 5x_2, V = -6x_1 + Cx_2 \\
+    \\
+    U &= N(3 - 5(-8), 4 - 5^2 5^2) = N(43, 629) \\
+    \\
+    V &= N(-6(3) + c(-8), -6^2(4) + C^2 (25)) \\
+      &= N(-18-8C, 144 + 25 C^2) \\
+  \end{align*}
+  
+#### 2) 4.6.3  
+
+  \begin{align*}
+    Let X &= N(3, 5), Let Y = N(-7, 2) \\
+    \\
+    \chi^2(C_5) &= C_1 (x + C_2)^2 + C_3(Y + C_4)^2 \\
+    \\
+    C_1(x + C_2)^2 &= C_1(\frac{3 + C_2}{\frac{\sqrt{1}}{C_1}}) = 0, C_2 = -3 \\
+    &= var(\sqrt{C_1(5 - 3)}) = 1, C_1 = 1/2 \\
+    \\
+    C_3(Y + C_4)^2 &= \frac{Y + C_4}{\frac{\sqrt{1}}{C_3}} = 0, C_4 = -7 \\
+    &= var(\sqrt{C_3 (2 + 7)}) = 1, C_3 = 1/3 \\
+    \\
+    \frac{1}{2} (x - 3)^2 + \frac{1}{3} (y + 7)^2 &= \chi^2(C_5), C_5 = 2 \\
+  \end{align*}
+  
+#### 3) 4.6.5  
+expand chi-square from N(0,1)
+  \begin{align*}
+    x &= \chi^2(n), y = \chi^2(m) \\
+    \\
+    x &= z_1^2 + z_2^2 + ... + z_n^2,  \chi^2(z = 1) \\
+    y &= t_1^2 + t_2^2 + ... + t_n^2,  \chi^2(t = 1) \\
+    x + y &= \chi^2(z + t) \\
+  \end{align*}
+  
+#### 4) 4.6.6  
+  \begin{align*}
+    F(n, 3n) &= C \frac{X_1^2 + X_2^2 + ... + X_n^2}{X_{n+1}^2 + X_{n+2}^2 + ... + X_{4n}}  \\
+    C &= \frac{n}{3n} \\
+      &= \frac{1}{2n} \\
+  \end{align*}
+  
+#### 5) 4.6.7  
+  We need to divide the square root by n...
+  \begin{align*}
+    t(n) &= C \frac{X_1}{\sqrt{X_2^2 + ... + X_n^2 + x_{n+1}^2}} \\
+    C&= \frac{1}{\sqrt{\frac{1}{n}}} \\
+  \end{align*}
+#### 6) 4.6.8  
+  \begin{align*}
+    X = N(3,5),  Y &= N(-7,2) \\
+    \\
+    t(C_6) &= \frac{C_1 (x + C_2)^{C_3}}{(Y + C_4)^{C_5}} \\
+    \\
+    C_1(3 + C_2)^{C_3} &= 0, C_2 = -3 \\
+    \sqrt{C_1 (5 - 3)^{C_3}} &= 1, C_3 = 2 \\
+    \sqrt{C_1} 2 &= 1, C_1 = 1/4 \\
+    \\
+    (-7 + C_4)^{C_5} &= 0, C_4 = 7 \\
+    \sqrt{(2 + 7)^{C_5}} &= 1, C_5 = 0 \\
+    \\
+    t(C_6) &= 1, C_6 = 1
+  \end{align*}
+  
+  
+#### 7) 4.6.10  
+  a) chi-square -> z ~ X^2(1)  
+  b) chi-square -> z ~ X^2(5)  
+  c) t-distribution -> z ~ t(3)  
+  d) F-distribution -> z ~ F(3, 1)  
+  e) F-distribution -> z ~ F(30, 70)  
+  
+#### 8) 4.6.12  
+  a) t-distribution -> z ~ t(20)  
+  b) t-distribution -> z ~ t(30)  
+  c) F-distribution -> z ~ F(20,30)  
+  d) F-distribution -> z ~ F(20,30)  
+  e) chi-square -> X^2(20)  
+  
+#### 9) 5.1.11  
+...
+```{r q9}
+  y.fun = function(x) x^4 + 2*x^3 - 3
+    
+  # random sample of 10k
+  rand.samp = rnorm(10000)
+  y.results = y.fun(rand.samp)
+  
+  length(which(y.results >=1 & y.results <= 2))/length(y.results)
+    
+```
+  
+#### 10) 5.3.11  
+  \begin{align*}
+    I &= N(10, 2),  II = N(8,3) \\
+    \\
+    \psi &= ln(\frac{\theta}{(1 - \theta)}) \\
+    e^{\psi} &= \frac{\theta}{1 - \theta} \\
+    \\
+    \frac{1 - \theta}{\theta} &= \frac{1}{e^{\psi}} \\
+    \frac{1}{\theta} - 1 &= \frac{1}{e^{\psi}} \\
+    \frac{1}{\theta} &= \frac{1}{e^{\psi}} + 1 \\
+    \theta &= e^{\psi} + 1 \\
+    \\
+    f_{\psi} (x_i) &= (e^{(\psi + 1)})^{x_i} (1 - e^{\psi + 1})^{1 - x_i} \\
+  \end{align*}
+  
+  
+#### 11) 5.4.11  
+.  
+```{r, q11, fig.height=3, fig.width=6}
+  # a) random sample
+  sample = rnorm(1000, mean = 3, sd = sqrt(2))
+  mean(sample)  
+  plot.ecdf(sample)
+  x = seq(-2,8,length = 1001)
+  lines(x, pnorm(x, mean = 3,sd = sqrt(2)), col = 2)
+  
+  # b)
+  x = seq(-5, 10, by = 1)
+  hist(x = rnorm(1000, 3, sqrt(2)), breaks = seq(-5, 10, by = 1), freq = FALSE,
+       main = "Histogram with few intervals")
+  lines(x = x, y = dnorm(x = x, mean = 3, sd = sqrt(2)))
+
+  # c)
+  x = seq(-5, 10, by = .1)
+  hist(x = rnorm(1000, 3, sqrt(2)), breaks = seq(-5, 10, by = .1), freq = FALSE,
+       main = "Histogram with more intervals")
+  lines(x = x, y = dnorm(x = x, mean = 3, sd = sqrt(2)))
+```
+  
+  d) The first histogram is rigid and has relatively few intervals. This density curve is also no smooth because of the small number of intervals. The second histrogram is much smoother because of the increased number of intervals
+  e) The limit for the size of intervals is the number of observations in the dataset. With more observations you can afford to have smaller intervas and still see the distribution.
+  
+  
+#### 12) 5.5.5  
+...
+```{r, q12, fig.height=3, fig.width=6}
+
+data = sort(c(1, -1.2, .4, 1.3, -.3, -1.4, .4, -.5, -.2, -1.3, 0, -1, -1.3, 2, 1,
+               .9, .4, 2.1, 0, -1.3))
+
+plot.ecdf(data)
+
+# median
+(data[10] + data[11]) / 2
+
+# 1st quartile with type 5
+(data[5] + data[6]) / 2
+
+# 3rd quartile with type 5
+(data[15] + data[16]) / 2
+
+# interquartile range
+((data[15] + data[16]) / 2) - ((data[5] + data[6]) / 2)
+
+# F(1)
+length(data[data < 1])/20
+```
+  
+  
+#### 13) 5.5.19  
+...  
+```{r, q13, fig.height=3, fig.width=6}
+
+(data = rchisq(50, 1))
+
+# a)
+boxplot(data, horizontal = T)
+
+```
+
+b) This plot is skewed heavily to the right
+c) Max, 1.5*IQR, and quartiles would give a good indication of the distribution because it would show how the data are distributed far to the right of the median. 
+  
+  
+#### 14) 5.5.20  
+... 
+```{r, q20}
+
+data = sort(rnorm(50, mean = 4, sd = sqrt(1)))
+
+# a)
+x = .9 * 50
+(data[x] + data[x+1]) / 2
+
+# b)
+z = qnorm(p = .9, mean = 0, sd = sqrt(1))
+mean(data) + z
+```
+c) I would prefer the estimate of the 90th percentile from part a because its an extreme number relative to the normal distribution and seems unlikely that if chosen at random, it would belong to that distribution.
+

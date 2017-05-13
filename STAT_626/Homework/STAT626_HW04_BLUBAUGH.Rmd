@@ -1,0 +1,142 @@
+---
+output: pdf_document
+mainfont: Bitstream Vera Sans Mono
+sansfont: Bitstream Vera Sans Mono
+geometry: margin=1in
+---
+
+# STAT 626 HW04 BLUBAUGH
+
+## 3.10
+
+a) 
+
+```{r a, echo=FALSE, comment=NA, warning=FALSE}
+suppressPackageStartupMessages(library(astsa))
+suppressPackageStartupMessages(library(forecast))
+
+dta = ts.intersect(
+  cmort = diff(cmort),
+  lag1 = lag(diff(cmort), -1),
+  lag2 = lag(diff(cmort), -2)
+)
+
+(mdl = ar.ols(diff(cmort), order = 2, demean = FALSE, intercept = TRUE))
+
+```
+
+b)
+
+\begin{align*}
+  \text{Prediction Equation for Differenced values: } \\
+  x_{t+1} = & \phi_1 x_{t} + \phi_2 x_{t-1} \\
+  = & -.03631 - .5380 x_{t} - .0665 x_{t-1} \\
+  x_{n+1} = & -.03631 - .5380(-3.94) - .0665(10.91) = 1.3581 \\
+  x_{n+2} = & -.03631 - .5380(1.3581) - .0665(-3.94) = -.5049 \\
+  x_{n+3} = & -.03631 - .5380(-.5049) - .0665(1.3581) = .14501 \\
+  x_{n+4} = & -.03631 - .5380(.14501) - .0665(-.5049) = -.08065 \\
+  \\
+  \text{Predicted Values for next 4 weeks: } & 86.84, 86.34, 86.48, 86.40 \\
+  \\
+  \text{Standard Errors} \\
+  x_{n+1} = & \sqrt{33.63} = 5.799  \\
+  x_{n+2} = & 5.799 \sqrt{1 + .538^2} = 6.58 \\
+  x_{n+3} = & 5.799 \sqrt{1 + .538^2 + (.538^2 - .0665)^2} = 6.71 \\
+  x_{n+4} = & 5.799 \sqrt{1 + .538^2 + (.538^2 - .0665)^2 + (.0665^2 + 0)} = 6.72 \\
+  \\
+  \text{95 Confidence Intervals for Difference} \\
+  \text{n+1: } 1.35  \pm 1.96 (5.799) = & [-10.01, 12.71] \\
+  \text{n+2: } -.504 \pm 1.96 (6.580) = & [-13.04, 12.39] \\
+  \text{n+3: } .1448 \pm 1.96 (6.711) = & [-13.00, 13.29] \\
+  \text{n+4: } -.080 \pm 1.96 (6.728) = & [-13.26, 13.10] \\
+  \\
+  \text{95 Confidence Interval} \\
+  \text{n+1: } & [76.83,99.55] \text{   n+2: } [73.30,98.73] \\
+  \text{n+3: } & [73.48,99.77] \text{   n+4: } [73.14,97.50] \\
+\end{align*}
+
+\newpage
+
+## 3.15
+
+\begin{align*}
+  \text{General Prediction form of AR(1)} \\
+  x_{n+m}^n = & \alpha_0 + \alpha_1 x_n \\
+  \\
+  \text{Expected Variance} \\
+  E[(x_{t + m} - x_{t + m}^t)^2] = & E[\alpha_0 + \alpha_1^2 x_n - \alpha_0 - \alpha_1^{2m}] \\
+  = & E[\alpha_1^2 - \alpha_1^{2m}] \\
+  = & \sigma_w^2 \frac{1 -\phi^{2m}}{1 - \phi^2} \\
+\end{align*}
+
+## 3.17
+
+The following is of a simulated AR(1) of 500 observations. A model is fit to the first 450 observations and then forecasts the next 50 observations. The forecast and the actual values are differenced and an autocorrelation plot is created to show that there is correlation in the errors for fixed N.
+
+```{r a2, echo=TRUE, comment=NA}
+x = arima.sim(n = 500, model = list(ar = .8))
+mdl = ar.ols(x[1:450], order.max = 1)
+y = predict(mdl, n.ahead = 50)$pred
+err = (y - x[451:500])^2
+Acf(err, main = "Autocorrelation of Prediction Errors")
+```
+
+\newpage
+
+## 3.18
+
+a) The coefficients for both methods are very similiar and error variance is slightly smaller for the ols version vs yw.
+
+```{r b, echo=FALSE, comment=NA}
+(mdl.ols = ar.ols(x = diff(cmort), order = 2))
+(mdl.yw = ar.yw(x = diff(cmort), order = 2))
+```
+
+b) The asymptotic approximations of the standard errors from the ordinary least squares model are approximately equal to the standard errors from the yule-walker model.
+
+```{r c, echo=FALSE, comment=NA}
+m = matrix(c( (1 + .0685^2), (.5407 * (1 - .0685)), (.5407 * (1 - .0685)), (1 + .0685^2)), nrow = 2)
+
+cat("Asymptotic Standard Error")
+cat("| (1 + .0685^2)/507           |  (.5407 * (1 - .0685))/507 |\n| (.5407 * (1 - .0685))/507   |  (1 + .0685^2)/507         |")
+
+cat("AN Standard Error from OLS fit")
+m/507
+cat("AN Standard Error from YW fit")
+mdl.yw$asy.var.coef
+```
+
+\newpage
+
+## 3.20.
+
+The 3 models all have very different coeficients even though they were generated using the same model parameters. This occurred because of the ar and ma parameters have opposite weights. When the absolute difference between ar and ma is greate than 0 the coefficients will be closer to the true parameters.
+
+```{r d, echo=FALSE, comment=NA, fig.height=2.2, warning=FALSE, message=FALSE}
+
+ts.1 = arima.sim(n = 500, model = list(ar = .9, ma = -.9))
+ts.2 = arima.sim(n = 500, model = list(ar = .9, ma = -.9))
+ts.3 = arima.sim(n = 500, model = list(ar = .9, ma = -.9))
+
+par(mfrow = c(1, 3))
+plot.ts(ts.1, main = "ts.1")
+plot.ts(ts.2, main = "ts.2")
+plot.ts(ts.3, main = "ts.3")
+
+Acf(ts.1, main = "ACF ts.1")
+Acf(ts.2, main = "ACF ts.2")
+Acf(ts.3, main = "ACF ts.3")
+
+Pacf(ts.1, main = "PACF ts.1")
+Pacf(ts.2, main = "PACF ts.2")
+Pacf(ts.3, main = "PACF ts.3")
+
+mdl1 = arima(ts.1, order = c(1, 0, 1))
+mdl2 = arima(ts.2, order = c(1, 0, 1))
+mdl3 = arima(ts.3, order = c(1, 0, 1))
+
+cat("Mdl1:\n"); mdl1$coef 
+cat("Mdl2:\n"); mdl2$coef 
+cat("Mdl3:\n"); mdl3$coef
+
+```

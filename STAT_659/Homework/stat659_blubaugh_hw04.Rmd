@@ -1,0 +1,478 @@
+---
+output:
+  pdf_document:
+    latex_engine: xelatex
+    highlight: pygments
+mainfont: Calibri Light
+sansfont: Calibri Light
+fontsize: 11pt
+geometry: margin=1in
+---
+
+**Homework 04**  
+**Joseph Blubaugh**  
+jblubau1@tamu.edu  
+**STAT 659-700**  
+
+
+#### 2.29
+
+At the $\alpha = .05$ level we conclude that the results of using prednisolone are significantly better than the control.
+
+```{r a, echo=FALSE, comment=NA, results='asis'}
+library(pander)
+
+dta = data.frame(
+  Normalization = c(7, 0),
+  No.Effect = c(8, 15),
+  row.names = c("Prednisolone", "Control")
+)
+
+pandoc.table(dta)
+
+```
+
+```{r a2, echo=FALSE, comment=NA}
+
+fisher.test(dta)
+```
+
+#### 2.30
+
+At the $\alpha = .05$ level we conclude that the odds ratio between radiation therapy and surgery are non significantly different.
+
+```{r b, echo=FALSE, comment=NA, results='asis'}
+dta = data.frame(
+  Cancer.Controlled = c(21, 15),
+  Cancer.Not.Controleed = c(2, 3),
+  row.names = c("Surgery", "Radiation Therapy")
+)
+
+pandoc.table(dta)
+
+```
+
+```{r b2, echo=FALSE, comment=NA}
+
+fisher.test(dta, alternative = "greater")
+
+```
+
+\newpage
+
+#### 2.31
+
+a) The two sided pvalue is not significant at the $\alpha = .05$ level. 
+```{r c, echo=TRUE, comment=NA}
+library(epitools)
+ormidp.test(21, 2, 15, 3)
+```
+
+b) The midpoint pvalue lowers the pvalue but not significantly enough to make a difference. The advantages the midpvalue has over the regular one is that is helps to correct for discrete distributions where the exact pvalue cannot be calculated and it is typically used where there are few observations.
+
+#### 2.33
+
+a)
+
+```{r d, echo=FALSE, comment=NA}
+cat("3 Way Table with adder")
+
+dta = list(
+  "white" = data.frame(
+    Death.Penalty = c(19.5, .5),
+    No.Death.Penalty = c(132.5, 9.5),
+    row.names = c("killed white", "killed black")
+  ),
+  "black" = data.frame(
+    Death.Penalty = c(11.5, 6.5),
+    No.Death.Penalty = c(52.5, 97.5),
+    row.names = c("killed white", "killed black")
+  )
+)
+
+dta
+
+```
+
+b) At the $\alpha = .05$ level the odds ratio between death penalty and victims race are not significant for white defendents, but the odds ratio is significant for black defendents.
+
+```{r d2, echo=FALSE, comment=NA, message=FALSE, warning=FALSE}
+cat("Partial Table for White Defendents")
+fisher.test(dta$white)
+cat("Partial Table for Black Defendents")
+fisher.test(dta$black)
+
+```
+
+c) Simpsons Paradox does appear to be in play here because the marginal odds ratio's differ from the results when looking at the odds ratis separately by defendent.
+
+```{r d3, echo=FALSE, comment=NA}
+
+cat("Marginal Table holding defendent constant")
+
+dta = data.frame(
+  Death.Penalty = c(19 + 11, 0 + 6),
+  No.Death.Penalty = c(132 + 52, 9 + 97),
+  row.names = c("killed white", "killed black")
+)
+
+dta
+
+fisher.test(dta)
+
+```
+
+#### 2.35
+
+This occurence would be known as simpsons paradox where the sub levels contradict the overall level. This could happen because the sample sizes for the different sub levels are lopsided and so the proportions might be larger for each level in south carolina but the overall death rate may be larger for maine.
+
+\newpage
+
+#### 2.37
+
+a) Conditional on gender non-white males are 5 times more likely to be victims of murder than white males and non-white females are 3 times more likely to be victims of murder than white females
+
+```{r e, echo=FALSE, comment=NA, results='asis'}
+
+dta = data.frame(
+  White = c(.0049, .0023),
+  NonWhite = c(.0263, .0072),
+  row.names = c("Male", "Female")
+)
+
+pandoc.table(dta)
+
+```
+ 
+ 
+```{r e2, comment=NA}
+(Male = ((.0263)/(1 - .0263)) / ((.0049)/(1 - .0049)))
+(Female = ((.0072)/(1 - .0072)) / ((.0023)/(1 - .0023)))
+
+```
+
+b) 
+
+```{r e3, comment=NA}
+
+marginal.white = mean(c(.0049, .0023))
+marginal.non.white = mean(c(.0263, .0072))
+
+(marginal.non.white / (1 - marginal.non.white)) / (marginal.white / (1 - marginal.white))
+
+```
+
+#### 3.2
+
+a) `.0304 - .0003 = .0301`
+b) Yes this is clearly an outlier, not only judging by the graphic, but also that the actual value is almost 4 times that of the predicted value.   
+$\hat \pi = -.0003 + .0304(.0079) = .00205$  
+$\frac{\pi_i}{\hat \pi} = .0774 / .00205 = 3.85$  
+$\pi_i - \hat \pi_i = .0774 - .00205 = .07535$
+
+#### 3.3
+
+a) The prediction equation is: $.00255 + .00109x$. Intercept is the estimated probability of a child having a birth defect if the mother consumes no alcohol. The Alcohol parameter .001 is the expected increase in birth defect probability for a one unit increase in alcohol consumption.
+
+b) For 0: $.00255 + .00109*0 = .0026$, For 7: $.00255 + .00109*7 = .0102$ The relative risk between 0 and 7 drinks is $.0102 / .0026 = 3.9$
+
+\newpage
+
+#### 3.4
+
+a) The prediction equation is: $.0026 + .0007x$ The intercept is essentially the same but the estimated increase in probability for an additional unit of alcohol is now .0007 as opposed to .0102 so the algorithm was sensitive to the small sample size. The relative risk is now $.0075 / .0026 = 2.9$
+
+```sas
+proc genmod data=defects;
+	model defects/count = drinks / dist=bin link=identity;
+```
+
+```{r f, echo=FALSE, comment=NA, results='asis'}
+
+out = data.frame(
+  Parameter = c("Intercept", "Drinks"),
+  DF = c(1, 1),
+  Estimate = c(".0026", ".0007"),
+  Std.Error = c(".0003", ".0007"),
+  Wald.lwr = c(".002", "-.0008"),
+  Wald.upr = c(".0033", ".0021"),
+  Wald.Chi.sq = c("58.14", ".8"),
+  Pvalue = c("<.001", ".3699")
+)
+
+pandoc.table(out, caption = "Output from SAS")
+```
+
+b) The prediction equation is: $.0027 + .0003x$. The intercept is essentially the same, but the increase in probability for additional unit of alcohol is now .0003.  The relative risk between 0 and 4 alcoholic drinks is now $.0039 / .0027 = 1.4$
+
+```{r f2, echo=FALSE, comment=NA, results='asis'}
+
+out = data.frame(
+  Parameter = c("Intercept", "Drinks"),
+  DF = c(1, 1),
+  Estimate = c(".0027", ".0003"),
+  Std.Error = c(".0004", ".0005"),
+  Wald.lwr = c(".0019", "-.0006"),
+  Wald.upr = c(".0034", ".0013"),
+  Wald.Chi.sq = c("58.58", ".43"),
+  Pvalue = c("<.001", ".5107")
+)
+
+pandoc.table(out, caption = "Output from SAS")
+```
+
+
+c) The prediction equation is now: $-5.92 + .1759x$ but the output is interpreted as odds. Intercept probability of birth defects when consuming no alcohol: $exp(-5.92) / (1 + exp(-5.92)) = .0027$ The increased probability of birth defects from an additional unit of alcohol: $exp(.1759) / (1 + exp(.1759)) = .543$ which is much higher than the other models.  
+
+```sas
+proc genmod data=defects;
+	model defects/count = drinks / dist=bin link=logit;
+```
+
+```{r f3, echo=FALSE, comment=NA, results='asis'}
+
+out = data.frame(
+  Parameter = c("Intercept", "Drinks"),
+  DF = c(1, 1),
+  Estimate = c("-5.92", ".1759"),
+  Std.Error = c(".1187", ".1705"),
+  Wald.lwr = c("-6.153", "-.158"),
+  Wald.upr = c("-5.687", ".51"),
+  Wald.Chi.sq = c("2487", "1.06"),
+  Pvalue = c("<.001", ".302")
+)
+
+pandoc.table(out, caption = "Output from SAS")
+```
+
+\newpage
+
+#### 3.5
+
+The linear relationship is preserved even when changing the values of x. The algorithm is measuring the effects on y based on changes in x so it really doesn't matter what the x values are as long as the relationship between changes in x and y are preserved.
+
+```{r g, echo=FALSE, results='asis'}
+
+out = data.frame(
+  Parameter = c("Intercept", "Drinks"),
+  DF = c(1, 1),
+  Estimate = c(".0176", ".0181")
+)
+
+pandoc.table(out, caption = "Partial SAS Output (0,2,4,6)")
+
+
+out = data.frame(
+  Parameter = c("Intercept", "Drinks"),
+  DF = c(1, 1),
+  Estimate = c(".0176", ".0362")
+)
+
+pandoc.table(out, caption = "Partial SAS Output (0,1,2,3)")
+
+
+
+out = data.frame(
+  Parameter = c("Intercept", "Drinks"),
+  DF = c(1, 1),
+  Estimate = c(".0176", ".0362")
+)
+
+pandoc.table(out, caption = "Partial SAS Output (1,2,3,4)")
+
+```
+
+\newpage
+
+#### Additional A)
+
+```{r h, comment=NA, echo=FALSE, results='asis'}
+
+dta = data.frame(
+  Department = c(1, 2, 3, 4 ,5, 6),
+  Male.Yes = c(512, 353, 120, 138, 53, 22),
+  Male.No = c(313, 207, 205, 279, 138, 351),
+  Female.Yes = c(89, 17, 202, 131, 94, 24),
+  Female.No = c(19, 8, 391, 244, 299, 317)
+)
+
+pandoc.table(dta)
+
+```
+
+a)
+
+```{r h1, comment=NA}
+dta$OR = with(dta, (Male.Yes * Female.No) / (Male.No * Female.Yes))
+dta$se = with(dta, (sqrt(1/Male.Yes + 1/Female.No + 1/Male.No + 1/Female.Yes)))
+dta$Conf.lwr = with(dta, OR - 1.96 * se)
+dta$Conf.Upr = with(dta, OR + 1.96 * se)
+```
+
+b) The marginal odds ratio shows that there is a significant overall difference between the entrace of male and female applicants, however 2 of the 6 sublevels have confidence intervals that cross 1 and so are not significantly different at the the $\alpha = .05$ level. Since most of the sub levels odds ratios agree with the marginal odds ratio, simpsons paradox is not really present.
+
+```{r h2, comment=NA}
+marginal = colSums(dta[, 2:5])
+OR = (marginal[1] * marginal[4]) / (marginal[2] * marginal[3])
+se = sqrt(1/marginal[1] + 1/marginal[4] + 1/marginal[2] + 1/marginal[3])
+
+## Confidence Interval for the Marginal OR
+OR + c(-1, 1) * 1.96 * se
+```
+
+c)
+
+```{r h3, comment=NA, warning=FALSE, message=FALSE}
+library(DescTools)
+library(lawstat)
+
+dta = xtabs(freq ~ .,
+            cbind(expand.grid(Gender = c("Male", "Female"),
+                              Entrace = c("Yes", "No"),
+                              Department = c("1", "2", "3", "4", "5", "6")),
+                  freq =  c(512, 89, 313, 19,
+                            353, 17, 207, 8,
+                            120, 202, 205, 391,
+                            138, 131, 279, 244, 
+                            53, 94, 138, 299,
+                            22, 24, 351, 317)))
+
+## Ho: OR = 1, Ha: OR > 1
+BreslowDayTest(dta, OR = 1)
+
+## Ho: OR_1 = OR_2 = OR_3 = OR_4 = OR_5 = OR_6, Ha: At least one set of OR are not equal
+cmh.test(dta)
+```
+
+d) Since the common odds ratio includes 1 and the pvalue = .72 we can conclude that a single common odds ratio can be used instead of using the odds ratio for each department.
+
+```{r h4, comment=NA, warning=FALSE, message=FALSE, echo=FALSE}
+dta = xtabs(freq ~ .,
+            cbind(expand.grid(Gender = c("Male", "Female"),
+                              Entrace = c("Yes", "No"),
+                              Department = c("2", "3", "4", "5", "6")),
+                  freq =  c(353, 17, 207, 8,
+                            120, 202, 205, 391,
+                            138, 131, 279, 244, 
+                            53, 94, 138, 299,
+                            22, 24, 351, 317)))
+
+cmh.test(dta)
+```
+
+```{r h5, comment=NA, warning=FALSE, message=FALSE}
+
+## 90% Confidence for the Common Odds Ratio
+1.031 + c(-1, 1) * 1.644 * .0723
+
+```
+
+\newpage
+
+#### Additional B)
+
+```{r i, comment=NA, echo=FALSE, results='asis'}
+
+dta = data.frame(
+  District = c("NC", "NE", "NW", "SE", "SW"),
+  Blacks.Yes = c(24, 10, 5, 16, 7),
+  Blacks.No = c(9, 3, 4, 7, 4),
+  Whites.Yes = c(47, 45, 57, 54, 59),
+  Whites.No = c(12, 8, 9, 10, 12)
+)
+
+pandoc.table(dta)
+
+```
+
+a) At the $\alpha = .1$ level, all districts show odds ratios that cross 1.
+
+```{r i2, comment=NA}
+
+## Conditional on Distric
+dta$OR = with(dta, (Blacks.Yes * Whites.No)/(Blacks.No * Whites.Yes))
+dta$se = with(dta, sqrt(1/Blacks.Yes + 1/Whites.No + 1/Blacks.No + 1/Whites.Yes))
+dta$Conf.Lwr = with(dta, OR - 1.644 * se) 
+dta$Conf.Upr = with(dta, OR + 1.644 * se) 
+
+dta
+```
+
+b) Simpsons paradox is in play in this case because the marginal odds ratio shows that there is a clear difference between merit pay based on race, but when reviewed at the district level the 90% confidence interval shows that there is no difference between merit pay and race.
+
+```{r i3, comment=NA}
+
+## Marginal OR
+marginal = colSums(dta[, 2:5])
+OR = (marginal[1] * marginal[3]) / (marginal[2] * marginal[4])
+
+se = sqrt(1/marginal[1] + 1/marginal[2] + 1/marginal[3] + 1/marginal[4])
+
+## 90% Cofidence
+OR + c(-1, 1) * 1.644 * se
+
+```
+
+c) We conclude from the Breslow Day test that the odds ratios differ between race and merit because the pvalue is small. We also conclude from the CMH test that the odds ratios are not equal and so should be viewed separately.
+
+```{r i4, comment=NA, warning=FALSE, message=FALSE, echo=FALSE}
+dta = xtabs(freq ~ .,
+            cbind(expand.grid(Gender = c("Black", "White"),
+                              Entrace = c("Yes", "No"),
+                              District = c("NC", "NE", "NW", "SE", "SW")),
+                  freq =  c(24, 47, 9, 12,
+                            10, 45, 3, 8,
+                            5, 57, 4, 9,
+                            16, 54, 7, 10,
+                            7, 59, 4, 12)))
+
+## Ho: OR = 1, Ha: OR < 1
+BreslowDayTest(dta, OR = 1)
+
+## Ho: OR_1 = OR_2 = OR_3 = OR_4, Ha: At least on OR pair are not equal
+cmh.test(dta)
+
+
+```
+
+
+#### Additional C)
+
+
+```{r j, comment=NA}
+
+dta = data.frame(
+  Class = c(1, 2),
+  Male.Yes = c(100, 101),
+  Male.No = c(99, 98),
+  Female.Yes = c(99, 100),
+  Female.No = c(98, 97)
+)
+
+## Odds Ratio conditional on Class
+OR.class = with(dta, (Male.Yes * Female.No) / (Female.Yes * Male.No))
+
+## Odds Ratio conditional on Gender
+OR.gender = c( (100*98)/(101*99) , (99*97)/(100*98) )
+
+OR.class; OR.gender
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

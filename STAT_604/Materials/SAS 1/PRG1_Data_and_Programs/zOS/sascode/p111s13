@@ -1,0 +1,9 @@
+ods listing close;
+ods pdf file='.workshop.report(p111s13p)';
+ods rtf file='.workshop.report(p111s13r)' rs=none style=curve;
+proc print data=orion.customer;
+   title 'Customer Information';
+run;
+ods pdf close;
+ods rtf close;
+ods listing;

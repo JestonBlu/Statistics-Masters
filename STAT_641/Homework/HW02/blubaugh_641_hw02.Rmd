@@ -1,0 +1,171 @@
+---
+output:
+  pdf_document:
+    latex_engine: xelatex
+    highlight: pygments
+mainfont: Calibri Light
+sansfont: Calibri Light
+fontsize: 11pt
+geometry: margin=1in
+---
+
+**Homework 02**  
+**Joseph Blubaugh**  
+jblubau1@tamu.edu  
+**STAT 641-720**  
+
+\newpage
+
+1.  
+    a)
+\begin{align*}
+    f(y) &= P(Y = y) = p(1 - p)^y                     \\
+    F(y) &= \sum_{k = 0}^y P(Y = k)                   \\
+         &= P \sum_{k = 0}^y (1 - p)^k                \\
+         &= P \frac{1 - (1 - p)^{y + 1}}{1 - (1 - p)} \\
+         &= 1 - (1 - p)^{y + 1}                       \\
+\end{align*}
+    
+    b)
+\begin{align*}
+        F(y) = 1 - (1 - p)^{y + 1} & \geq q                  \\
+                             1 - q & \geq (1 - p)^{y + 1}    \\
+                        log(1 - q) & \geq (y + 1) log(1 - p) \\
+     \frac{log(1 - q)}{log(1 - p)} & \geq (y + 1)            \\
+ \frac{log(1 - q)}{log(1 - p)} - 1 & \geq y                  \\
+\end{align*}
+
+2.  
+    a)  The cdf of z is not affected by $\alpha$ and $\theta$
+\begin{align*}
+    F_Z(z) = P( Z \leq z) &= P(\frac{y - \theta}{\alpha} \leq z) \\
+      &= P(y \leq \alpha z + \theta)                             \\
+      &= Fy(\alpha z + \theta)                                   \\
+      &= 1 - exp \Big [- \Big ( \frac{\alpha z + \theta - \theta}{\alpha} \Big )^{\gamma} \Big ] \\
+      &= 1 - exp \Big [ - z^{\gamma} \Big ] \\
+\end{align*}
+
+    b)  
+\begin{align*}
+    F_Z = 1 - exp \Big ( -\frac{y - \theta}{\alpha})^{\gamma} & \geq q \\
+    1 - q & \geq exp \Big ( -\frac{y - \theta}{\alpha})^{\gamma}       \\
+    log(1 - q) & \geq \big (-\frac{y - \theta}{\alpha} \big )^{\gamma} \\
+    log(1 - q)^{\frac{1}{\gamma}} & \geq - \frac{y - \theta}{\alpha}   \\
+    -a (-log(1 - q))^{\frac{1}{\gamma}} & \geq y - \theta              \\
+    \frac{a (-log(1 - q))^{\frac{1}{\gamma}}}{\theta} & \geq = y       \\
+\end{align*}
+    c)
+
+```{r 2c}
+y = 30; theta = 10; gamma = 2; alpha = 25
+1 - exp(-(y - theta)/alpha)^gamma
+```
+
+    d)
+```{r 2d}
+q = .4; theta = 10; gamma = 2; alpha = 25
+(alpha * (-log(1 - q))^(1/gamma)) / theta
+```
+
+3.  
+    a)  
+\begin{align*}
+    F_Z(z) = P(Z \leq z) &= P(\frac{Y}{B} \leq z)                   \\
+    &= P(y \leq z \beta)                                            \\
+    &= F_y(z \beta)                                                 \\
+    &= 1 - exp \Big ( - \frac{(z \beta)^{\gamma}}{\beta} \Big )     \\
+    &= 1 - exp \Big ( - z^{\gamma} \beta^{\gamma-1} \Big )          \\
+\end{align*}
+
+    b)  
+\begin{align*}
+    Z &= \frac{y}{\beta^{y \gamma}}                                                    \\
+    F_Z(z) &= P(\frac{Y}{\beta^{y \gamma}})                                            \\
+    &= P(y \leq z \beta^{y \gamma})                                                    \\
+    &= 1 - exp \Big [- \Big ( \frac{z \beta^{y \gamma}}{\beta} \Big )^{\gamma} \Big ]  \\ 
+    &= 1 - exp \Big [- z \frac{\beta}{beta} \Big ]                                     \\
+    &= 1 - e^{-z}                                                                      \\
+\end{align*}
+
+4.  
+    a)  Expected value of the probability function, $\lambda$ = .25
+    b)  52 weeks in a year with a $\lambda$ = .25, so it is certain at least one event will occur in any give year.
+
+```{r 4b}
+ppois(52, .25)
+```
+
+5.  a)  Chi-square(6)
+	b)  t(6)
+	c)  F(1,7)
+	d)  Cauchy(0,1)
+	e)  F(2,3)
+
+6.  a)  W = Weibull($\gamma$ = 4, $\alpha$ = 1.5)
+
+\begin{align*}
+     38 &= 1 - exp - \Big ( \Big ( \frac{y}{1.5} \Big )^{4} \Big )           \\
+    1 - .38 &= e^{ \Big ( \frac{y}{1.5} \Big )^{4} }                         \\
+    - \Big ( \frac{y}{1.5}  \Big )^4 &= log(.62)                             \\
+    \frac{y}{1.5} &= \Big ( -log(.62)  \Big )^{\frac{1}{4}}                  \\
+    y &= 1.5 \Big [ -log(.62) \Big ]^{.25}                                   \\
+    y &= 1.24
+\end{align*}
+
+	b)  N = NegBin(r = 8, p = .7), C = 2
+
+```{r b}
+pnbinom(1, 8, .7); pnbinom(2, 8, .7)
+```
+
+	c)  B = Bin(20, .4), C = 7
+
+```{r c}
+pbinom(6, 20, .4); pbinom(7, 20, .4)
+
+```
+
+	d)  P = Poisson($\lambda$ = 3), C = 2
+```{r d}
+ppois(1, 3); ppois(2, 3)
+
+```
+
+	e)  U = Uniform(.3, 2.5)
+\begin{align*}
+    .38 &= \frac{1}{b - a}      \\
+      Q &= a + p(b - a)         \\
+        &= .3 + .38(2.5 - .3)   \\
+        &= 1.36                 \\
+\end{align*}
+
+
+7.  a)  Cauchy, because its the ratio of 2 standard normal distributions
+	b)  Gamma, because T is the length of time between events
+	c)  Uniform, the probability is equally likely
+	d)  Weibull, because we are measuring the time it takes for an event to occur
+    e)  Bernoulli, the possible values are 1/0, pass/fail
+    f)  Poisson, because the interval of time is fixed
+    g)  Double Exponential, a cubic function would have a very steep incline
+    h)  Binomial, because known probability of failure with fixed n
+    i)  Hypergeometric, sampling without replacement would make most sense
+    j)  Normal, 68 & 95 percent are the 1st and 2nd standard deviations of the normal distribution
+    k)  Negative Binomial, because the interviews will continue until the 50th success
+    l)  Poisson, because the space of the wing is fixed and we are counting events
+    m)  Exponential, because we are measuring the time till an event occurs based on a poisson distribution
+    n)  Chi-square, because of the small sample size, it should be normal as the samples increase
+    o)  F, right skewed distribution
+
+
+
+
+
+
+
+
+
+
+
+
+
+

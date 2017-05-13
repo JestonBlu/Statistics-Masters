@@ -1,0 +1,463 @@
+---
+output:
+  pdf_document:
+    latex_engine: xelatex
+    highlight: pygments
+mainfont: Calibri Light
+sansfont: Calibri Light
+fontsize: 11pt
+geometry: margin=1in
+---
+
+**Homework 06**  
+**Joseph Blubaugh**  
+jblubau1@tamu.edu  
+**STAT 659-700**  
+
+
+### 4.1 
+
+a) $exp[log(\frac{\pi}{1 - \pi})] = exp[-3.771 + .1449(8)] = .0734 \rightarrow \frac{.0734}{1 + .0734} = .068$
+
+b) $exp[log(\frac{\pi}{1 - \pi})] = exp[-3.771 + .1449(26)] = .9964 \rightarrow \frac{.9964}{1 + .9964} = .5$
+
+c) $\text{LI=8: }.1499 * .068(1 - .068) = .009$  
+$\text{LI=26: }.1499 * .5(1 - .5) = .036$
+
+d) $exp[-3.771 + .1449(14)] = .175 \rightarrow \frac{.175}{1 + .175} = .15$  
+$exp[-3.771 + .1449(28)] = 1.331 \rightarrow \frac{1.331}{1 + 1.331} = .57$
+
+e) $exp(.1449) = 1.16$
+
+
+### 4.2 
+
+a) $Ho: li = 0, Ha: li > 0$,  $\text{    } .1449/.0593 = 2.44 > 1.96$  
+$\text{pvalue} = (1 - pnorm(2.44)) * 2 = .014$
+
+b) $exp[.1449 \pm 1.96 (.0593)]$     
+A one unit increase in li increases the odds of remission by`r exp(.1449 + c(-1, 1) * 1.96 * .0593)`
+
+c) $Ho: li = 1, Ha: li > 1$, $\text{   } 8.3 > 3.84 = X_{1, .05}^2$  
+$\text{pvalue} = 1 - pchisq(8.3, 1) = .004$
+
+d) $exp(.0425, .2846) = (1.04, 1.32)$  
+A one unit increase in li increases the odds of remission by .03, 1.32
+
+
+### 4.5 
+
+a)
+```{r a, comment=NA, message=FALSE, warning=FALSE}
+dta = data.frame(
+  Temperature = c(66, 70, 69, 68, 67, 72, 73, 70, 57, 63, 70, 78, 
+                  67, 53, 67, 75, 70, 81, 76, 79, 75, 76, 58),
+  TD = c(0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 
+         0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1)
+)
+
+summary(dta)
+
+(mdl = glm(TD ~ Temperature, family = binomial(), data = dta))
+anova(mdl, test = "Chisq")
+```
+
+As temperature increases by one unit, the odds of a failure are multiplied by `r exp(coef(mdl)[2])`
+
+b) $log(\frac{\pi(31)}{1 - \pi(31)}) = 15.043 - .2322(31) = 7.84$  
+$exp(7.84) / (1 + exp(7.84)) = .999$
+
+c) $log(.5 / (1 - .5)) = 0 = 15.04 - .2322x \rightarrow x = .64.77$  
+$-.2322 * .5 * (1 - .5) = -.05$
+
+d) For a one unit increase in temperature, the odds of stress are multiplied by exp(-.2322) = `r exp(-.2322)`
+
+e) i. Wald Test Statistic: -.2322 / .1082 = -2.145, 2*pnorm(-2.145) = .032
+ii. Liklihood Ratio Test: 1 - pchisq(7.965, 1), `r 1 - pchisq(7.965, 1)`
+
+### 4.7
+
+```{r b, comment=NA, message=FALSE, warning=FALSE, echo=FALSE}
+
+dta = data.frame(
+  response = c("kyphosis", "kyphosis", "kyphosis", "kyphosis", "kyphosis", "kyphosis", "kyphosis", 
+               "kyphosis", "kyphosis", "kyphosis", "kyphosis", "kyphosis", "kyphosis", "kyphosis", 
+               "kyphosis", "kyphosis", "kyphosis", "kyphosis", "nokyphosis", "nokyphosis", "nokyphosis", 
+               "nokyphosis", "nokyphosis", "nokyphosis", "nokyphosis", "nokyphosis", "nokyphosis", 
+               "nokyphosis", "nokyphosis", "nokyphosis", "nokyphosis", "nokyphosis", "nokyphosis", 
+               "nokyphosis", "nokyphosis", "nokyphosis", "nokyphosis", "nokyphosis", "nokyphosis", "nokyphosis"),
+  age = c(12, 15, 42, 52, 59, 73, 82, 91, 96, 105, 114, 120, 121, 128, 130, 139, 139, 
+          157, 1, 1, 2, 8, 11, 18, 22, 31, 37, 61, 72, 81, 97, 112, 118, 127, 131, 140, 
+          151, 159, 177, 206)
+)
+
+summary(dta)
+```
+
+```{r c, comment=NA, message=FALSE, warning=FALSE}
+mdl = glm(response ~ age, family = binomial(), data = dta)
+summary(mdl); anova(mdl, test = "Chisq")
+```
+
+a) Based on both the Wald and the Likelihood Ratio statistic, age does not significantly affect the odds of kyphosis occurring
+
+b)
+
+```{r d, comment=NA, message=FALSE, warning=FALSE, fig.height=3.5, echo=FALSE}
+
+library(ggplot2)
+ggplot(dta) + geom_boxplot(aes(x = response, y = age)) + coord_flip()
+
+```
+
+c) The odds of kyphosis is not a linear function of age, extreme highs and lows of age have higher odds of kyphosis. The ages between 50 and 150 appear to minimize the odds of developing kyphosis
+
+```{r e, comment=NA, message=FALSE, warning=FALSE}
+
+mdl = glm(response ~ poly(age, 2), binomial(), data = dta)
+summary(mdl); anova(mdl, test = "Chisq")
+
+plot(x = dta$age, y = as.numeric(dta$response) - 1, xlab = "Probability", ylab = "Age")
+curve(predict(mdl, data.frame(age = x), type = "response"), add = TRUE)
+
+```
+
+\newpage
+
+
+### 4.8
+
+a) Prediction Equation: $log(\frac{\pi(x)}{1 - \pi(x)}) = -3.695 + 1.815x$
+
+```{r f, comment=NA, message=FALSE, warning=FALSE, echo=FALSE}
+crabs = read.csv("crabs.csv")
+
+mdl = glm(y ~ weight, family = binomial(), data = crabs); summary(mdl)
+
+```
+
+b)
+
+```{r g, comment=NA, message=FALSE, warning=FALSE}
+predict(mdl, data.frame(weight = c(1.2, 2.44, 5.2)), type = "response")
+```
+
+c)
+\begin{align*}
+  log(\frac{\pi(.5)}{1 - \pi(.5)}) = & -3.695 + 1.815x \\
+  log(1) = & -3.695 + 1.815x \\
+  3.695 = & 1.815x \\
+  x = & 3.695/1.815 \\ 
+  = & 2.035 \\
+\end{align*}
+
+d) i. $1.815(.5)(1 - .5) = .45$,  ii. $.45 / 10 = .045$,  iii. $.45 / .58 = .77$
+
+e) $exp[1.815 \pm 1.96 (.376)] = (2.93, 12.83)$ A one unit increase in weight increases the odds of a having a satellite by 2.9 to 12.8 times.
+
+f) $Ho: \theta = 1, Ha: \theta > 1, 4.81 > 1.96 = 1 - pnorm(4.81) = .0001$
+
+
+### 4.9 
+
+a) $\log(\frac{\pi(x)}{1 - \pi(x)}) = 1.0986 - .1226(color_2) - .7309(color_3) - 1.86(color_4)$ Color 1 is the default level in R so the coefficient is the intercept. The odds of having a satellite when the female crab is $color_1$ is exp(1.098) = 2.99
+
+```{r h, comment=NA}
+(mdl = glm(y ~ factor(color), family = binomial(), data = crabs))
+```
+
+b) $13.7 > 7.8 = X_{3, .05}^2 \rightarrow 1 - pchisq(225.76 - 212.06, 3) = .003$  
+Reject null and conclude that color is significant.
+
+```{r i, comment=NA}
+anova(mdl, test = "Chisq")
+```
+
+c) $log(\frac{\pi(x)}{1 - \pi(x)}) = 2.363 - .714x$  
+As color increases by one unit, the odds of a female crab having a satellite increase by a factor of $exp(-7.14) = .48$
+
+```{r j, comment=NA}
+(mdl = glm(y ~ color, family = binomial(), data = crabs))
+```
+
+d) $12.461 > 3.84 = X_{1, .05}^2 \rightarrow 1 - pchisq(12.461, 1) = .0004$ Color appears to have a significant factor on the probability of a female having a satellite. 
+
+```{r k, comment=NA}
+anova(mdl, test = "Chisq")
+```
+
+e) The advantage of having more power is because there are more degrees of freedom when you treat a variable as quantitative vs qualitative however a disadvantage of treated color as a quantitative variable implies that $color_2$ is greater than $color_1$ which doesn't make sense for something that should be qualitative and so you wont get an accurate representation between the effects of color.
+
+\newpage
+
+### 4.15 
+
+```{r l, comment=NA, warning=FALSE, message=FALSE}
+
+## d)
+library(DescTools)
+library(reshape2)
+
+dta = data.frame(
+  District = c("NC", "NC", "NE", "NE", "NW", "NW", "SE", "SE", "SW", "SW"),
+  Race = rep(c("Black", "White"), 5),
+  Yes = c(24, 47, 10, 45, 5, 57, 16, 54, 7, 59),
+  No = c(9, 12, 3, 8, 4, 9, 7, 10, 4, 12)
+)
+
+dta$Proportion = with(dta, Yes / (Yes + No))
+
+mdl = glm(cbind(dta$Yes, dta$No) ~ Race, family = binomial(), data = dta); anova(mdl, test = "Chisq")
+
+dta2 = melt(dta[, 1:4], value.name = "Freq", variable.name = "Merit")
+
+BreslowDayTest(xtabs(Freq ~ Race + Merit + District, data = dta2))
+```
+
+Reject that null that the odds ratios are the same based on the Liklihood Ratio Statistic. Fail to reject the null of the Breslow Day test that the odds ratios differ. These two tests conflict
+
+a) Conditional on District we reject the null that the proportions of race and merit are the same.
+
+```{r m, comment=NA, warning=FALSE, message=FALSE}
+library(lawstat)
+
+cmh.test(xtabs(Freq ~ Race + Merit + District, data = dta2))
+```
+
+b) Using the Wald Test, $2.91 > 1.96 \rightarrow (1 - pnorm(2.91)) * 2 = .003$
+
+c) You can create confidence intervals for the odds ratios.
+
+
+### 4.16
+
+a) Model: $log(\frac{\pi(x)}{1 - \pi(x)}) = -2.11 - .55(EI_I) - .429(SN_S) + .687(TF_T) + .2(JP_P)$  
+The indicator variables are set up as factor with the default level intercept equal to $EI_E, SN_N, TF_F, JP_J$
+
+```{r n, comment=NA, warning=FALSE, message=FALSE}
+
+dta = data.frame(
+  EI = c("E", "E", "E", "E", "E", "E", "E", "E", "I", "I", "I", "I", "I", "I", "I", "I"),
+  SN = c("S", "S", "S", "S", "N", "N", "N", "N", "S", "S", "S", "S", "N", "N", "N", "N"),
+  TF = c("T", "T", "F", "F", "T", "T", "F", "F", "T", "T", "F", "F", "T", "T", "F", "F"),
+  JP = c("J", "P", "J", "P", "J", "P", "J", "P", "J", "P", "J", "P", "J", "P", "J", "P"),
+  Y = c(10, 8 , 5 , 7 , 3 , 2 , 4 , 15, 17, 3 , 6 , 4 , 1 , 5 , 1 , 6),
+  N = c(67, 34, 101, 72, 20, 16, 27, 65, 123, 49, 132, 102, 12, 30, 30, 73)
+)
+
+(mdl = glm(cbind(dta$Y, dta$N) ~ EI + SN + TF + JP, family = binomial(), data = dta))
+
+```
+
+\newpage
+
+b) 
+
+```{r o, comment=NA, warning=FALSE, message=FALSE}
+predict(mdl, data.frame(EI = "E", SN = "S", TF = "T", JP = "J"), type = "response")
+```
+
+c) This is the combination of variables which all coefficients are positive so it will have the highest probability
+
+```{r p, comment=NA, warning=FALSE, message=FALSE}
+summary(mdl)
+```
+
+\newpage
+
+### 4.17
+
+a)
+\begin{align*}
+  log(\frac{\pi(x)}{1 - \pi(x)}) = & -2.829 + .5805(e) + .597(t) \\
+  \text(I,F) = & -2.829 + 0 + .597 = -.232 \\
+  = & exp(-.232) / (1 + exp(-.232)) \\
+  = & .44 \\
+\end{align*}
+
+b) $exp(.5805) = 1.78$  
+Someone with an extrovert personality type is 1.78 times more likely that introverts to use alcohol frequently
+
+c) $exp(.1589, 1.008) = (1.17, 2.74)$  
+At a 95% confidence level an extrovert is between 1.17 to 2.74 times more likely to use alcohol frequently
+
+d) $exp(-1,008, -.1589) = (.364, 853). An introvert is between .364 and .854 times more likely to use alcohol frequently
+
+e) I used the Liklihood Ratio test which tests the intercept only model first, then the intercept with EI, then with TF added. The results of the test show that both EI and TF are significant variables. The EI model is an improvement over the intercept only model and the TF model is an improvement over the EI model.
+
+```{r q, comment=NA, warning=FALSE, message=FALSE}
+mdl = glm(cbind(dta$Y, dta$N) ~ EI + TF, family = binomial(), data = dta)
+anova(mdl, test = "Chisq")
+```
+
+\newpage
+
+### 4.19
+
+a) The odds of supporting abortion are increased by $exp(.16) = 1.17$ when the gender is female
+
+b) 
+\begin{align*}
+  \text{i)  } log(\frac{\pi(x)}{1 - \pi(x)}) = & \alpha + \beta_2^G + \beta_2^R + \beta_2^P \\
+  = & -.11 + 0 -.66 - 1.67 = -2.44 \\
+  \pi(x) = & \frac{exp(-2.44)}{1 + exp(-2.44)} \\
+  = & .08 \\
+  \\
+  \text{ii)  } log(\frac{\pi(x)}{1 - \pi(x)}) = & \alpha + \beta_1^G + \beta_3^R + \beta_1^P \\
+  = & -.11 + .16 + 0 + .84 \\
+  \pi(x) = & \frac{exp(.84)}{1 + exp(.84)} \\
+  = & .698 \\
+\end{align*}
+
+c) $B_2^G = -.16$
+
+d) $B_1^G = .08, B_2^G = -.08$
+
+### 4.22
+
+a) For each unit increase in weight, the odds of a female having a satellite increase by a factor of $exp(.43) = 1.53$. When a female is color2 the odds of her attracting a satellite are increased by a factor of $exp(-.008) = .99$ than if the crab is color 1. When a female is color3 the odds of her attracting a satellite are increased by a factor of $exp(-.137) = .871$ than if the crab is color1. When a female is color4 the odds of her attracting a satellite are increased by a factor of $exp(-.66) = .51$ then if she is color1.
+
+```{r s, echo=FALSE, comment=NA, warning=FALSE, message=FALSE}
+(mdl = glm(cbind(crabs$y, crabs$n) ~ weight + factor(color), family = binomial(), data = crabs))
+```
+
+b) The likelihood Ratio test for color shows that controlling for Weight, color is insignificant in determining the probability of a female crab having a satellite.
+
+```{r t, echo=FALSE, comment=NA, message=FALSE, warning=FALSE}
+anova(mdl, test = "Chisq")
+```
+
+c) For each unit increase in weight, the odds of a female having a satellite increase by a factor of $exp(.44) = 1.55$. For a one unit increase in color, the odds of a female having a satellite increases by a factor of $exp(-.2) = .818$.  The liklihood Ratio Test for color controlling for weight also shows that weight is insignificant in determining the probability that a female will have a satellite.
+
+```{r u, echo=FALSE, comment=NA, message=FALSE, warning=FALSE}
+(mdl = glm(cbind(crabs$y, crabs$n) ~ weight + color, family = binomial(), data = crabs))
+anova(mdl, test = "Chisq")
+```
+
+
+### 4.24
+
+a) For a one minute increase in duration, the odds of a patient having a sore throat increases by a factor of $exp(.068) = 1.07$.  Having a tracheal tube increases the odds of having a sore throat by a factor of $exp(-1.65) = .19$ vs having a laryngeal mask.
+
+```{r v, echo=FALSE, comment=NA, message=FALSE, warning=FALSE}
+
+dta = data.frame(
+  D = c(45, 15, 40, 83, 90, 25, 35, 65, 95, 35, 75, 45, 50, 75, 30, 25, 20, 60, 
+        70, 30, 60, 61, 65, 15, 20, 45, 15, 25, 15, 30, 40, 15, 135, 20, 40),
+  T = c(0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 
+        1, 1, 0, 1, 0, 1, 0, 0, 1, 1, 1, 1),
+  Y = c(0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 
+        0, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 0)
+)
+
+(mdl = glm(Y ~ D + T, family = binomial(), data = dta))
+
+```
+
+b) A 95% confidence interval for the odds increase in duration is between `r exp(.0686 + c(-1, 1) * 1.96 * .0264)`
+
+c) 
+i. When T = 1, $log(\frac{\pi(x)}{1 - \pi(x)}) = .049 + (.0284 + .0746)x + -4.47$. The odds of a patient having a sore throat increases by a factor of $exp(.103) = 1.1$.  
+ii. When T = 0, $log(\frac{\pi(x)}{1 - \pi(x)}) = .049 + .028x$. The odds of a patient having a sore throat increases by a factor of $exp(.028) = 1.028$
+
+```{r w, echo=FALSE, comment=NA, message=FALSE, warning=FALSE}
+(mdl = glm(Y ~ D*T, family = binomial(), data = dta))
+```
+
+d) Based on the likelihood ratio test, the interaction term does not significantly affect the odds of a patient having a sore throat.
+
+\newpage
+
+```{r x, echo=FALSE, comment=NA, message=FALSE, warning=FALSE}
+anova(mdl, test = "Chisq")
+```
+
+### 4.30
+
+If the athlete is white, the odds that the person will graduate increases by a factor of $exp(1.01) = 2.74$ vs someone who is black. If the athlete is male the odds the person will graduate increases by a factor of $exp(-.352) = .7$ vs that of a male. The 95% confidence level for the odds ratio between race and gender are $exp[log(.483) \pm 1.96 * sqrt(.018 + .0011 + .002 + .005)] = (.351, .662)$. We would conclude that the odds ratios between race and gender are significantly different and the odds of a white person graduating are higher than a black person.
+
+```{r y, comment=NA, message=FALSE, warning=FALSE, echo=FALSE}
+dta = data.frame(
+  Grad = c(498, 878, 54, 197),
+  No.Grad = c(796-498, 1625-878, 143-54, 660-197),
+  Race = c("White", "White", "Black", "Black"),
+  Gender = c("Female", "Male", "Female", "Male")
+)
+dta
+mdl = glm(cbind(dta$Grad, dta$No.Grad) ~ Race + Gender, family = binomial(), data = dta)
+cat("Probability Prediction")
+predict(mdl, dta, type = "response")
+summary(mdl)
+
+```
+
+### Additional Problem
+
+```{r z, comment=NA, warning=FALSE, message=FALSE, echo=FALSE}
+dta = data.frame(
+  Department = c(1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 
+                 5, 5, 6, 6, 6, 6),
+  Gender = rep(c("Male", "Male", "Female", "Female"), 6),
+  Admitted = rep(c("Yes", "No"), 12),
+  Freq = c(512, 313, 89, 19, 353, 207, 17, 8, 120, 205, 202, 391, 138, 279, 
+           131, 244, 53, 138, 94, 299, 22, 351, 24, 317)
+)
+
+dta2 = dcast(dta, Department + Gender ~ Admitted)
+
+mdl = glm(cbind(dta2$Yes, dta2$No) ~ Gender + factor(Department), 
+          family = binomial(), data = dta2)
+summary(mdl)
+
+```
+
+
+a) 
+
+```{r z2, comment=NA, warning=FALSE, message=FALSE}
+
+## Conditional Odds Ratios
+exp(coef(mdl))
+## 95% Confidence Interval
+exp(confint(mdl))
+
+```
+
+b)
+
+Breslow Day: $Ho: \theta_1 = 1, Ha: \theta_1 \ne 1$. Reject the null and conclude that the odds ratio between male and female are significantly different
+
+```{r z3, comment=NA}
+anova(mdl, test = "Chisq")
+```
+
+CMH: $Ho: \beta_1 = 0, Ha: \beta_1 \ne 0$
+Conditional on department there is insufficient evidence to show that the odds ratio between men and women are different.
+
+c) There is insufficient evidence to suggest that the common odds ratio is sufficient.
+
+```{r z4, comment=NA}
+dta2 = dta2[3:12,]
+
+mdl = glm(cbind(dta2$Yes, dta2$No) ~ Gender + factor(Department), 
+          family = binomial(), data = dta2)
+summary(mdl)
+exp(confint(mdl))
+```
+
+### 4.34
+
+When x = 0, $log(\frac{\pi(x)}{1 - \pi(x)}) = \alpha \rightarrow \pi(x) = \frac{exp(\alpha)}{1 + exp(\alpha)}$  
+When x = 1, $log(\frac{\pi(x)}{1 - \pi(x)}) = \alpha + \beta (1) \rightarrow \pi(x) = \frac{exp(\alpha + \beta (1))}{1 + exp(\alpha + \beta (1))}$  
+When x = 2, $log(\frac{\pi(x)}{1 - \pi(x)}) = \alpha + \beta (2) \rightarrow \pi(x) = \frac{exp(\alpha + \beta (2))}{1 + exp(\alpha + \beta (2))}$  
+When x = 3, $log(\frac{\pi(x)}{1 - \pi(x)}) = \alpha + \beta (3) \rightarrow \pi(x) = \frac{exp(\alpha + \beta (3))}{1 + exp(\alpha + \beta (3))}$  
+
+### 4.35
+
+a) $exp[- (\alpha + \beta (-\alpha / \beta))^2 / 2] = 0 \rightarrow exp[0] = 1 \rightarrow \pi(x) = .5 = .4 \beta$
+
+b) $7.502 / .302 = 24.8$
+
+c) $.4*.5*(1 - .4) = .12$
+
+

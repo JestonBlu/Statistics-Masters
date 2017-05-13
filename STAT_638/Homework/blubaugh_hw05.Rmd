@@ -1,0 +1,197 @@
+---
+output:
+  pdf_document:
+    latex_engine: xelatex
+    highlight: pygments
+mainfont: DejaVu Sans Mono
+sansfont: DejaVu Sans Mono
+fontsize: 11pt
+geometry: margin=1in
+---
+
+Homework 05  
+Joseph Blubaugh      
+jblubau1@tamu.edu    
+
+```{r a, echo=FALSE, results='hide'}
+library(knitr)
+library(scales)
+library(ggplot2)
+```
+
+
+## 6.1
+
+a) $\theta_A$ and $\theta_B$ are not independent under this prior distribution because $\theta_A = \theta, \theta_B = \theta \gamma$ both depend on $\theta$
+
+b) $\theta, \gamma = \theta_b / \theta_a, Y_a = (y_1...y_n), Y_b = (y_1..y_m)$
+
+\begin{align*}
+  p(y_a, y_b | \theta, \gamma) \propto & e^{-n \theta - m \theta \gamma} \theta^{n \bar y} (\theta \gamma)^{m \bar z} \\
+  p(\theta, \gamma) = & \theta^{a-1} e^{-b \theta} \gamma^{c-1} e^{-d\gamma} \\
+  \\
+  \text{Full Conditional:} \\
+  p(\theta | \gamma, y_a, y_b) \propto & \theta^{n \bar y} e^{-n \theta} e^{-m \theta \gamma} (\theta \gamma)^{m \bar z} \theta^{a-1} e^{-b\theta} \\
+  = & e^{-\theta(n + m \gamma + b)} \theta^{n \bar y + a - 1} \theta^{m \bar z} \gamma^{m \bar z} \\
+  = & \theta^{n \bar y + m \bar z + a -1} e^{-\theta(n + m \gamma + b)} \\
+  \propto & gamma(n \bar y + m \bar z + a, n + m \gamma + b) \\
+  \textup{Using estimates from the data:} \\
+  \propto & gamma(359 + a, 385.59 + b) \\
+\end{align*}
+
+c)
+
+\begin{align*}
+  \textup{Full Conditional:} \\
+  p(\gamma | \theta, y_a, y_b) \propto & p(\theta, \gamma | y_a, y_b) \\
+  \propto & e^{-n \theta - m \theta \gamma} (\theta \gamma)^{m \bar z} \gamma^{c-1} e^{-d \gamma} \\
+  \propto & e^{-n \theta} e^{-m \theta \gamma} e^{-d \gamma} \theta^{m \bar z} \gamma^{m \bar z} \gamma^{c-1} \\
+  \propto & \gamma^{m \bar z + c - 1} e^{-\gamma(m \theta + d)} \\
+  \propto & gamma(m \bar z + c, m \theta + d) \\
+  \textup{Using estimates from the data:} \\
+  \propto & gamma(305 + c, 202.96 + d) \\
+\end{align*}
+
+\newpage
+
+d)
+
+As the values of the prior for gamma get larger, the expectation of the difference between the two parameters increases
+
+```{r b, echo=FALSE, comment=NA}
+bach = c(1, 0, 0, 1, 2, 2, 1, 5, 2, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 2, 1, 3, 2, 0, 0, 3, 
+         0, 0, 0, 2, 1, 0, 2, 1, 0, 0, 1, 3, 0, 1, 1, 0, 2, 0, 0, 2, 2, 1, 3, 0, 0, 0, 1, 1)
+
+nobach = c (2, 2, 1, 1, 2, 2, 1, 2, 1, 0, 2, 1, 1, 2, 0, 2, 2, 0, 2, 1, 0, 0, 3, 6, 1, 6, 4, 0, 3, 2, 
+          0, 1, 0, 0, 0, 3, 0, 0, 0, 0, 0, 1, 0, 4, 2, 1, 0, 0, 1, 0, 3, 2, 5, 0, 1, 1, 2, 1, 2, 1, 
+          2, 0, 0, 0, 2, 1, 0, 2, 0, 2, 4, 1, 1, 1, 2, 0, 1, 1, 1, 1, 0, 2, 3, 2, 0, 2, 1, 3, 1, 3, 
+          2, 2, 3, 2, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 3, 3, 0, 1, 2, 2, 2, 0, 6, 0, 0, 0, 2, 0, 1, 1, 
+          1, 3, 3, 2, 1, 1, 0, 1, 0, 0, 2, 0, 2, 0, 1, 0, 2, 0, 0, 2, 2, 4, 1, 2, 3, 2, 0, 0, 0, 1, 
+          0, 0, 1, 5, 2, 1, 3, 2, 0, 2, 1, 1, 3, 0, 5, 0, 0, 2, 4, 3, 4, 0, 0, 0, 0, 0, 0, 2, 2, 0, 
+          0, 2, 0, 0, 1, 1, 0, 2, 1, 3, 3, 2, 2, 0, 0, 2, 3, 2, 4, 3, 3, 4, 0, 3, 0, 1, 0, 1, 2, 3, 
+          4, 1, 2, 6, 2, 1, 2, 2)
+
+a = 2; b = 1; c = d = 8
+
+dta1 = data.frame(gamma = 1, theta = 1)
+
+for (i in 2:5000) {
+  gamma = rgamma(n = 1, shape = 305 + a, rate = (218*dta1$theta[i-1]) + d)
+  theta = rgamma(n = 1, shape = 359 + a, rate = 58 + (218*dta1$gamma[i-1]) + b)
+  
+  dta1 = rbind(dta1, data.frame(theta, gamma))
+}
+
+c = d = 16
+
+dta2 = data.frame(gamma = 1, theta = 1)
+
+for (i in 2:5000) {
+  gamma = rgamma(n = 1, shape = 305 + a, rate = (218*dta2$theta[i-1]) + d)
+  theta = rgamma(n = 1, shape = 359 + a, rate = 58 + (218*dta2$gamma[i-1]) + b)
+  
+  dta2 = rbind(dta2, data.frame(theta, gamma))
+}
+
+c = d = 32
+
+dta3 = data.frame(gamma = 1, theta = 1)
+
+for (i in 2:5000) {
+  gamma = rgamma(n = 1, shape = 305 + a, rate = (218*dta3$theta[i-1]) + d)
+  theta = rgamma(n = 1, shape = 359 + a, rate = 58 + (218*dta3$gamma[i-1]) + b)
+  
+  dta3 = rbind(dta3, data.frame(theta, gamma))
+}
+
+c = d = 64
+
+dta4 = data.frame(gamma = 1, theta = 1)
+
+for (i in 2:5000) {
+  gamma = rgamma(n = 1, shape = 305 + a, rate = (218*dta4$theta[i-1]) + d)
+  theta = rgamma(n = 1, shape = 359 + a, rate = 58 + (218*dta4$gamma[i-1]) + b)
+  
+  dta4 = rbind(dta4, data.frame(theta, gamma))
+}
+
+
+c = d = 128
+
+dta5 = data.frame(gamma = 1, theta = 1)
+
+for (i in 2:5000) {
+  gamma = rgamma(n = 1, shape = 305 + a, rate = (218*dta5$theta[i-1]) + d)
+  theta = rgamma(n = 1, shape = 359 + a, rate = 58 + (218*dta5$gamma[i-1]) + b)
+  
+  dta5 = rbind(dta5, data.frame(theta, gamma))
+}
+
+dta1$diff = with(dta1, gamma - theta)
+dta2$diff = with(dta2, gamma - theta)
+dta3$diff = with(dta3, gamma - theta)
+dta4$diff = with(dta4, gamma - theta)
+dta5$diff = with(dta5, gamma - theta)
+
+dta = data.frame(
+  Sim = c(1:5),
+  Param = c("a=2, b=1,   c=d=8", 
+            "a=2, b=1,  c=d=16", 
+            "a=2, b=1,  c=d=32", 
+            "a=2, b=1,  c=d=64", 
+            "a=2, b=1, c=d=128"),
+  Mu.Diff = c(mean(dta1$diff), mean(dta2$diff), mean(dta3$diff), mean(dta4$diff), mean(dta5$diff))
+)
+
+dta
+
+```
+
+
+
+## 7.1
+
+#### a)
+
+$|\sum|^{-(p + 2)/2}$ is impropper and does not depend on $\theta$. 
+
+#### b)
+
+\begin{align*}
+  pj(\theta, \Sigma | y_1...y_n) \propto & |\Sigma|^{-(p+2)/2} |\Sigma|^{-n/2} exp[-1/2 \sum_{i=1}^n (y_i - \theta)^T \Sigma^{-1} (y_i - \theta)] |\Sigma|^{-(p+2)/2} \\
+  \propto & |\Sigma|^{-(n + p + 2)/2} exp[-1/2 \sum_{i=1}^n (y_i - \theta)^T \Sigma^{-1} (y_i - \theta)] |\Sigma|^{-(p+2)/2} \\
+  \\
+  pj(\theta | \Sigma, y_1...y_n) \propto & |\Sigma|^{-(n + p + 2)/2} exp[-.5 tr[\sum_{i=1}^n (y_i - \theta)(y_i - \theta)^T \Sigma^{-1}]] | \Sigma |^{-(p+2)/2} \\
+  \propto & |\Sigma|^{-(n + p + 2)/2} exp[-.5 tr[\sum_{i=1}^n (y_i - \bar y)(y_i - \bar y)^T \Sigma^{-1}]] | \Sigma |^{-(p+2)/2} \\
+  \propto & |\Sigma|^{-1/2} exp[ -.5 (y_i - \theta)^T \Sigma^{-1} (y_i - \theta)] \\
+  \propto & N(\bar y, \Sigma / n) \\
+  \\
+  pj(\Sigma | y_1...y_n) \propto & |\Sigma|^{-(p+2)/2} exp[-1/2 tr[S_0 \Sigma^{-1}]] \\
+  \propto & |\Sigma|^{(-v_0 + p + 1)/2} exp[-1/2 (tr(S_0 \Sigma^{-1}))] \\
+  \propto & InverseWishart(n-1, (n S^2)^{-1}) \\
+\end{align*}
+
+\newpage
+
+## 7.2
+
+#### a)
+
+\begin{align*}
+  p(y | \theta, \psi) = & (2 \pi)^{-p/2} |\Sigma|^{-1/2} exp [-1/2 (y - \theta)^T \Sigma^{-1} (y - \theta)] \\
+    lp(y | \theta, \psi) = & \frac{-np}{2} log[2 \pi] + \frac{n}{2} log[|\psi|] - \frac{1}{2} (y-\theta)^T \psi (y - \theta) \\
+    \text{The likelihood is proportional to:} \\
+    \sqrt{|\psi|} exp[-1/2n \sum_{i=1}^n (y_i - \theta)^T \psi (y_i - \theta)] = & \sqrt{|\psi|} exp[-1/2 tr[s^2 \psi + (\theta - \bar y)^2]] \\
+    p_u(\psi) = & InverseWishart(1, 1/\psi) \\
+    p_u(\theta, \psi | y) = & MVN(\bar y, 1/\psi)\\
+\end{align*}
+
+#### b)
+
+Yes because it is constructed from the product of the prior of $\Sigma$, the prior of $\theta | \Sigma$, and the likelihood.
+
+\begin{align*}
+  pu(\theta | \Sigma) pu(\Sigma) pu(y | \theta, \Sigma) = & |\Sigma|^{-(v_0 + p + 2)/2} exp[-1/2 tr[(S_o \psi)]] exp[-\rho_o / 2 (\theta - \mu_0) \psi (\theta - \mu_o)] \\
+  & \sqrt{|\psi|} exp[-1/2n \sum_{i=1}^n (y_i - \theta)^T \psi (y_i - \theta)] \\
+  \propto & MVN(\mu, \psi) \\
+\end{align*}

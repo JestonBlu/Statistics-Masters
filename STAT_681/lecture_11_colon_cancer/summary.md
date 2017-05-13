@@ -1,0 +1,4 @@
+Title: Notes from the crypt: What stistics can tell us about colon cancer
+Speaker: Joanne Lupton
+
+Dr. Lupton gave a very interesting talk on the impact of fiber and fish oil based fatty acids on colon cancer cells proliferation.  She highlighted several of her studies that showed the positive effects of using different types of oils that limit cancer cell proliferation. The most interesting part of this talk to me was the use of self organzing maps which appears to be a neural network based approach to visualizing highly dimensional data. I would have liked to heard a bit more about the interaction between corn oil and fish oil that was highlighted earlier in the talk. It was unclear to me from the reults that Dr. Lupton presented which treatment seemed to be the best. It looked like it was fish oil, but was the interaction between fish oil and corn oil significant?

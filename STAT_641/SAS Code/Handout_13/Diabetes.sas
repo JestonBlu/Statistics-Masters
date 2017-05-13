@@ -1,0 +1,19 @@
+*The following program will calculate the ;
+*McNemar Test;
+*for Example in Handout 13;
+
+OPTIONS PS=55 LS=75 NOCENTER NODATE;
+TITLE 'Circulatory Problem - McNemar Test';
+DATA CIRC;
+INPUT DIABWITHOUTCIR $ DIABWITHCIR $ CNT @@;
+CARDS;
+YES  YES   79   
+YES  NO    21
+NO   YES   39   
+NO   NO    41
+RUN;
+PROC FREQ ORDER=DATA; 
+TABLES DIABWITHOUTCIR*DIABWITHCIR;
+WEIGHT CNT;
+EXACT MCNEM;
+RUN;

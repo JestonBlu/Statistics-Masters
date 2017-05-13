@@ -1,0 +1,264 @@
+---
+output: pdf_document
+mainfont: Bitstream Vera Sans Mono
+sansfont: Bitstream Vera Sans Mono
+geometry: margin=1in
+---
+
+# STAT 626 HW03 BLUBAUGH
+
+## I
+
+### a
+
+i) There appears to be no pattern of dependence between the two series which makes sense given that they are made up of random variables and are non-autoregressive
+
+```{r a, echo=FALSE, fig.height=3}
+library(scales)
+library(astsa)
+
+set.seed(1000)
+w1 = rnorm(100)
+set.seed(1001)
+w2 = rnorm(100)
+
+x.t = 0; y.t = 0
+
+for (i in 2:100) {
+  x.t[i] = w1[i]
+  y.t[i] = w2[i]
+}
+
+par(mfrow = c(1, 2))
+
+plot.ts(x.t, main = "White Noise Series X.t")
+plot.ts(y.t, main = "White Noise Series Y.t")
+
+```
+
+```{r b, echo=FALSE, fig.height=3.5}
+
+par(mfrow = c(1, 1))
+
+plot(x = x.t, y = y.t, main = "X vs Y")
+
+```
+
+ii) Since the two series were generated independently of one another I would expect to fail to reject $H_0: \beta_1 = 0$
+
+\newpage
+
+iii) $.043 \pm 1.96*.112 = [-.179, .267]$ Since the 95% confidence interval crosses 0 we fail to rejec that the null hypothesis that $\beta_1 = 0$. The pvalue is also greater than .05 as a double check with agrees with the test.
+
+```{r c, echo=FALSE, fig.height=3.5, comment=NA}
+summary(lm(y.t ~ x.t))
+```
+
+b) 
+
+```{r d, echo=FALSE, comment=NA, fig.height=3.5}
+
+total = c()
+
+for (j in 1:1000) {
+  w1 = rnorm(100)
+  w2 = rnorm(100)
+  
+  x.t = 0; y.t = 0
+  
+  for (i in 2:100) {
+    x.t[i] = w1[i]
+    y.t[i] = w2[i]
+  }
+  
+  mdl = summary(lm(y.t ~ x.t))
+  total = c(total, mdl$coefficients[2, 4])
+  
+}
+
+hist(total, main = "Histogram of X.t pvalues", xlab = "Pvalue")
+
+```
+
+The similation in resulted in `r percent(length(which(total < .05)) / length(total))` of pvalues being < .05 which is consistent with expectations. Since $\alpha = .05$ we would expect the test to result in finding significant relationship between X and Y approximately 5% of the time.
+
+\newpage
+
+#### 2.9
+
+a)
+Sea surface temperatures trend downward over time with a $\beta_1 = -.007$ and standard error = .0016 which yields a significant pvalue <.0001.
+
+```{r e, echo=FALSE, comment=NA, fig.height=3.5}
+summary(lm(soi ~ time(soi)))
+plot.ts(soi - 13.70 + (.00692*time(soi)), main = "Detrended Surface Temperature")
+```
+
+\newpage
+
+b) The spikes tend to show up every 2 years.
+
+```{r f, echo=FALSE, comment=NA, fig.height=3.5}
+x = soi - 13.70 + (.00692*time(soi))
+
+I = abs(fft(x)/sqrt(453))^2
+P = (4/453) * I[1:(453/2 + 1)]
+f = 0:226 / 453
+
+plot(f, P, type = "l", xlab = "Frequency", ylab = "Index", main = "Periodogram")
+abline(v = f[c(39, 39+24, 39+24+24, 39+24+24+24, 39+24+24+24+24)],
+       lty = 2, col = "blue")
+
+```
+
+
+#### 2.10
+
+```{r g, echo=FALSE, comment=NA, fig.height=3.5}
+plot.ts(gas/100 * 19, ylim = c(1, 150), col = "blue", main = "Oil vs Gas Dollar per barrel")
+lines(oil, col = "red")
+legend(x = 2000, y = 100, legend = c("Gas", "Oil"), lty = c(1,1), col = c("blue", "red"))
+```
+
+a) Neither of these series are stationary based on their ACF plots which shows that the recent lags are highly correlated with previous periods. Figure 1.3 shows a series with decresing variation as t increases. Gas appears to have less variation after transforming the series into the same scale as oil (dollar per barrel).
+
+b) Natural log transformations change the interpretation of a series from units to percent. Taking the log of X.t alone will not make the series stationary, but taking the difference of t-1 and t after taking the log it will get the series closer to being stationary.
+
+\newpage
+
+c) Both series look stationary because there are not any significant spikes beyond the 95% confidence line. 
+
+```{r h, echo=FALSE, comment=NA, fig.height=3}
+plot(diff(log(gas/100 * 19)), col = "blue", 
+     main = "Log Differencing Oil and Gas", ylab = "Percent Change")
+lines(diff(log(oil)), col = "red")
+
+par(mfrow = c(1,2))
+acf(diff(log(gas)))
+acf(diff(log(oil)))
+```
+
+d) Gas appears to be leading oil slightly based on the 3 periods (h-(1,2,3)) where the correlation is at or above the confidence band.
+
+```{r i, echo=FALSE, comment=NA, fig.height=3}
+par(mfrow = c(1,1))
+ccf(diff(log(gas)), diff(log(oil)), 
+    main = "Cross Correlation Plot (x=Gas and y=Oil)",
+    xlab = "Gas (lag h)")
+```
+
+\newpage
+
+e) The most significant relationship is at lag 0 indicating that the 2 series move together instead of one leading the other. There is a small ammount of correlation at lag 1. There are a few noticeable outliers that are probably not affecting the correlation based on the relative straightness of the smoother.
+
+```{r j, echo=FALSE, comment=NA, fig.height=3}
+lag2.plot(series1 = diff(log(oil)), series2 = diff(log(gas)), max.lag = 3)
+
+```
+
+f) 
+
+i)The regression summary shows that the most significant variable affecting the price of gas at time t is the price of oil at time t. Oil at lag 1 also shows significant and when the change in oil is positive than the change in gass is positive with mild significance.
+
+```{r k, echo=FALSE, comment=NA, fig.height=3}
+poil = diff(log(oil)); pgas = diff(log(gas/100 * 19))
+
+indi = ifelse(poil < 0, 0, 1)
+mess = ts.intersect(pgas, poil, poiL = lag(poil, -1), indi)
+summary(fit <- lm(pgas ~ poil + poiL + indi, data = mess))
+
+```
+
+ii) $pgas = -.0064 + .683(poil) + .112(poiL) + e$
+
+\newpage
+
+iii) Ignoring that the residuals are correlated there are some obvious outliers that are affecting the model. The standardized residuals show not pattern and there are some observations with high leverage, but arent neccesarily negatively affecting the model.
+
+```{r l, echo=FALSE, comment=NA, fig.height=6}
+par(mfrow = c(2,2))
+plot(fit, ask = FALSE)
+```
+
+#### 3.4
+
+a) AR(1)   
+$-.5(2 - B)(10 - 3B)\phi = (10 - 3B)w_t4$  
+The $\phi$ root is > 1 so the model is causal.  
+The $\theta$ root is = 1 so the model is not invertible.  
+
+b) ARMA(2,1)  
+$(1 - B - .5^2)x_t = (1 - B)w_t$  
+The roots are complex numbers so the model is not causal    
+the $\theta$ root is = 1 so it is not invertible    
+
+\newpage
+
+#### 3.6
+
+\begin{align*}
+  x_t = & -.9x_{t-2} + w_t \\
+  (1 + .9B^2)x_t = & w_t \\
+  \\
+  \text{Find Root: } 1 + .9B^2 = & 0 \rightarrow B = \pm \sqrt{1/.9} \\
+  \text{Find Root: } w_t = & 0 \\
+  \\
+  \text{Calculate ACF} \\
+  \rho(0) = 1 = & c_1 (\sqrt{1/.9})^{-0} + c_2 (-\sqrt{1/.9})^{-0} \rightarrow c_1 + c_2 = 0 \\
+  \rho(1) = \frac{\phi_1}{1 - \phi_2} = & \frac{0}{1 - .9} \rightarrow 0 = c_1(\sqrt{1/.9})^{-1} + c_2(-\sqrt{1/.9})^{-1} \\
+  c_1 = c_2 = & .5 \\
+  \end{align*}
+
+```{r m, echo=FALSE, comment=NA, fig.height=4}
+plot(x = 0:10, y = .5*sqrt(1/.9)^-(0:10) + .5*sqrt(1/.9)^-(0:10), main = "ACF", type = "l",
+     xlab = "p(h)", ylab = "Autocorrelation")
+```
+
+\newpage
+
+#### 3.7
+
+a) 
+
+\begin{align*}
+  p(-1) = 4.44 = & (-1.25)^(-1) (C_1 + C_2 h) \\
+  = & .8 C_1 + .8 C_2 \\
+  4.44 - .8 C_1 = & .8 C_2 \\
+  (4.44 - .8 C_1) / .8 = & C_2 \\
+  4.44 = & .8 ( C_1 = \frac{4.44 - .8 C_1}{.8} h ) \\
+  C_1 = C_2 = & 1 \\
+  \rho(h) = & (-1.25)^{-h} (1 - 1h) \\
+\end{align*}
+
+```{r n, echo=FALSE, comment=NA, fig.height=4}
+plot(x = 0:5, y = (5/4)^-(0:5) * (1 - 1*(0:5)), type = "l", main = "ACF (A)")
+```
+
+
+b)
+
+\begin{align*}
+  p(0) = 1 = & C_1 (-.4)^{-0} + C_2 (-.45)^{-0} \\
+  1 = & -4 C_1 - .45 C_2 \\
+  (1 - .4 C_1) / -.45 = & C_2 \\
+  1 = & C_1 (-.4)^{-0} + \frac{1 - .4 C_1}{-.45} (-.45)^{-0} \\
+  C_1 = 1.7, C_2 = & -.7 \\
+  \rho(h) = & 1.7(-.4)^{-h} - .7(-.45)^{-h} \\
+\end{align*}
+
+```{r o, echo=FALSE, comment=NA, fig.height=4}
+plot(x = 0:5, y = 1.7*(-.4^-(0:5)) - .7*(-.45^-(0:5)), type = "l", main = "ACF (B)")
+```
+
+
+c)
+
+\begin{align*}
+  \text{root: } & .705 + .823i \\
+  \rho (0) = & C_1(.705 + .823i) + C_2(.705 + .823i) \\
+  1 = & C_1 + C_2 \\
+  1 - C_1 = & C_2 \\
+  C_1 = C_2 = & .5 \\
+  \rho(h) = & 2(.5(.705 + .823i)^{-h}) \\
+\end{align*}
+

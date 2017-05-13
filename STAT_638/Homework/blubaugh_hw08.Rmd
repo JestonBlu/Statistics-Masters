@@ -1,0 +1,363 @@
+---
+output:
+  pdf_document:
+    latex_engine: xelatex
+    highlight: pygments
+mainfont: DejaVu Sans Mono
+sansfont: DejaVu Sans Mono
+fontsize: 11pt
+geometry: margin=1in
+---
+  
+Homework 08  
+Joseph Blubaugh      
+jblubau1@tamu.edu    
+
+```{r a, echo=FALSE}
+modelselect=function(X,y,nreps,z){
+#
+#  This function uses Gibbs sampling to draw samples from the posterior
+#  distribution of z given regression data, where z is a vector of
+#  0s and 1s indicating which independent variables are included in the
+#  model. X is the design matrix, y the vector of responses, nreps the
+#  desired number of samples to draw, and z a starting value for the
+#  model.  Taking z to be a vector of ncol(X) 1s is reasonable.  (This is
+#  the full model containing all the independent variables.)
+#
+#  Values of regression coefficients and error variance are also
+#  generated from their posterior each time a value of z is drawn. A
+#  g-prior (with g=n) is used for the regression coefficients and a unit
+#  information conjugate prior is used for the error variance.  All z
+#  are equally likely a priori.
+#
+p=ncol(X)
+n=nrow(X)
+I=diag(rep(1,len=n))
+# 
+#  Initialize Beta (matrix of all generated regression
+#  coefficients), Sigma2 (vector of generated error variances) and Z
+#  (matrix of all generated models). 
+#
+Beta=matrix(0,nreps,p+1)
+Sigma2=1:nreps
+Z=matrix(0,nreps,p)
+#
+#  Start generating parameters.  
+#
+for(i in 1:nreps){
+vec=sample(1:p)
+y=matrix(y,n,1)
+#
+#  Update z.
+#
+for(j in 1:p){
+z1=z
+z1[vec[j]]=1
+z2=z
+z2[vec[j]]=0
+Odds=odds(X,y,z1,z2)
+prob=Odds/(1+Odds)
+z[vec[j]]=rbinom(1,1,prob)
+}
+Z[i,]=z
+vec=(1:p)[z==1]
+p1=length(vec)
+#
+#  Compute least squares estimates for current model z. 
+#
+Xz=cbind(rep(1,len=n),X[,vec])
+out=lsfit(Xz,y,intercept=F)
+resid=out$resid
+betahat=out$coef
+A=solve(t(Xz)%*%Xz)
+SSR=t(y)%*%(I-(n/(n+1))*Xz%*% A %*%t(Xz))%*%y
+SSR=as.vector(SSR)
+s2=sum(resid^2)/(n-length(vec)-1)
+rate=(s2+SSR)/2
+#
+# Generate error variance. 
+#
+Sigma2[i]=rgamma(1,(n+1)/2,rate=rate)
+Sigma2[i]=1/Sigma2[i]
+#
+#  Compute mean vector and covariance matrix of multivariate normal
+#  from which beta is drawn.
+#
+mu=n*betahat/(n+1)
+Sigma=n*Sigma2[i]*A/(n+1)
+#
+#  Generate beta.
+#
+beta=rjmvnorm(1,mu,Sigma)
+Beta[i,1]=beta[1]
+if(length(vec)>0) Beta[i,vec+1]=beta[2:(p1+1)]
+}
+#
+#  Output Beta, Z and Sigma2.
+#
+list(Beta,Z,Sigma2)
+}
+
+rjmvnorm=function(n,mu,Sigma){
+#
+#  This function generates n values from a MVN(mu,Sigma)
+#  distribution. 
+#
+  p=length(mu)
+  X=matrix(rnorm(p*n),p,n)
+  Sigroot=t(chol(Sigma))
+  X=Sigroot %*% X + mu
+  t(X)
+}
+
+odds=function(X,y,z1,z2){
+#
+#  This function computes the odds ratio used to calculate the
+#  posterior probability that the jth component of z is 1, given
+#  values of all the other components of z.
+#
+  n=nrow(X)
+  p=ncol(X)
+  I=diag(rep(1,len=n))
+  X=cbind(rep(1,len=n),X)
+  vec1=(1:p)[z1==1]
+  vec2=(1:p)[z2==1]
+  p1=length(vec1)
+  p2=length(vec2)
+  odds=(1+n)^((p2-p1)/2)
+  Xz1=cbind(rep(1,len=n),X[,1+vec1])
+  Xz2=cbind(rep(1,len=n),X[,1+vec2])
+  RSS1=t(y) %*% (I-(n/(n+1)) * Xz1 %*% solve(t(Xz1) %*% Xz1) %*% t(Xz1)) %*% y
+  RSS1=as.vector(RSS1)
+  RSS2=t(y)%*%(I-(n/(n+1))*Xz2%*%solve(t(Xz2)%*%Xz2)%*%t(Xz2))%*%y
+  RSS2=as.vector(RSS2)
+  s21=lsfit(Xz1,y,intercept=F)$resid
+  s21=sum(s21^2)/(n-p1-1)
+  s22=lsfit(Xz2,y,intercept=F)$resid
+  s22=sum(s22^2)/(n-p2-1)
+  odds=odds*(s21/s22)^(1/2)
+  num=s22+RSS2
+  denom=s21+RSS1
+  odds=odds*(num/denom)^((n+1)/2)
+  odds
+}
+```
+
+
+
+## 9.2)
+
+```{r b, echo=FALSE, comment=NA}
+dta = read.table(file = "../Data/azdiabetes.dat", header = TRUE)
+y = dta$glu; dta = as.matrix(dta[, c(1,3,4,5,6,7)])
+
+g = 532; nu0 = 2; s20 = 1; S = 1000
+
+n = dim(dta)[1]; p = dim(dta)[2]
+Hg = (g / (g + 1)) * dta %*% solve(t(dta) %*% dta) %*% t(dta)
+SSRg = t(y) %*% (diag(1, nrow = n) - Hg) %*% y
+s2 = 1 / rgamma(S, (nu0 + n) / 2, (nu0 * s20 + SSRg) / 2 )
+Vb = g * solve(t(dta) %*% dta) / (g + 1)
+Eb = Vb %*% t(dta) %*% y
+E = matrix(rnorm(S * p, 0, sqrt(s2)), S, p)
+beta = t(t(E %*% chol(Vb)) + c(Eb))
+
+results.b = data.frame(
+  npreg = quantile(beta[,1], c(.025, .975)),
+  bp = quantile(beta[,2], c(.025, .975)),
+  skin = quantile(beta[,3], c(.025, .975)),
+  bmi = quantile(beta[,4], c(.025, .975)),
+  ped = quantile(beta[,5], c(.025, .975)),
+  age = quantile(beta[,6], c(.025, .975)),
+  row.names = c("2.5%", "97.5%")
+  )
+
+cat("a) Estimates of the posterior betas")
+results.b
+
+
+x = modelselect(X = dta,
+                y = y,
+                nreps = 1000,
+                z = c(1,1,1,1,1,1))
+
+results = data.frame(
+  npreg = quantile(x[[1]][,2], c(.025, .975)),
+  bp = quantile(x[[1]][,3], c(.025, .975)),
+  skin = quantile(x[[1]][,4], c(.025, .975)),
+  bmi = quantile(x[[1]][,5], c(.025, .975)),
+  ped = quantile(x[[1]][,6], c(.025, .975)),
+  age = quantile(x[[1]][,7], c(.025, .975)),
+  row.names = c("2.5%", "97.5%")
+  )
+
+
+cat("b) Estimates of the after best model selection")
+results
+
+freq = data.frame(x[[2]])
+library(plyr)
+freq$all = with(freq, paste(X1,X2,X3,X4,X5,X6))
+
+cat("   Probability of best model")
+arrange(ddply(freq, .(all), summarise, prob = length(all)/1000), desc(prob))
+
+cat("The 95% Confidence interval of the betas after model selection is much smaller than\nthe intial posterior betas in the previous model")
+
+```
+
+\newpage
+
+## 9.3)
+
+```{r c, echo=FALSE, comment=NA}
+
+dta = read.table("../Data/crime.dat", header = TRUE)
+
+y = dta$y; dta = as.matrix(dta[, 2:16])
+
+g = 47; nu0 = 2; s20 = 1; S = 1000
+
+n = dim(dta)[1]; p = dim(dta)[2]
+Hg = (g / (g + 1)) * dta %*% solve(t(dta) %*% dta) %*% t(dta)
+SSRg = t(y) %*% (diag(1, nrow = n) - Hg) %*% y
+s2 = 1 / rgamma(S, (nu0 + n) / 2, (nu0 * s20 + SSRg) / 2 )
+Vb = g * solve(t(dta) %*% dta) / (g + 1)
+Eb = Vb %*% t(dta) %*% y
+E = matrix(rnorm(S * p, 0, sqrt(s2)), S, p)
+beta = t(t(E %*% chol(Vb)) + c(Eb))
+
+cat("a)\n")
+cat("Posterior betas")
+apply(beta, 2, mean)
+cat("95% Confidence Posterior Betas")
+apply(beta, 2, function(x) quantile(x, c(.025, .975)))
+
+dta = read.table("../Data/crime.dat", header = TRUE)
+mdl = lm(y ~ ., data = dta)
+
+cat("LS Coefficients")
+mdl$coefficients
+cat("LS 95% Confidence Interval")
+t(confint(mdl))
+
+```
+
+The coefficients of the LS and Bayesian models are very similar and both agree on which variables are significant. M, Ed, U2, Ineq, Prob are the significant variables in the model, because their 95% cofidence interval does not cross zero. M, Ed, U2, and Ineq all contribute to the crime rate as they increase and Prob decreases the crime rate as it increases.
+
+b)
+
+In this particular case the linear regression error is less than the bayesian error. The bayesian estimates are not the same as the least squared estimates and the influence of the prior prevents them from equaling the least square estimates. In the case when the random sample of data is not representitive of the population, the least squares estimates will hurt prediction accuracy on the test set. The Bayesian estimates are more consistent so in the long run it has a lower average error.
+
+```{r d, echo=FALSE, comment=NA}
+dta = read.table("../Data/crime.dat", header = TRUE)
+
+set.seed(1)
+x = sample(47, 23)
+dta.train = dta[x, ]
+dta.test = dta[-x, ]
+
+## Least Squares Regression
+mdl = lm(y ~ ., data = dta.train)
+ls.predict = predict(mdl, dta.test)
+cat("Least Squares Regression Error")
+(error = 1/24 * sum((dta.test$y - ls.predict)^2))
+plot(x = dta.test$y, y = ls.predict, xlab = "Test Y", ylab = "Pred Y", 
+     main = "LS Regression")
+
+```
+
+\newpage
+
+```{r e, echo=FALSE, comment=NA}
+
+## Bayesian Regression
+y = dta.train$y; dta2 = as.matrix(dta.train[, 2:16])
+g = 23; nu0 = 2; s20 = 1; S = 1000
+
+n = dim(dta2)[1]; p = dim(dta2)[2]
+Hg = (g / (g + 1)) * dta2 %*% solve(t(dta2) %*% dta2) %*% t(dta2)
+SSRg = t(y) %*% (diag(1, nrow = n) - Hg) %*% y
+s2 = 1 / rgamma(S, (nu0 + n) / 2, (nu0 * s20 + SSRg) / 2 )
+Vb = g * solve(t(dta2) %*% dta2) / (g + 1)
+Eb = Vb %*% t(dta2) %*% y
+E = matrix(rnorm(S * p, 0, sqrt(s2)), S, p)
+beta = t(t(E %*% chol(Vb)) + c(Eb))
+
+coefs = apply(beta, 2, mean)
+
+bs.pred = with(dta.test, 
+               coefs[1] * M + coefs[2] * So + coefs[3] * Ed + coefs[4] * Po1 + coefs[5] * Po2 + 
+                 coefs[6] * LF + coefs[7] * M.F + coefs[8] * Pop + coefs[9] * NW + coefs[10] * U1 + 
+                 coefs[11] * U2 + coefs[12] * GDP + coefs[13] * Ineq + coefs[14] * Prob +
+                 coefs[1] * Time)
+
+cat("Bayesian Regression Error")
+(error = 1/24 * sum((dta.test$y - bs.pred)^2))
+
+plot(x = dta.test$y, y = bs.pred, xlab = "Test Y", ylab = "Pred Y", 
+     main = "Bayesian Regression")
+
+```
+
+\newpage
+
+c)
+
+I ran 1000 simulations of the experiment and computed the prediction error for the least squares and bayesian regression. On average the bayesian regression has a smaller mean and variance error than the LS regression.
+
+```{r f, echo=FALSE, comment=NA}
+
+errors = data.frame()
+
+for (i in 1:1000) {
+  
+  dta = read.table("../Data/crime.dat", header = TRUE)
+
+  x = sample(47, 23)
+  dta.train = dta[x, ]
+  dta.test = dta[-x, ]
+  
+  ## Least Squares Regression
+  mdl = lm(y ~ ., data = dta.train)
+  ls.predict = predict(mdl, dta.test)
+  ls.error = 1/24 * sum((dta.test$y - ls.predict)^2)
+  
+  
+  x = sample(47, 23)
+  dta.train = dta[x, ]
+  dta.test = dta[-x, ]
+  
+  ## Bayesian Regression
+  y = dta.train$y; dta = as.matrix(dta.train[, 2:16])
+  g = 23; nu0 = 2; s20 = 1; S = 1000
+  
+  n = dim(dta)[1]; p = dim(dta)[2]
+  Hg = (g / (g + 1)) * dta %*% solve(t(dta) %*% dta) %*% t(dta)
+  SSRg = t(y) %*% (diag(1, nrow = n) - Hg) %*% y
+  s2 = 1 / rgamma(S, (nu0 + n) / 2, (nu0 * s20 + SSRg) / 2 )
+  Vb = g * solve(t(dta) %*% dta) / (g + 1)
+  Eb = Vb %*% t(dta) %*% y
+  E = matrix(rnorm(S * p, 0, sqrt(s2)), S, p)
+  beta = t(t(E %*% chol(Vb)) + c(Eb))
+  
+  coefs = apply(beta, 2, mean)
+  
+  bs.pred = with(dta.test, 
+                 coefs[1] * M + coefs[2] * So + coefs[3] * Ed + coefs[4] * Po1 + coefs[5] * Po2 + 
+                   coefs[6] * LF + coefs[7] * M.F + coefs[8] * Pop + coefs[9] * NW + coefs[10] * U1 + 
+                   coefs[11] * U2 + coefs[12] * GDP + coefs[13] * Ineq + coefs[14] * Prob +
+                   coefs[1] * Time)
+ bs.error = 1/24 * sum((dta.test$y - bs.pred)^2)
+ 
+ errors = rbind(errors, data.frame(ls.error, bs.error))
+ 
+}
+
+summary(errors)
+cat("Variance of estimates")
+var(errors)
+boxplot(errors)
+
+
+```

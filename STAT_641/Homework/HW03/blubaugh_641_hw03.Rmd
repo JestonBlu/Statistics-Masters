@@ -1,0 +1,135 @@
+---
+output:
+  pdf_document:
+    latex_engine: xelatex
+    highlight: pygments
+mainfont: Calibri Light
+sansfont: Calibri Light
+fontsize: 11pt
+geometry: margin=1in
+---
+
+**Homework 03**  
+**Joseph Blubaugh**  
+jblubau1@tamu.edu  
+**STAT 641-720**  
+
+\newpage
+
+1.  
+    a.
+\begin{align*}
+    S(y) = P[Y > y] &= 1 - F(y) \\
+                    &= 1 - 1 - exp \Big [  - \Big ( \frac{y - \theta}{\alpha} \Big ) ^{\gamma}  \Big ] \\
+                    &= -exp \Big [  - \Big ( \frac{y - \theta}{\alpha} \Big ) ^{\gamma}  \Big ] \\
+\end{align*}
+
+    b.
+\begin{align*}
+    h(y) = \frac{f(y)}{S(y)} &= \frac{\frac{\gamma}{\alpha^{\gamma}}(y - \theta)^{\gamma - 1} exp \Big [  - \Big ( \frac{y - \theta}{\alpha} \Big ) ^{\gamma}  \Big ]}{-exp \Big [  - \Big ( \frac{y - \theta}{\alpha} \Big ) ^{\gamma}  \Big ]} \\
+    &= -\frac{\gamma}{\alpha^{\gamma}}(y - \theta)^{\gamma - 1} \\
+\end{align*}
+
+2.  
+    a.  $Q(.25) = Y_{((51 - 1).25 + 1)} = Y_{(13.5)} = 2.61$  
+    b.  $Q(.5) = Y_{((51 - 1).5 + 1)} = Y_{26} = 5$  
+    c.  $Q(.75) = Y_{((51 - 1).75 + 1)} = Y_{38.5} = 10.445$  
+
+
+3.  
+    a) Combining the Kernel Denisty function with the pdf, our function to esimate f(3) and f(6) are:
+    $$f(y) = \frac{1}{51(3)} \sum_{i=1}^{51} \frac{1}{\sqrt{2 \pi}} exp \Big [ -\frac{(y - Y_i)^2}{2(3)^2} \Big ]$$
+
+```{r 3a, echo=FALSE, comment=NA}
+Y = c(0.42, 0.86, 0.88, 1.11, 1.34, 1.38, 1.42, 1.47, 1.63,
+      1.73, 2.17, 2.42, 2.48, 2.74, 2.74, 2.79, 2.90, 3.12,
+      3.18, 3.27, 3.30, 3.61, 3.63, 4.13, 4.40, 5.00, 5.20,
+      5.59, 7.04, 7.15, 7.25, 7.75, 8.00, 8.84, 9.30, 9.68,
+      10.32, 10.41, 10.48, 11.29, 12.30, 12.53, 12.69, 14.14, 14.15,
+      14.27, 14.56, 15.84, 18.55, 19.73, 20.00)
+
+x = 1 /(51 * 3)
+
+x1 = as.numeric()
+for (i in 1:51) {
+  tmp = (1 / (sqrt(2 * pi))) * exp(-(3 - Y[i])^2 / (2 * 3^2))
+  x1 = c(x1, tmp)
+  results = x * x1
+}
+
+paste("f(3) = ", round(sum(results),4))
+
+x = 1 /(51 * 3)
+
+x1 = as.numeric()
+for (i in 1:51) {
+  tmp = (1 / (sqrt(2 * pi))) * exp(-(16 - Y[i])^2 / (2 * 3^2))
+  x1 = c(x1, tmp)
+  results = x * x1
+}
+
+paste("f(16) = ", round(sum(results),4))
+```
+b)  With a bin width of 5, minimum value of .42  
+        
+    bin1 = [.42, 5.42)  
+    bin2 = [5.42, 10.42)  
+    bin3 = [10.42, 15.42)  
+    bin4 = [15.42, 20.42)  
+
+```{r 3b, echo=FALSE, comment=NA}
+paste("f(3) = ", round(21/ (51*5),4))
+paste("f(16) = ", round(4/ (51*5),4))
+```
+
+  c)  The smallest contribution at y=16, f(16) is the smallest value from 16 which is .42
+  d)  The largest contribution at y=16, f(16) is the closest value to 16 which is 15.84
+  
+4.    
+    a)
+
+```{r 4a, echo=FALSE, comment=NA, fig.height=3}
+Y = c(0.42, 0.86, 0.88, 1.11, 1.34, 1.38, 1.42, 1.47, 1.63,
+      1.73, 2.17, 2.42, 2.48, 2.74, 2.74, 2.79, 2.90, 3.12,
+      3.18, 3.27, 3.30, 3.61, 3.63, 4.13, 4.40, 5.00, 5.20,
+      5.59, 7.04, 7.15, 7.25, 7.75, 8.00, 8.84, 9.30, 9.68,
+      10.32, 10.41, 10.48, 11.29, 12.30, 12.53, 12.69, 14.14, 14.15,
+      14.27, 14.56, 15.84, 18.55, 19.73, 20.00)
+
+X = c(.94, 1.26, 1.44, 1.49, 1.63, 1.80, 2, 2, 2.56,
+      2.58, 3.24, 3.39, 3.53, 3.77, 4.36, 4.41, 4.6, 4.67,
+      5.39, 6.25, 7.02, 7.89, 7.97, 8, 8.28, 8.83, 8.91,
+      8.96, 9.92, 11.36, 12.15, 14.4, 16, 18.61, 18.75,
+      19.05, 21, 21.41, 23.27, 24.71, 25, 28.75, 30.23, 35.45,
+      36.35) 
+
+
+par(mfrow=c(1,3))
+plot(density(Y), main = "PDF (small litter)", xlim=c(0,37))
+plot(quantile(Y, probs=seq(0,1,.01)), type="l", y=seq(0,1,.01), main='CDF (small litter)', xlab="bs", ylab="F(y)", xlim=c(0,37))
+plot(y = quantile(Y, probs = seq(0,1,.01)), type = "l", x = seq(0,1,.01), main = 'Quantiles (small litter)', xlab="u", ylab="Q(u)(bs)", ylim=c(0,37))
+
+par(mfrow=c(1,3))
+plot(density(X), main = "PDF (large litter)", xlim=c(0,37))
+plot(quantile(X, probs = seq(0,1,.01)), type = "l", y = seq(0,1,.01), main = 'CDF (large litter)', xlab="bs", ylab="F(y)", xlim=c(0,37))
+plot(y = quantile(X, probs = seq(0,1,.01)), type = "l", x = seq(0,1,.01), main = 'Quantiles (large litter)', xlab="u", ylab="Q(u)(bs)", ylim=c(0,37))
+```
+
+  b)  Both distributions are right skewed, but the small litter distribution has more area near the peak of the distribution while the large litter has less area under the peak and tails off to the right.  
+  c)  Based on the two distrubitions my conclusions is that larger litters tend to have larger brain sizes but there is a lot more variation in brain size for large litters than there are for small litters.
+
+5. 
+  1) E, each function can be found from any of the other functions assuming they exist
+  2) B, observations far from the center of the distribution will have large bin widths and will not be representative of the concentration of data in the bin
+  3) D, this will take into account the concentration of points in the bin
+  4) B, kernel density is better than relative frequency because relative frequency only considers the observations in specific bins
+  5) B, mean and variance alone will not tell you the shape of the graph
+  6) D, skewness measures symmetry and kurtosis measurses concentraion in the tails or lack there of which would result in more area in the peak of the distribution
+  7) E, both C and D are correct
+  8) B, $(\mu, \sigma)$ are better estimators when the distribution is pretty close to normal
+  9) E, MAD is preferred to SIQR for very skewed distributions or heavy tails
+  10) A, since the expectd value of E(t) = 0, the mean and variance are equal to the expected values of $\mu$ and $\sigma^2$
+
+
+
+

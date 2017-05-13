@@ -1,0 +1,85 @@
+---
+output:
+  pdf_document:
+    latex_engine: xelatex
+    highlight: pygments
+mainfont: Calibri Light
+sansfont: Calibri Light
+fontsize: 11pt
+geometry: margin=1in
+---
+
+**Homework 06**  
+**Joseph Blubaugh**  
+jblubau1@tamu.edu  
+**STAT 608-720**  
+
+\newpage
+
+
+1.  
+
+\begin{align*}
+    E[\hat{\beta} | X] &= Var((X'X)^{-1} X'Y)                          \\
+                       &= (X'X)^{-1} X' Var(Y) X (X'X)                 \\
+                       &= (X'X)^{-1} X' Var(X \beta + e) X (X'X)^{-1}  \\
+                       &= (X'X)^{-1} X' \Sigma X(X'X)^{-1}               \\
+                       &= (X'X)^{-1} X' \sigma^2 I X (X'X)^{-1}        \\
+                       &= \sigma^2 (X'X)^{-1} X'X (X'X)^{-1}           \\
+                       &= \sigma^2 (X'X)^{-1}                          \\
+\end{align*}
+
+
+2.  
+a)  Weights might be neccesary if we were looking at variation in weight gain for a single diet, but since we are looking at multiple diets we want to fit multiple slopes so weighting is not neccesary.  
+b)  A polynomial model might be a good fit in this case because there is a curving pattern in the data. I would use a polynomial(3) because higher order polynomials will fit closer to the data points than lower orders  
+c)  The data points seem to spread out more as the dose increases and all of the points seem to be overlapping at dose = 0 so a good idea is to use a polynomial model with a single intercept and different slopes  
+d)  $y_i = \beta_0 + \beta_1 x_i + \beta_2 (iSource2) (iSource3) x_i$ 
+
+
+3.  
+a) 
+\begin{displaymath}
+\mathbf{Y}
+\begin{bmatrix}
+    y_1 \\ y_2 \\ y_3 \\ y_4 \\ y_5 \\ y_6 \\ 
+    y_7 \\ y_8 \\ y_9 \\ y_10 \\ y_11 \\ y_12 \\
+\end{bmatrix}
+\mathbf{ = A} 
+\begin{bmatrix}
+    1 & 0 & 0 \\ 1 & 0 & 0 \\ 1 & 0 & 0 \\ 1 & 0 & 0 \\
+    0 & 1 & 0 \\ 0 & 1 & 0 \\ 0 & 1 & 0 \\ 0 & 1 & 0 \\
+    0 & 0 & 1 \\ 0 & 0 & 1 \\ 0 & 0 & 1 \\ 0 & 0 & 1 \\
+\end{bmatrix}
+\mathbf{+ B}
+\begin{bmatrix}
+    \beta_1 \\ \beta_2 \\ \beta_3 \\
+\end{bmatrix}
+\mathbf{+ E}
+\begin{bmatrix}
+    e_1 \\ e_2 \\ e_3 \\ e_4 \\ e_5 \\ e_6 \\ 
+    e_7 \\ e_8 \\ e_9 \\ e_10 \\ e_11 \\ e_12 \\
+\end{bmatrix}
+\end{displaymath}
+
+$H_0: \frac{\beta_1 + \beta_2}{2} - \beta_3 = 0$,  $H_1: A \beta \ne h$
+
+$F = \frac{(A \hat{\beta} - h)' (A (X'X)^{-1} A')^{-1} (A \hat{\beta} - h) (n - p - 1)}{r (\hat{e}'\hat{e})}$
+
+b)  
+$H_0: \frac{(\mu_1 + \mu_2)}{2} - \mu_3 = \frac{5.6 + 7.9}{2} - 6.1 = .65 = 0$  
+$H_1: .65 \ne 0$
+
+$F = 0.101^2 = .01$
+
+
+4.  
+a)  37.5 is the average for treatment group A. [-11.5  1  -27.7] is the difference between groups B, C, D and group A so the average values for B, C, and D are [26  38.5  9.8]
+
+b)  
+    1) $X_1, X_2, X_3, X_4$ are independent
+    2) Errors are normally distributed around 0
+    3) Variance is constant
+    4) Errors are independent of each other
+c)  $B_2$ is the difference between $\mu_B$ and $\mu_A$ so $-11.5 \pm (1.96 * 3.89) = (-19.1244, -3.8756)$
+d)  $37.5 - 11.5 = 26$

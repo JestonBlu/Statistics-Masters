@@ -1,0 +1,239 @@
+---
+output:
+  pdf_document:
+    latex_engine: xelatex
+    highlight: pygments
+mainfont: DejaVu Sans Mono
+sansfont: DejaVu Sans Mono
+fontsize: 11pt
+geometry: margin=1in
+---
+
+Homework 04   
+Joseph Blubaugh    
+jblubau1@tamu.edu  
+
+**5.1)**
+
+```{r a, echo=TRUE, comment=NA}
+school1 = scan(file = "../Data/school1.dat")
+school2 = scan(file = "../Data/school2.dat")
+school3 = scan(file = "../Data/school3.dat")
+school = data.frame()
+
+for(i in 1:3) {
+  s = paste("school", i, sep = "")
+  
+  ## Prior
+  mu_0 = 5; s2_0 = 4; k_0 = 1; v_0 = 2
+  
+  ## Data
+  n = length(eval(parse(text=s))); ybar = mean(eval(parse(text=s))); 
+  s2 = var(eval(parse(text=s)))
+  
+  ## Posterior Inference
+  k_n = k_0 + n; v_n = v_0 + n
+  
+  ## Posterior mean of theta
+  mu_n = (k_0 * mu_0 + n * ybar) / k_n
+  
+  ## Posterior mean of sigma
+  s2_n = (v_0*s2_0 + (n - 1)*s2 + k_0*n*(ybar-mu_0)^2 / (k_n)) / v_n
+  
+  school = 
+    rbind(school, data.frame(
+      School = s, 
+      mu_n = mu_n, 
+      s_n = sqrt(s2_n),
+      k_n = k_n,
+      v_n = v_n,
+      mu_95_l = qnorm(p = .025, mean = mu_n, sd = s2_n / k_n),
+      mu_95_u = qnorm(p = .975, mean = mu_n, sd = s2_n / k_n),
+      s_95_l = sqrt(1 / qgamma(p = .975, shape = v_n / 2, rate = v_n * s2_n / 2)),
+      s_95_u = sqrt(1 / qgamma(p = .025, shape = v_n / 2, rate = v_n * s2_n / 2))))
+}
+## A) Posterior Parameters with 95% Confidence Intervals of Mu and Sigma
+school
+```
+
+\newpage
+
+```{r b, echo=TRUE, comment=NA}
+
+## B)
+
+theta = data.frame(
+  theta.1 = rnorm(n = 1E6, mean = 9.292, sd = sqrt(3.798^2 / 26)),
+  theta.2 = rnorm(n = 1E6, mean = 6.948, sd = sqrt(4.263^2 / 24)),
+  theta.3 = rnorm(n = 1E6, mean = 7.812, sd = sqrt(3.618^2 / 21)) 
+)
+
+theta = cbind(theta, data.frame(p1 = F, p2 = F, p3 = F, p4 = F, p5 = F, p6 = F))
+theta$p1[theta$theta.1 < theta$theta.2 & theta$theta.1 < theta$theta.3 & 
+           theta$theta.2 < theta$theta.3] = T
+theta$p2[theta$theta.1 < theta$theta.3 & theta$theta.1 < theta$theta.2 & 
+           theta$theta.3 < theta$theta.2] = T
+theta$p3[theta$theta.2 < theta$theta.1 & theta$theta.2 < theta$theta.3 & 
+           theta$theta.1 < theta$theta.3] = T
+theta$p4[theta$theta.2 < theta$theta.3 & theta$theta.2 < theta$theta.1 & 
+           theta$theta.3 < theta$theta.1] = T
+theta$p5[theta$theta.3 < theta$theta.1 & theta$theta.3 < theta$theta.2 & 
+           theta$theta.1 < theta$theta.2] = T
+theta$p6[theta$theta.3 < theta$theta.2 & theta$theta.3 < theta$theta.1 & 
+           theta$theta.2 < theta$theta.1] = T
+
+## P1: theta.1 < theta.2 < theta.3
+length(which(theta$p1 == TRUE)) / 1E6
+## P2: theta.1 < theta.3 < theta.2
+length(which(theta$p2 == TRUE)) / 1E6
+## P3: theta.2 < theta.1 < theta.3
+length(which(theta$p3 == TRUE)) / 1E6
+## P4: theta.2 < theta.3 < theta.1
+length(which(theta$p4 == TRUE)) / 1E6
+## P5: theta.3 < theta.1 < theta.2
+length(which(theta$p5 == TRUE)) / 1E6
+## P6: theta.3 < theta.2 < theta.1
+length(which(theta$p6 == TRUE)) / 1E6
+
+
+```
+
+\newpage
+
+```{r c, echo=TRUE, comment=NA}
+## C)
+## Simulate SD from the posterior distribution of sigma
+Y1.sd = sqrt(1/rgamma(n = 1E6, shape = 27 / 2, rate = 27 * 3.798^2 / 2) / 26)
+Y2.sd = sqrt(1/rgamma(n = 1E6, shape = 25 / 2, rate = 25 * 4.263^2 / 2) / 24)
+Y3.sd = sqrt(1/rgamma(n = 1E6, shape = 22 / 2, rate = 22 * 3.618^2 / 2) / 21)
+
+## Simulate predicted Y from the posterior predictive distribution of theta
+Y = data.frame(
+  y.1 = rnorm(n = 1E6, mean = 9.292, sd = Y1.sd),
+  y.2 = rnorm(n = 1E6, mean = 6.487, sd = Y2.sd),
+  y.3 = rnorm(n = 1E6, mean = 7.812, sd = Y3.sd)
+)
+
+Y = cbind(Y, data.frame(p1 = F, p2 = F, p3 = F, p4 = F, p5 = F, p6 = F))
+Y$p1[Y$y.1 < Y$y.2 & Y$y.1 < Y$y.3 & Y$y.2 < Y$y.3] = T
+Y$p2[Y$y.1 < Y$y.3 & Y$y.1 < Y$y.2 & Y$y.3 < Y$y.2] = T
+Y$p3[Y$y.2 < Y$y.1 & Y$y.2 < Y$y.3 & Y$y.1 < Y$y.3] = T
+Y$p4[Y$y.2 < Y$y.3 & Y$y.2 < Y$y.1 & Y$y.3 < Y$y.1] = T
+Y$p5[Y$y.3 < Y$y.1 & Y$y.3 < Y$y.2 & Y$y.1 < Y$y.2] = T
+Y$p6[Y$y.3 < Y$y.2 & Y$y.3 < Y$y.1 & Y$y.2 < Y$y.1] = T
+
+## P1: y.1 < y.2 < y.3
+length(which(Y$p1 == TRUE)) / 1E6
+## P2: y.1 < y.3 < y.2
+length(which(Y$p2 == TRUE)) / 1E6
+## P3: y.2 < y.1 < y.3
+length(which(Y$p3 == TRUE)) / 1E6
+## P4: y.2 < y.3 < y.1
+length(which(Y$p4 == TRUE)) / 1E6
+## P5: y.3 < y.1 < y.2
+length(which(Y$p5 == TRUE)) / 1E6
+## P6: y.3 < y.2 < y.1
+length(which(Y$p6 == TRUE)) / 1E6
+
+
+```
+
+\newpage
+
+```{r d, echo=TRUE, comment=NA}
+
+## D)
+
+## Probability that Theta.1 is greather than Theta.2 and Theta.3
+theta$p7 = F; theta$p7[theta$theta.1 > theta$theta.2 & theta$theta.1 > theta$theta.3] = T
+length(which(theta$p7 == TRUE)) / 1E6
+
+## Probability that Theta.1 is greather than Theta.2 and Theta.3
+Y$p7 = F; Y$p7[Y$y.1 > Y$y.2 & Y$y.1 > Y$y.3] = T
+length(which(Y$p7 == TRUE)) / 1E6
+
+
+
+```
+
+**5.2**
+
+```{r e, echo=TRUE, comment=NA}
+
+## Prior probabilities
+mu_0 = 75; s_0 = 10; vk_0 = c(1, 2, 4, 8, 16, 32)
+
+## Sample data
+n = 16; ybar_a = 75.2; s_a = 7.3; ybar_b = 77.5; s_b = 8.1
+
+## Parameters
+param = data.frame(mu_0, s_0, vk_0)
+param$vk_n = with(param, vk_0 + n)
+param$s_a_n = with(param, 1/vk_n * ((vk_0 * s_0^2) + ((n - 1) * s_a^2) + 
+                                      (vk_0 * n / vk_n) * (ybar_a - mu_0)^2))
+param$s_b_n = with(param, 1/vk_n * ((vk_0 * s_0^2) + ((n - 1) * s_b^2) + 
+                                      (vk_0 * n / vk_n) * (ybar_b - mu_0)^2))
+param$mu_a_n = with(param, ((vk_0 * mu_0) + (n*ybar_a)) / vk_n)
+param$mu_b_n = with(param, ((vk_0 * mu_0) + (n*ybar_b)) / vk_n)
+
+## Simulate draws from the posterior distributions
+results = c()
+
+for (i in 1:6) {
+  theta_1 = rnorm(n = 1E6, mean = param$mu_a_n[i], sd = sqrt(param$s_a_n / param$vk_n[i]))
+  theta_2 = rnorm(n = 1E6, mean = param$mu_b_n[i], sd = sqrt(param$s_b_n / param$vk_n[i]))
+  results = c(results, length(which(theta_1 < theta_2)) / 1E6)
+}
+
+(param = cbind(param, thetaA_LT_thetaB = results))
+
+```
+
+The increase in V represents having more prior information. Since the prior mu is 75, as V and K increase, the posterior probabilities of Theta A and Theta B move closer to 75. This shows how when you have more data which forms your prior opinion, the prior has a much larger influence on the posterior probabilities.
+
+```{r f, echo=TRUE, comment=NA}
+
+library(ggplot2)
+ggplot(aes(x = factor(vk_0), y = thetaA_LT_thetaB), data = param) +
+  geom_point(pch = 16, size = 6) +
+  scale_x_discrete("V = K") +
+  scale_y_continuous("P(Theta.A < Theta.B)") +
+  ggtitle("P(Theta.A < Theta.B)")
+
+```
+
+\newpage
+
+**5.5**
+
+a)
+
+\begin{align*}
+  f(y|\mu, \sigma^2) = & (2\pi \sigma^2)^{-.5} exp[-.5 (y - \mu)^2/\sigma] \\
+  f(y|\mu, \psi = \frac{1}{\sigma^2}) = & \frac{(2 \pi)^{-.5}}{\psi} exp [-.5 \psi (y - \mu)^2] \\
+  L p(y | \theta, \psi) = & \frac{(2 \pi)^{-n/2}}{\psi} exp[\frac{-\psi}{2} \sum (y_i - \theta)^2] \\
+  l p(y | \theta, \psi) = & \frac{-n}{2} log(2\pi) - \frac{n}{2} log(\psi) - \frac{1}{2\psi} \sum (y_i - \theta)^2 \\
+\end{align*}
+
+b)
+
+\begin{align*}
+  log[Pu(\theta, \psi)] = & \frac{l P(\theta, \psi | y)}{n} + c \\
+  log [\psi^{.5}] - \frac{\gamma \psi}{2} (\theta - \mu)^2 + (a - 1) log[\psi] - b \psi = & \frac{\frac{-n}{2} log(2\pi) - \frac{n}{2} log(1/\psi) - \frac{\psi}{2} \sum (y_i - \theta)^2}{n} + c \\
+  - \frac{\gamma \psi}{2} (\theta - \mu)^2 + (a - 1) log[\psi] - b \psi = & \frac{-log[2\pi]}{2} - \frac{\sum (y_i - \bar y)^2 + n(\theta - \bar y)^2}{2 \psi n} + c \\
+\end{align*}
+
+Im lost at this point
+
+c) The joint density can be considered a posterior density because it integrates to 1 and depends on data only through the sufficient statistic.
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,290 @@
+---
+output:
+  pdf_document:
+    latex_engine: xelatex
+    highlight: pygments
+mainfont: DejaVu Sans Mono
+sansfont: DejaVu Sans Mono
+fontsize: 11pt
+geometry: margin=1in
+---
+
+Homework 03   
+Joseph Blubaugh    
+jblubau1@tamu.edu  
+
+```{r a, echo=FALSE, results='hide'}
+library(knitr)
+library(scales)
+library(ggplot2)
+```
+
+## 3.14
+
+### a)
+
+\begin{align*}
+p(y|\theta) = & \theta^y (1 - \theta)^{(n-y)} \\
+log [p(\theta | y)] = \sum log[p(y|\theta)] = & y log[\theta] + (n - y) log[1 - \theta] \\
+\frac{d log[p(\theta|y)]}{d\theta} = & \frac{y}{\theta} + \frac{n-y}{1-\theta} \\
+\text{MLE estimate}: 0 = & \frac{y}{\theta} + \frac{n-y}{1-\theta} \\
+\frac{n}{y} = & \frac{1}{\theta} \\
+\theta = & \frac{y}{n} \\
+\frac{d^2 log[p(\theta | y)]}{d \theta^2} = & \frac{y}{\theta^2} + \frac{(n-y)}{(1-\theta)^2} \\
+J(\theta) = & -\frac{y}{\theta^2} - \frac{(n-y)}{(1-\theta)^2} \\
+\end{align*}
+
+### b)
+
+\begin{align*}
+p_u(\theta) = & \theta^y (1 - \theta)^{(n-y)} / exp[n] \\
+-\frac{d^2 P_u(\theta)}{d \theta^2} = & -\frac{y}{n \theta^2} - \frac{n - y}{n (1 - \theta)^2} \\
+\end{align*}
+
+### c)
+
+\begin{align*}
+p_u(\theta | y) = \theta^y (1 - \theta)^{n-y} [-\frac{y}{n\theta^2} - \frac{n-y}{n(1 - \theta)^2}] \\
+\end{align*}
+
+No because it no longer retains the form of the binomial density function
+
+### d)
+
+\begin{align*}
+p(y | \theta) = & \Pi_{i=1}^n \frac{e^{-\theta} \theta^y}{y!} \\
+= & \frac{e^{-n \theta} \theta^y}{y!} \\
+l p(\theta | y) = & y log[\theta] - n \theta \\
+\frac{l p(\theta | y)}{d \theta} = & \frac{y}{\theta} - n \\
+\text{MLE}: 0 = & \frac{y}{\theta} - n \rightarrow \theta = \frac{y}{n} \\
+-\frac{d^2 l p(\theta | y)}{d \theta^2} = & -\frac{y}{\theta^2} \\
+\\
+p_u(\theta) = & \frac{e^{-n \theta} \theta^y}{y!} / n \\
+= & exp[\frac{y}{n}] \theta - \theta \\
+\frac{d^2 log[p(\theta | y)]}{d \theta^2} = & \frac{y}{n\theta} - 1 \\
+\\
+p_u(\theta | y) = & \frac{e^{-n \theta} \theta^{y - 1} y}{y!} - 1 \\
+\end{align*}
+
+Yes because it still maintains the general form of the poisson density function
+
+\newpage
+
+## 4.1
+
+Posterior Distributions:
+$P(\theta_1 | Y_1 = 57) = beta(58, 47)$  
+$P(\theta_2 | Y_2 = 30) = beta(31, 21)$  
+
+```{r b, echo=TRUE, comment=NA}
+
+theta.1 = rbeta(n = 5000, shape1 = 58, shape2 = 44)
+theta.2 = rbeta(n = 5000, shape1 = 31, shape2 = 21)
+
+## Estimated Probability that theta.1 < theta.2
+length(which(theta.1/theta.2 < 1) == TRUE) / 5000
+
+plot(density(theta.1), col = "blue", main = "Posterior Simulation Comparison")
+lines(density(theta.2), col = "red")
+legend(x = .4, y = 6, legend = c("theta1", "theta2"), lty = c(1,1), col = c("blue", "red"))
+
+```
+
+\newpage
+
+## 4.2
+
+### a)
+
+$P(\theta_a | Y_a) = P(Y_a | \theta) P(\theta) = Poisson(Y_a/N) | \theta) Gamma(120, 10) = Gamma(120 + 237, 10 + 10)$  
+$P(\theta_b | Y_b) = P(Y_b | \theta) P(\theta) = Poisson(Y_b/N)) Gamma(12, 1) = Gamma(12 + 125, 1 + 13)$  
+
+```{r c, echo=TRUE, comment=NA}
+
+Y.a = c(12, 9, 12, 14, 13, 13, 15, 8, 15, 6)
+Y.b = c(11, 11, 10, 9, 9, 8, 7, 10, 6, 8, 8, 9, 7)
+
+theta.a = rgamma(n = 100000, shape = 120 + sum(Y.a), rate = 10 + 10)
+theta.b = rgamma(n = 100000, shape = 12 + sum(Y.b), rate = 1 + 13)
+
+## Probability that theta.a is > theta.b
+mean(theta.a > theta.b)
+
+
+plot(density(theta.a), col = "blue", main = "Posterior Simulation Comparison", 
+     xlim = c(6, 15))
+lines(density(theta.b), col = "red")
+legend(x = 6, y = .5, legend = c("theta.a", "theta.b"), lty = c(1,1), col = c("blue", "red"))
+
+```
+
+\newpage
+
+### b)
+
+```{r d, echo=TRUE, comment=NA}
+
+
+results = data.frame()
+
+n = 20; sims = 100000
+
+for (i in 1:n) {
+  theta.a = rgamma(n = sims, shape = 120, rate = 10)
+  theta.b = rgamma(n = sims, shape = 12 * i, rate = i)
+  
+  x = mean(theta.a < theta.b)
+  
+  results = rbind(results, data.frame(N = i, Prob = x))
+  
+}
+
+## The Probability of N where Theta.b < Theta.a ~ 10+
+t(round(results, 4))
+
+```
+
+### c)
+
+```{r e, echo=TRUE, comment=NA}
+
+theta.a = rgamma(n = sims, shape = 120, rate = 10 + 10)
+theta.b = rgamma(n = sims, shape = 12 + sum(Y.b), rate = 1 + 13)
+
+pois.a = rpois(n = sims, lambda = theta.a)
+pois.b = rpois(n = sims, lambda = theta.b)
+
+mean(pois.b < pois.a)
+
+results = data.frame()
+
+sims = 100000
+
+for (i in seq(.0, 2, .05)) {
+  
+  theta.a = rgamma(n = sims, shape = 120, rate = 10 + 10)
+  theta.b = rgamma(n = sims, shape = 12 * i, rate = i)
+  
+  pois.a = rpois(n = sims, lambda = theta.a)
+  pois.b = rpois(n = sims, lambda = theta.b)
+  
+  x = mean(pois.b < pois.a)
+  
+  results = rbind(results, data.frame(N = i, Prob = x))
+  
+}
+
+## The Probability of N where Theta.b < Theta.a for approximately all N
+t(round(results, 4))
+
+
+
+```
+
+\newpage
+
+## 4.8
+
+### a)
+
+```{r f, echo=FALSE, comment=NA}
+nobach = c (2, 2, 1, 1, 2, 2, 1, 2, 1, 0, 2, 1, 1, 2, 0, 2, 2, 0, 2, 1, 0, 0, 3, 6, 1, 6, 4, 0, 3, 2, 
+          0, 1, 0, 0, 0, 3, 0, 0, 0, 0, 0, 1, 0, 4, 2, 1, 0, 0, 1, 0, 3, 2, 5, 0, 1, 1, 2, 1, 2, 1, 
+          2, 0, 0, 0, 2, 1, 0, 2, 0, 2, 4, 1, 1, 1, 2, 0, 1, 1, 1, 1, 0, 2, 3, 2, 0, 2, 1, 3, 1, 3, 
+          2, 2, 3, 2, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 3, 3, 0, 1, 2, 2, 2, 0, 6, 0, 0, 0, 2, 0, 1, 1, 
+          1, 3, 3, 2, 1, 1, 0, 1, 0, 0, 2, 0, 2, 0, 1, 0, 2, 0, 0, 2, 2, 4, 1, 2, 3, 2, 0, 0, 0, 1, 
+          0, 0, 1, 5, 2, 1, 3, 2, 0, 2, 1, 1, 3, 0, 5, 0, 0, 2, 4, 3, 4, 0, 0, 0, 0, 0, 0, 2, 2, 0, 
+          0, 2, 0, 0, 1, 1, 0, 2, 1, 3, 3, 2, 2, 0, 0, 2, 3, 2, 4, 3, 3, 4, 0, 3, 0, 1, 0, 1, 2, 3, 
+          4, 1, 2, 6, 2, 1, 2, 2)
+
+bach = c(1, 0, 0, 1, 2, 2, 1, 5, 2, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 2, 1, 3, 2, 0, 0, 3, 
+         0, 0, 0, 2, 1, 0, 2, 1, 0, 0, 1, 3, 0, 1, 1, 0, 2, 0, 0, 2, 2, 1, 3, 0, 0, 0, 1, 1)
+```
+
+```{r g, echo=TRUE, comment=NA, fig.height=4.1}
+
+prior.theta.shape = 2; prior.theta.rate = 1
+
+post.theta.a = rgamma(5000, shape = prior.theta.shape + sum(bach), 
+                      rate = prior.theta.rate + length(bach))
+post.theta.b = rgamma(5000, shape = prior.theta.shape + sum(nobach), 
+                      rate = prior.theta.rate + length(nobach))
+
+pred.theta.a = rpois(n = 5000, lambda = post.theta.a)
+pred.theta.b = rpois(n = 5000, lambda = post.theta.b)
+
+dta = data.frame(
+  Theta = c(rep("A", 5000), rep("B", 5000)),
+  Pred = c(pred.theta.a, pred.theta.b)
+)
+
+ggplot(dta) + 
+  geom_bar(aes(x = Pred, fill = Theta), position = "dodge", alpha = .7, color = "black") +
+  scale_x_continuous("Predicted Number of Children") +
+  scale_fill_manual("", labels = c("Bach", "NoBach"), values = c("gray50", "black")) +
+  ggtitle("Posterior Predictive Densities")
+
+```
+
+\newpage
+
+### b)
+
+Since the 95% Confidence Interval of the difference in the posterior distributions does not include 0 we could conclude that there are significant differences between two distributions. The 95% Confidence intervals of the difference in posterior predictive distributions does however contain 0 so we not be able to say that these two distributions are significantly different.
+
+```{r h, echo=TRUE, comment=NA}
+## Difference in Posterior Theta Estimate
+quantile(post.theta.b - post.theta.a, c(.025, .975))
+
+## Difference in Posterior Prediction Estimate
+quantile(pred.theta.b - pred.theta.a, c(.025, .975))
+
+```
+
+### c)
+
+The Poisson(1.4) appears to be a good model for approximating the distribution of the NoBach data set. Except for Y = 0, all of the ECDF points are very close to the points of of the poisson densisty.
+
+```{r i, echo=TRUE, comment=NA}
+
+plot(ecdf(nobach), main = "NoBach ECDF vs Pois(1.4)")
+points(x = 0:6, ppois(q = 0:6, lambda = 1.4), col = "blue")
+```
+
+\newpage
+
+### d)
+
+The plot supports the poisson model as an appropriate model for the data. The average count of NoBach that have one child is higher than the those with no children which is consistent with the sampled data and with the distribution function of the Poisson(1.4) model used in the last section. I would expect Ones to be closer than Zero because its most likely closer to the true average.
+
+```{r j, echo=TRUE, comment=NA}
+
+results = data.frame()
+
+for (i in 1:5000) {
+  y = pred.theta.b[sample(x = 5000, size = 218)]
+  
+  zero = length(which(y == 0))
+  ones = length(which(y == 1))
+  
+  results = rbind(results, data.frame(zero = zero, ones = ones))
+}
+
+ggplot(results) +
+  geom_point(aes(x = zero, y = ones)) +
+  geom_vline(xintercept = mean(results$zero), lty = 2, color = "blue") +
+  geom_hline(yintercept = mean(results$ones), lty = 2, color = "blue") +
+  ggtitle("Comparison of Theta_B Posterior Predictive Sampling")
+
+```
+
+
+
+
+
+
+
+
+
+
+

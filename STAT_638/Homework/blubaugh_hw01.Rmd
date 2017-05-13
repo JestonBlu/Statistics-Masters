@@ -1,0 +1,146 @@
+---
+output:
+  pdf_document:
+    latex_engine: xelatex
+    highlight: pygments
+mainfont: DejaVu Sans Mono
+sansfont: DejaVu Sans Mono
+fontsize: 11pt
+geometry: margin=1in
+---
+
+Homework 01  
+Joseph Blubaugh  
+jblubau1@tamu.edu  
+
+```{r a, echo=FALSE, results='hide'}
+library(knitr)
+library(scales)
+library(ggplot2)
+```
+
+
+### 2.1
+
+Rows: Fathers Profession, Cols: Sons Profession
+
+```{r b, echo=FALSE}
+jobs = data.frame(row.names = c('farm', 'operative', 'craftsman', 'sales', 'professional'),
+                  farm = c(.018, .002, .001, .001, .001),
+                  operative = c(.035, .112, .066, .018, .029),
+                  craftsman = c(.031, .064, .094, .019, .032),
+                  sales = c(.008, .032, .032, .01, .043),
+                  professional = c(.018, .069, .084, .051, .13)
+                  )
+kable(jobs)
+```
+
+#### a)  Fathers marginal density
+
+```{r c, comment=NA}
+rowSums(jobs)
+```
+
+#### b)  Sons marginal density
+
+```{r d, comment=NA}
+colSums(jobs)
+```
+
+#### c) P(Son Profession | Father = Farmer)
+
+```{r e, comment=NA}
+jobs[1, ] / rowSums(jobs)[1]
+```
+
+#### d) P(Father Profession | Son = Farmer)
+
+```{r f, comment=NA}
+data.frame(farm = jobs[, 1] / colSums(jobs)[1], 
+           row.names = c('farm', 'operative', 'craftsman', 'sales', 'professional'))
+```
+
+\newpage
+
+### 2.2
+
+a)  $E[a_1 Y_1 + a_2 Y_2] =  a_1 E[Y_1] + a_2 E[Y_2]$  
+ $Var[a_1 Y_1 + a_2 Y_2] =  a_1^2 Var[Y_1] + a_2^2 Var[Y_2]$  
+ 
+b)  $E[a_1 Y_1 - a_2 Y_2] =  a_1 E[Y_1] - a_2 E[Y_2]$  
+ $Var[a_1 Y_1 - a_2 Y_2] =  a_1^2 Var[Y_1] + a_2^2 Var[Y_2]$  
+
+### 2.3
+
+a)  $P(X|Y) = P(X)$; $P(X|Y, Z) = P(X,Z) \approx f(X,Z)$
+
+b)  $P(Y|X) = P(Y)$; $P(Y|X, Z) = P(Y,Z) \approx f(Y,Z)$
+ 
+### 2.5
+
+a)
+
+Rows: X, Cols: Y
+
+```{r g, comment=NA, echo=FALSE}
+dta = data.frame(
+  row.names = c("Head", "Tail", "Marginal.Y"),
+  "Green" = c(.2, .3, .5),
+  "Red" = c(.3, .2, .5),
+  "Marginal.X" = c(.5, .5, 1)
+)
+
+kable(dta, format = "markdown")
+
+```
+
+b)  $E[Y] = .5$  
+    $P[Y = G | X = H] = .2$  
+    $P[Y = G | X = T] = .3$  
+    $P[Y = G] = .5$
+    
+c)  $Var[Y|X = 0] = 0^2 (.2) + 1^2 (.3) = .3$  
+    $Var[Y|X = 1] = 0^2 (.3) + 1^2 (.2) = .2$  
+
+The difference in variance is because we are essentially comparing the following conditional probabilities: $P(Y = 1 | X = 0) = .3$ and $P(Y = 1 | X = 1) = .2$. The smaller probability will have smaller variation than the larger probability because we are more certain that the smaller probability will occur less often than the larger probability.
+
+d)  $P(X = 0 | Y = 1) = .2/.5 = .4$
+
+\newpage
+
+### 2.6
+
+Under this scenario the following are conditionally dependent. $P(A \bot B | C); P(A^c \bot B | C); P(A \bot B^c | C)$ and $A^c, B^c$ are the same area. $P(A \bot B | C^c)$ are not conditionally independent because A and B intersect outside of C.  
+
+```{r h, echo=FALSE}
+ggplot() +
+  geom_tile(aes(x = 2, y = 4), width = 5, height = 5, fill = "yellow", alpha = .3, color = "black", lty = 2) +
+  geom_tile(aes(x = 5, y = 4.5), width = 1, height = 4, fill = "yellow", alpha = .3, color = "black", lty = 2) +
+  geom_tile(aes(x = 3, y = 1), width = 7, height = 3, fill = "blue", alpha = .3, color = "black") +
+  geom_tile(aes(x = 5.5, y = 3), width = 2, height = 7, fill = "red", alpha = .3, color = "black") +
+  annotate("text", x = 0, y = 6, label = "C") +
+  annotate("text", x = 0, y = 0, label = "A") +
+  annotate("text", x = 6, y = 6, label = "B") +
+  annotate("text", x = 6, y = 0, label = "A n B") +
+  annotate("text", x = 0, y = 2, label = "A n C") +
+  annotate("text", x = 5, y = 6, label = "B n C") +
+  annotate("text", x = 5, y = 2, label = "C^c") +
+  annotate("text", x = 4, y = 1, label = "C^c") +
+  annotate("text", x = 6, y = 3, label = "C^c") +
+  theme_void()
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+

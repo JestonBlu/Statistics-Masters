@@ -1,0 +1,267 @@
+---
+output: pdf_document
+mainfont: Bitstream Vera Sans Mono
+sansfont: Bitstream Vera Sans Mono
+geometry: margin=.5in
+---
+
+# STAT 626 HW06 BLUBAUGH
+
+## I
+
+### 2.8 
+
+a) There are 634 observations in the series. In the first half (1:317), $\sigma^2 = 113$, in the second half (318:634) $\sigma^2 = 594$ The difference between the two makes it clear that variance is not constant across the series.  Applying a log transformation to the series and calculating variance across the same intervals returns $\sigma^2 = [.27, .45]$ respectively. Although the variance is not the same for the two segments, it is much closer than before the transformation. A histogram of varve before the transformation shows a heavily right skewed, non normal distribution where as the log transformation of varve shows a much more normal distribution although slightly right skewed.
+
+```{r a, echo=FALSE, fig.height=3, fig.align='center'}
+library(astsa)
+
+par(mfrow = c(1, 2))
+hist(varve, main = "x.t")
+hist(log(varve), main = "y.t")
+
+```
+
+b)
+
+There doesn't appear to be a noticeable similarity between the two series when breaking up the varve set into 100 year intervals other than the linear trend seems to stay relatively stable for long periods of time. The two datasets are related to different periods in time so it may not be appropriate to compare the two.
+
+```{r b, echo=FALSE, fig.height=5, fig.align='center'}
+par(mfrow = c(2,1))
+plot.ts(log(varve), main = "y.t log(varve)")
+abline(v = seq(100, 600, 100))
+plot.ts(gtemp, main = "global temp")
+```
+
+c)
+
+The long tail of the ACF indicates the possibility that the data are not stationary. Differencing would be a suggested method for making the series stationary
+
+```{r c, echo=FALSE, fig.height=3, fig.align='center'}
+par(mfrow = c(1,1))
+acf(log(varve))
+```
+
+d)
+
+The data appears to be stationary with $E(u_t) = 0$. The ACF plot shows significance at lag 1 indicating that an MA(1) model may be an appropriate fit. P can be interpreted as the percent change in the series between $y_t$ and $y_{t-1}$
+
+```{r d, echo=FALSE, fig.height=3, fig.align='center'}
+par(mfrow = c(1,2))
+plot.ts(diff(log(varve)))
+acf(diff(log(varve)))
+```
+
+
+e)
+
+\begin{align*}
+  u_t = & \mu + w_t - \theta w_{t-1} \\
+  \gamma(h=0) = & var(\mu + w_t - \theta w_{t-1}) \\
+              = & (1 + \theta^2) \sigma^2 \\
+  \gamma(h=1) = & cov(w_{t-1} - \theta w_{t-2}, w_t - \theta w_{t-1}) \\
+              = & -\theta \sigma^2 \\
+  \gamma(h=1) = & cov(w_{t-2} - \theta w_{t-3}, w_t - \theta w_{t-1}) \\
+              = & 0 \\
+\end{align*}
+
+
+f)
+
+
+\newpage
+
+### 4.16ab
+
+a) Since each series is independently stationary, they are also jointly stationary with an expected covariance of 0.
+$cov(w_t - w_{t-1}, \frac{1}{2}(w_t + w_{t-1})) = \frac{w_t}{2} - \frac{w_{t-1}}{2} = \frac{1}{2} - \frac{1}{2} = 0$
+
+b)
+
+\begin{align*}
+  \gamma_x(0) = & 1 + 1^2 = 2 \sigma^2 \\
+  \gamma_x(1) = & (1)(-1) = -\sigma^2 \\
+  f_x(w) = & \sum_{-\infty}^{\infty} = \gamma(h) e^{-2 \pi i w h} = \sigma_w^2 [2 - e^{-2 \pi i w} + e^{2 \pi i w}] \\
+  \\
+  \gamma_y(0) = & .5(1^2 + 1^2) = \sigma^2 \\
+  \gamma_y(1) = & .5 \sigma^2 \\
+  f_y(w) = & \sum_{-\infty}^{\infty} = \gamma(h) e^{-2 \pi i w h} = \sigma_w^2 [1 + .5(e^{-2 \pi i w h} + e^{2 pi i w h})] \\
+\end{align*}
+
+### 5.6
+
+Plotting the first difference of gnp to eliminate the trend shows how the variance of the series is not constant. For example the sample variance in the first half of the series is 934 and in the second half 2350. A preliminary model of ARMA(0,4), based on the assessment of acf/pacf plots also shows nonconstant variance in the residuauls. Since there is a case for non-constant variance, a GARCH model is an appropriate modeling choice. An ARCH(3,0) is chosen based on the pacf plot of the squared residuals showing the first 3 lags as being significant.
+
+```{r f, echo=FALSE, fig.align='center', fig.height=2.5, message=FALSE, warning=FALSE, comment=FALSE}
+library(fGarch)
+library(forecast)
+
+par(mfrow = c(1,2))
+Acf(diff(gnp), main = "ACF Stationary GNP")
+Pacf(diff(gnp), main = "PACF Stationary GNP")
+
+mdl = arima(diff(gnp), order = c(0,0,4))
+
+par(mfrow = c(1,2))
+Acf(mdl$residuals, main = "ACF ARMA(0,4) Residual")
+Pacf(mdl$residuals, main = "PACF ARMA(0,4) Residual")
+
+par(mfrow = c(1,2))
+Acf(mdl$residuals^2, main = "ACF ARMA(0,4) Residual^2")
+Pacf(mdl$residuals^2, main = "PACF ARMA(0,4) Residual^2")
+
+mdl = garchFit(~arma(0,4) + garch(3,0), diff(gnp), trace = F)
+mdl
+
+```
+
+\newpage
+
+### 5.11
+
+I included the differecend variable lead with lag = 3 as the xregressor in the arima model. $\beta_0$ is represented by intercept, $\beta_1$ is represented by xreg.  $x_t$ is the ARMA process that includes 2 ar terms and 4 ma terms. The ARMA process was determined by looking at the differenced sales variable that shows 4 significant lags on the acf plot and 2 significant lags on the pacf plot. As a result an ARMA(2,4) process was chosen.
+
+```{r g, echo=FALSE, fig.align='center', fig.height=3.5, message=FALSE, warning=FALSE, comment=FALSE}
+par(mfrow = c(1,2))
+plot.ts(diff(sales), main = "diff(sales)")
+plot.ts(diff(lead, lag = 3), main = "diff(lead, lag = 3)")
+
+dta = data.frame(ts.intersect(sales = diff(sales), lead_3 = diff(lead, lag = 3)))
+
+par(mfrow = c(1,2))
+acf(dta$sales)
+pacf(dta$sales)
+
+```
+
+```{r h, echo=FALSE, fig.align='center', fig.height=7, message=FALSE, warning=FALSE, comment=FALSE}
+mdl = sarima(xdata = dta$sales, p = 2, d = 0, q = 4, xreg = dta$lead_3, details = FALSE)
+mdl$fit
+```
+
+
+### 5.13a
+
+```{r i, echo=TRUE, fig.align='center', fig.height=8, message=FALSE, warning=FALSE, comment=FALSE}
+## i)
+mdl = sarima(xdata = sqrt(climhyd$Precip), 0, 0, 0, 0, 1, 1, 12, details = FALSE)
+```
+
+\newpage
+
+```{r i2, echo=TRUE, fig.align='center', fig.height=8, message=FALSE, warning=FALSE, comment=FALSE}
+## ii)
+mdl = sarima(xdata = log(climhyd$Inflow), 0, 0, 0, 0, 1, 1, 12, details = FALSE)
+```
+
+\newpage
+
+
+### 5.15
+
+```{r j, echo=FALSE, fig.align='center', fig.height=5.5, message=FALSE, warning=FALSE, comment=FALSE}
+library(vars)
+dta.log = apply(X = econ5, MARGIN = 2, FUN = log)
+
+trend1 = lm(dta.log[,1] ~ time(dta.log[,1]))
+trend2 = lm(dta.log[,2] ~ time(dta.log[,2]))
+trend3 = lm(dta.log[,3] ~ time(dta.log[,3]))
+trend4 = lm(dta.log[,4] ~ time(dta.log[,4]))
+trend5 = lm(dta.log[,5] ~ time(dta.log[,5]))
+
+detrended = as.data.frame(dta.log)
+detrended$unemp = with(detrended, unemp - fitted(trend1))
+detrended$gnp = with(detrended, gnp - fitted(trend2))
+detrended$consum = with(detrended, consum - fitted(trend3))
+detrended$govinv = with(detrended, govinv - fitted(trend4))
+detrended$prinv = with(detrended, prinv - fitted(trend5))
+
+mdl.var = VAR(y = detrended, p = 2)
+mdl.var
+
+plot(mdl.var)
+
+```
+
+
+## II
+
+### a
+
+All 3 series appear to be stationary with an expected mean of 0.
+
+```{r k, echo=FALSE, fig.align='center', fig.height=5.5, message=FALSE, warning=FALSE, comment=FALSE}
+
+wt1 = rnorm(100)
+wt2 = rnorm(100)
+wt = rnorm(100)
+
+xt1 = 0; for (i in 2:100) xt1[i] = .5 * xt1[i-1] + wt1[i]
+xt2 = rep(0,12); for (i in 13:100) xt2[i] = .9 * xt2[i-12] + wt2[i]
+plot.ts(cbind(xt1, xt2))
+
+yt1 = xt1 + wt1 + wt2
+yt2 = xt2 + 5 * (wt1 + wt2)
+zt3 = (5 * yt1) - yt2
+
+plot.ts(cbind(yt1, yt2, zt3), main = "Simulated Series")
+
+```
+
+
+### b
+
+\begin{align*}
+  \gamma(0) = & var(.5 x_{t-1} + w_{t,1} + w_{t,1} + w_{t,2}) \\
+  = & .5^2 var(x_t) + 1^2 + 1^2 + 1^2 \\
+  = & \frac{3 \sigma^2}{.75} = 4 \sigma^2 \\
+  \\
+  \gamma(1) = & cov[.5 x_{t-2} + w_{t-1,1} + w_{t-1,1} + w_{t-1,2}, .5 x_{t-1} + w_{t,1} + w_{t,1} + w_{t,2}] \\
+  = & 0 \\
+  \\
+  \text{ACF Function: } & \text{ when h = 0: } 4 \sigma^2 \text{, when h > 0: } 0, Y_{t,1} \text{ is stationary} \\
+\end{align*}
+
+\newpage
+
+### c
+
+There is a correlation at lag 2 so the series is not stationary
+
+\begin{align*}
+  z_t = & 5(.25x_{t-1,1} + 2w_{t-1,1} + w_{t,2}) - .9x_{t-12,2} - 2w_{t,2} - w_{t,1} \\
+  var(z_t) = & 25 var[.25 x_{t-1,1} + w_{t-1,1} - .9 x_{t-12,12} - w_{t,2}] \\
+  5
+  \begin{bmatrix}
+    (1 - .25) x_{t-1,1} \\
+    (1 + .9) x_{t-12,2} \\
+  \end{bmatrix} = &
+  w_{t-1,1} - w_{t,2} = 2 \sigma^2 \\
+  \gamma(1) = & cov[w_{t-2,1} - w_{t-1,2}, w_{t-1,1} - w_{t-2,2}] = 0 \\
+  \gamma(2) = & cov[1_{t-3,1} - w_{t-2,2}, w_{t-1,1} - w_{t-2,2}] = 2\sigma^2 \\
+\end{align*}
+
+### d
+
+$y_{t1}$ and $y_{t2}$ are both stationary, but the linear combination of the 2 are not stationary.
+
+### e
+
+\begin{align*}
+  y_{t1} = & .5 x_{t-1,1} + 2 w_{t1} + w_{t2} \\
+  y_{t2} = & .9 x_{t-12,1} + 2 w_{t2} + w_{t1} \\
+  cov(y_{t1}, y_{t2}) = & cov[.5 x_{t-1,1} + 2 w_{t1} + w_{t2} , .9 x_{t-12,1} + 2 w_{t2} + w_{t1}] \\
+  = & 2 w_{t1} + 2 w_{t2} = 4 \sigma_w^2 \\
+  \gamma(1) = & cov[.5 x_{t-2,1} + 2 w_{t-1,1} + w_{t-1,2} , .9 x_{t-12,1} + 2 w_{t2} + w_{t1}] \\
+  = & 0 \\
+  \gamma(11) = & cov[.5 x_{t-12,1} + 2 w_{t-11,1} + w_{t-11,2} , .9 x_{t-12,1} + 2 w_{t2} + w_{t1}] \\
+  = & .45 \sigma_w^2 \\
+  \\
+  \text{Autocovariance Function: when h=0: } & 4 \sigma_2^2 \text{ when h=11} .45 \sigma_w^2 \text{ else 0} \\
+  \text{Autocorrelation Function: when h=0: } & 1 \text{ when h=11: } .1125 \text{ else: 0} \\
+\end{align*}
+
+
+
+
+

@@ -1,0 +1,9 @@
+data contacts;
+   length Name $ 20 Phone Mobile $ 14;
+   infile '.workshop.rawdata(phone2)' dsd;
+   input Name $ Phone $ Mobile $;
+run;
+
+proc print data=contacts noobs;
+run;
+

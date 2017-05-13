@@ -1,0 +1,4 @@
+Title:  Statistics and Stockpile Stewardship
+Speaker: Alyson Wilson, Iowa State
+
+Alyson Wilson presents a very interesting talk on statistical analysis applied to nuclear weapon stockpiles. The context of the problem is to be able to build probability models that a weapon will work properly, but without being able to test the weapons since nuclear weapon testing is now banned. She introduces something called a Bayesian Network where events are linked and interdependent with a probability of success tied to each node. Alyson referred to an engineered system for simulating the reliability of all components working correctly. I have noticed that a lot of talks are heavily Bayesian in focus, but I have had hardly any exposure to Bayesian statistics. It has made me interested in enrolling in a Bayesian course at the very least.

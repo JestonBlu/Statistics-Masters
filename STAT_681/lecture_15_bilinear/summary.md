@@ -1,0 +1,4 @@
+Title: Bilinear Varying Coefficient Models for Seasonal Data
+Speaker: Brian Marx
+
+Marx sets up a time series with seasonal data and shows an initial poisson regression model with 3 disctint coefficients for each observation. The varying coefficient is a way of getting around the problem of no degrees of freedom by using a smoothing parameter. Bilinear means that the components of the model are independently linear. Marx is able to show how using this approach you able to capture seasonality as the peak of the seasonal cycle moves around. He also shows how a penalization mechanism which effects the coefficients, but it does so on an individual observation basis so a given penalty will not affect and adjacent observation. This was very interesting and complicated presentation. I did not understand all of it, but I was particularly interested in the way Marx was able to capture drifting seasonality.

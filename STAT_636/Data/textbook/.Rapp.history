@@ -1,0 +1,1387 @@
+1 - pt(abs(t_0), 9)
+2 * (1 - pt(abs(t_0), 9))
+? qqplot
+? ppoints
+qqplot(qt(ppoints(B), n - 1), t_B)
+qqline(qt(ppoints(B), n - 1), t_B)
+? qqline
+qqplot(qt(ppoints(B), n - 1), t_B)#
+qqline(t_B)
+y
+y_b
+hist(t_B)
+101 %% 10
+10 %% 101
+10 %% 100
+10 %% 109
+10 %% 110
+1 %/% 0.2
+100 %/% 10
+101 %/% 10
+109 %/% 10
+109 %% 10
+library(boot)#
+#
+###
+## Example: Inference on a univariate mean.#
+###
+#
+n <- 10#
+B <- 100#
+N <- 1000#
+#
+## Normal case. When H_0 is true, the t statistic is distributed as t with n - 1 degrees #
+## of freedom. Below, we illustrate under the scenario that H_0 is indeed true. One #
+## implication is that we should only get p-values < 0.05 for 5% of samples. The boot-#
+## strap can be relied on to work *on average*.#
+mu_0 <- 0#
+#
+type_I <- rep(NA, N)#
+for(i in 1:N) {#
+  if(100 %% i == 0)#
+    cat(".")#
+#
+  ## Simulate a sample of size n and compute its t statistic.#
+  y <- rnorm(n)#
+  t_0 <- (mean(y) - mu_0) / (sqrt(var(y) / n))#
+#
+  ## Bootstrap by repeatedly sampling with replacement, each time computing a new t #
+  ## statistic on the bootstrapped sample.#
+  t_B <- rep(NA, B)#
+  for(b in 1:B) {#
+    y_b <- sample(y, replace = TRUE)#
+    t_B[b] <- (mean(y_b) - mu_0) / (sqrt(var(y_b) / n))#
+  }#
+#
+  ## Do we commit a Type I error (incorrectly reject H_0)?#
+  q_t <- quantile(t_B, c(0.025, 0.975))#
+  type_I[i] <- t_0 < q_t[1] | t_0 > q_t[2]#
+}
+100%%1
+100 %% 1000
+1000 %% 1000
+type_I <- rep(NA, N)#
+for(i in 1:N) {#
+  if(N %% i == 0)#
+    cat(".")#
+#
+  ## Simulate a sample of size n and compute its t statistic.#
+  y <- rnorm(n)#
+  t_0 <- (mean(y) - mu_0) / (sqrt(var(y) / n))#
+#
+  ## Bootstrap by repeatedly sampling with replacement, each time computing a new t #
+  ## statistic on the bootstrapped sample.#
+  t_B <- rep(NA, B)#
+  for(b in 1:B) {#
+    y_b <- sample(y, replace = TRUE)#
+    t_B[b] <- (mean(y_b) - mu_0) / (sqrt(var(y_b) / n))#
+  }#
+#
+  ## Do we commit a Type I error (incorrectly reject H_0)?#
+  q_t <- quantile(t_B, c(0.025, 0.975))#
+  type_I[i] <- t_0 < q_t[1] | t_0 > q_t[2]#
+}
+1000 / 2
+1000 %% 2
+10%%i
+i%%10
+1000%%10
+1%%10
+10%%10
+20%%10
+type_I <- rep(NA, N)#
+for(i in 1:N) {#
+  if(i %% 10 == 0)#
+    cat(".")#
+#
+  ## Simulate a sample of size n and compute its t statistic.#
+  y <- rnorm(n)#
+  t_0 <- (mean(y) - mu_0) / (sqrt(var(y) / n))#
+#
+  ## Bootstrap by repeatedly sampling with replacement, each time computing a new t #
+  ## statistic on the bootstrapped sample.#
+  t_B <- rep(NA, B)#
+  for(b in 1:B) {#
+    y_b <- sample(y, replace = TRUE)#
+    t_B[b] <- (mean(y_b) - mu_0) / (sqrt(var(y_b) / n))#
+  }#
+#
+  ## Do we commit a Type I error (incorrectly reject H_0)?#
+  q_t <- quantile(t_B, c(0.025, 0.975))#
+  type_I[i] <- t_0 < q_t[1] | t_0 > q_t[2]#
+}
+table(type_I)
+t_0
+qt
+q_t
+mu_0 <- 0#
+#
+type_I <- rep(NA, N)#
+for(i in 1:N) {#
+  if(i %% 10 == 0)#
+    cat(".")#
+#
+  ## Simulate a sample of size n and compute its t statistic.#
+  y <- rnorm(n)#
+  t_0 <- (mean(y) - mu_0) / (sqrt(var(y) / n))#
+#
+  ## Bootstrap by repeatedly sampling with replacement, enforcing H_0 to be true each #
+  ## time. Compute t for each bootstrapped sample.#
+  ## statistic on the bootstrapped sample.#
+  t_B <- rep(NA, B)#
+  for(b in 1:B) {#
+    y_b <- sample(y - mean(y), replace = TRUE)#
+    t_B[b] <- (mean(y_b) - mu_0) / (sqrt(var(y_b) / n))#
+  }#
+#
+  ## Do we commit a Type I error (incorrectly reject H_0)?#
+  q_t <- quantile(t_B, c(0.025, 0.975))#
+  type_I[i] <- t_0 < q_t[1] | t_0 > q_t[2]#
+}#
+#
+table(type_I)
+hist(rchisq(100, 1, 1))
+hist(rchisq(100, 2, 2))
+hist(rchisq(100, 2, 3))
+hist(rgamma(100, 1, 1))
+hist(rgamma(100, 2, 2))
+n <- 10#
+B <- 100#
+N <- 1000#
+#
+## Normal case. When H_0 is true, the t statistic is distributed as t with n - 1 degrees #
+## of freedom. Below, we illustrate under the scenario that H_0 is indeed true. One #
+## implication is that we should only get p-values < 0.05 for 5% of samples. The boot-#
+## strap can be relied on to work *on average*.#
+mu_0 <- 0#
+#
+type_I_t <- type_I_boot <- rep(NA, N)#
+for(i in 1:N) {#
+  if(i %% 10 == 0)#
+    cat(".")#
+#
+  ## Simulate a sample of size n and compute its t statistic.#
+  y <- rnorm(n)#
+  t_0 <- (mean(y) - mu_0) / (sqrt(var(y) / n))#
+#
+  ## Bootstrap by repeatedly sampling with replacement, enforcing H_0 to be true each #
+  ## time. Compute t for each bootstrapped sample.#
+  ## statistic on the bootstrapped sample.#
+  t_B <- rep(NA, B)#
+  for(b in 1:B) {#
+    y_b <- sample(y - mean(y), replace = TRUE)#
+    t_B[b] <- (mean(y_b) - mu_0) / (sqrt(var(y_b) / n))#
+  }#
+#
+  ## Do we commit a Type I error (incorrectly reject H_0)?#
+  qq <- quantile(t_B, c(0.025, 0.975))#
+  type_I_boot[i] <- t_0 < qq[1] | t_0 > qq[2]#
+  type_I_t[i] <- 2 * (1 - pt(abs(t_0), n - 1)) < 0.05#
+}#
+#
+table(type_I_t)#
+table(type_I_boot)
+type_I_t <- type_I_boot <- rep(NA, N)#
+for(i in 1:N) {#
+  if(i %% 10 == 0)#
+    cat(".")#
+#
+  ## Simulate a sample of size n and compute its t statistic.#
+  y <- rnorm(n)#
+  t_0 <- (mean(y) - mu_0) / (sqrt(var(y) / n))#
+#
+  ## Bootstrap by repeatedly sampling with replacement, enforcing H_0 to be true each #
+  ## time. Compute t for each bootstrapped sample.#
+  ## statistic on the bootstrapped sample.#
+  t_B <- rep(NA, B)#
+  for(b in 1:B) {#
+    y_b <- sample(y - mean(y), replace = TRUE)#
+    t_B[b] <- (mean(y_b) - mu_0) / (sqrt(var(y_b) / n))#
+  }#
+#
+  ## Do we commit a Type I error (incorrectly reject H_0)?#
+  qq <- quantile(t_B, c(0.025, 0.975))#
+  type_I_boot[i] <- mean(abs(t_B) >= abs(t_0)) < 0.05#
+  type_I_t[i] <- 2 * (1 - pt(abs(t_0), n - 1)) < 0.05#
+}#
+#
+table(type_I_t)#
+table(type_I_boot)
+type_I_t <- type_I_boot <- rep(NA, N)#
+for(i in 1:N) {#
+  if(i %% 10 == 0)#
+    cat(".")#
+#
+  ## Simulate a sample of size n and compute its t statistic.#
+  y <- rgamma(n, 2, 2)#
+  t_0 <- (mean(y) - mu_0) / (sqrt(var(y) / n))#
+#
+  ## Bootstrap by repeatedly sampling with replacement, enforcing H_0 to be true each #
+  ## time. Compute t for each bootstrapped sample.#
+  ## statistic on the bootstrapped sample.#
+  t_B <- rep(NA, B)#
+  for(b in 1:B) {#
+    y_b <- sample(y - mean(y), replace = TRUE)#
+    t_B[b] <- (mean(y_b) - mu_0) / (sqrt(var(y_b) / n))#
+  }#
+#
+  ## Do we commit a Type I error (incorrectly reject H_0)?#
+  type_I_boot[i] <- mean(abs(t_B) >= abs(t_0)) < 0.05#
+  type_I_t[i] <- 2 * (1 - pt(abs(t_0), n - 1)) < 0.05#
+}#
+#
+table(type_I_t)#
+table(type_I_boot)
+type_I_t <- type_I_boot <- rep(NA, N)#
+for(i in 1:N) {#
+  if(i %% 10 == 0)#
+    cat(".")#
+#
+  ## Simulate a sample of size n and compute its t statistic.#
+  y <- runif(n, -3, 3)#
+  t_0 <- (mean(y) - mu_0) / (sqrt(var(y) / n))#
+#
+  ## Bootstrap by repeatedly sampling with replacement, enforcing H_0 to be true each #
+  ## time. Compute t for each bootstrapped sample.#
+  ## statistic on the bootstrapped sample.#
+  t_B <- rep(NA, B)#
+  for(b in 1:B) {#
+    y_b <- sample(y - mean(y), replace = TRUE)#
+    t_B[b] <- (mean(y_b) - mu_0) / (sqrt(var(y_b) / n))#
+  }#
+#
+  ## Do we commit a Type I error (incorrectly reject H_0)?#
+  type_I_boot[i] <- mean(abs(t_B) >= abs(t_0)) < 0.05#
+  type_I_t[i] <- 2 * (1 - pt(abs(t_0), n - 1)) < 0.05#
+}#
+#
+table(type_I_t)#
+table(type_I_boot)
+type_I_t <- type_I_boot <- rep(NA, N)#
+for(i in 1:N) {#
+  if(i %% 10 == 0)#
+    cat(".")#
+#
+  ## Simulate a sample of size n and compute its t statistic.#
+  y <- c(rnorm(n / 2, -2, 1), rnorm(n / 2, 2, 1))#
+  t_0 <- (mean(y) - mu_0) / (sqrt(var(y) / n))#
+#
+  ## Bootstrap by repeatedly sampling with replacement, enforcing H_0 to be true each #
+  ## time. Compute t for each bootstrapped sample.#
+  ## statistic on the bootstrapped sample.#
+  t_B <- rep(NA, B)#
+  for(b in 1:B) {#
+    y_b <- sample(y - mean(y), replace = TRUE)#
+    t_B[b] <- (mean(y_b) - mu_0) / (sqrt(var(y_b) / n))#
+  }#
+#
+  ## Do we commit a Type I error (incorrectly reject H_0)?#
+  type_I_boot[i] <- mean(abs(t_B) >= abs(t_0)) < 0.05#
+  type_I_t[i] <- 2 * (1 - pt(abs(t_0), n - 1)) < 0.05#
+}#
+#
+table(type_I_t)#
+table(type_I_boot)
+mean(y)
+type_I_t <- type_I_boot <- rep(NA, N)#
+for(i in 1:N) {#
+  if(i %% 10 == 0)#
+    cat(".")#
+#
+  ## Simulate a sample of size n and compute its t statistic.#
+  y <- rt(n, 2)#
+  t_0 <- (mean(y) - mu_0) / (sqrt(var(y) / n))#
+#
+  ## Bootstrap by repeatedly sampling with replacement, enforcing H_0 to be true each #
+  ## time. Compute t for each bootstrapped sample.#
+  ## statistic on the bootstrapped sample.#
+  t_B <- rep(NA, B)#
+  for(b in 1:B) {#
+    y_b <- sample(y - mean(y), replace = TRUE)#
+    t_B[b] <- (mean(y_b) - mu_0) / (sqrt(var(y_b) / n))#
+  }#
+#
+  ## Do we commit a Type I error (incorrectly reject H_0)?#
+  type_I_boot[i] <- mean(abs(t_B) >= abs(t_0)) < 0.05#
+  type_I_t[i] <- 2 * (1 - pt(abs(t_0), n - 1)) < 0.05#
+}#
+#
+table(type_I_t)#
+table(type_I_boot)
+? boot
+mu_a <- 1#
+#
+type_II_t <- type_II_boot <- rep(NA, N)#
+for(i in 1:N) {#
+  if(i %% 10 == 0)#
+    cat(".")#
+#
+  ## Simulate a sample of size n and compute its t statistic.#
+  y <- rnorm(n, mu_a)#
+  t_0 <- (mean(y) - mu_0) / (sqrt(var(y) / n))#
+#
+  ## Bootstrap by repeatedly sampling with replacement, enforcing H_0 to be true each #
+  ## time. Compute t for each bootstrapped sample.#
+  t_B <- rep(NA, B)#
+  for(b in 1:B) {#
+    y_b <- sample(y - mean(y), replace = TRUE)#
+    t_B[b] <- (mean(y_b) - mu_0) / (sqrt(var(y_b) / n))#
+  }#
+#
+  ## Do we commit a Type II error (incorrectly fail to reject H_0)?#
+  qq <- quantile(t_B, c(0.025, 0.975))#
+  type_II_boot[i] <- mean(abs(t_B) >= abs(t_0)) >= 0.05#
+  type_II_t[i] <- 2 * (1 - pt(abs(t_0), n - 1)) >= 0.05#
+}
+table(type_II_t)#
+table(type_II_boot)
+diff(c(1, 2))
+diff(c(2, 0))
+y <- rnorm(n)#
+#
+stat_f <- function(y) {#
+  return(diff(quantile(y, c(0.25, 0.75))))#
+}#
+boot_out <- boot(y, stat_f)
+? boot
+y <- rnorm(n)#
+#
+stat_f <- function(y) {#
+  return(diff(quantile(y, c(0.25, 0.75))))#
+}#
+boot_out <- boot(y, stat_f, R = 1000)
+stat_f <- function(y, ii) {#
+  return(diff(quantile(y[ii], c(0.25, 0.75))))#
+}#
+boot_out <- boot(y, stat_f, R = 1000)
+names(boot_out)
+boot_out$t0
+diff(quantile(y, c(0.25, 0.75)))
+hist(boot_out$t)
+hist(boot_out$t, main = "Estimated Sampling Distribution of IQR")
+? boot
+library(Hotelling)#
+library(DescTools)#
+library(boot)#
+#
+## Load data.#
+data(container.df)#
+attach(container.df)#
+container.df#
+#
+n <- 10
+p <- 8#
+X_bar_1 <- colMeans(container.df[1:10, -c(1, 5)])#
+X_bar_2 <- colMeans(container.df[11:20, -c(1, 5)])#
+S_1 <- var(container.df[1:10, -c(1, 5)])#
+S_2 <- var(container.df[11:20, -c(1, 5)])#
+#
+## Multivariate assessment of normality, by group. We saw two diagnostics in Topic 4: (1)#
+## a check for whether approximately 50% of the d_j^2 are <= the median of the chi-square #
+## distribution with p degrees of freedom, and (2) a QQ plot of the d_j^2 (the "chi-#
+## square plot"). The chi-square plot is only appropriate for large sample sizes, so we #
+## won't use it here. The proportions of d_j^2 less than the chi-square_p median differ #
+## from 0.5, so multivariate normality looks suspect. Unfortunately, Box-Cox trans-#
+## formation does not help in this example. We will proceed, but note that the parametric #
+## assumption is not to be trusted.#
+d_j_2_g1 <- d_j_2_g2 <- rep(NA, n)#
+for(j in 1:n) {#
+  x_j_1 <- as.numeric(container.df[j, -c(1, 5)])#
+  x_j_2 <- as.numeric(container.df[j + 10, -c(1, 5)])#
+  d_j_2_g1[j] <- (x_j_1 - X_bar_1) %*% solve(S_1) %*% (x_j_1 - X_bar_1)#
+  d_j_2_g2[j] <- (x_j_2 - X_bar_2) %*% solve(S_2) %*% (x_j_2 - X_bar_2)#
+}#
+#
+table(d_j_2_g1 <= qchisq(0.5, p))#
+table(d_j_2_g2 <= qchisq(0.5, p))#
+#
+###
+## Hotelling's T2 test for one mean vector. We'll look at the first container type. We #
+## fail to reject H_0 at significance level alpha = 0.05.#
+###
+#
+mu_0 <- c(0.035, 0.9, 0.15, 0.25, 7, 0.02, 0.015, 0.011)#
+T2 <- n * (X_bar_1 - mu_0) %*% solve(S_1) %*% (X_bar_1 - mu_0)#
+p_value <- 1 - pf((n - p) * T2 / ((n - 1) * p), p, n - p)#
+qf(0.05, p, n - p)#
+#
+HotellingsT2Test(container.df[1:10, -c(1, 5)], mu = mu_0)#
+((n - p) / ((n - 1) * p)) * T2
+stat_f <- function(X, ii, mu_0) {#
+  n <- nrow(X)#
+  p <- ncol(X)#
+  X <- X[ii, ]#
+#
+  X_bar <- colMeans(X)#
+  S <- var(X)#
+  T2 <- n * (X_bar - mu_0) %*% solve(S) %*% (X_bar - mu_0)#
+#
+  return(T2)#
+}#
+#
+boot_out <- boot(container.df[1:10, -c(1, 5)], stat_f, B = 100, mu_0 = mu_0)
+stat_f <- function(X, ii, mu_0) {#
+  n <- nrow(X)#
+  p <- ncol(X)#
+  X <- X[ii, ]#
+#
+  X_bar <- colMeans(X)#
+  S <- var(X)#
+  T2 <- n * (X_bar - mu_0) %*% solve(S) %*% (X_bar - mu_0)#
+#
+  return(T2)#
+}#
+#
+boot_out <- boot(container.df[1:10, -c(1, 5)], stat_f, R = 100, mu_0 = mu_0)
+qnorm(0.99)
+qnorm(0.9)
+stat_f <- function(X, ii, mu_0) {#
+  n <- nrow(X)#
+  p <- ncol(X)#
+  X <- X[ii, ]#
+#
+  X_bar <- colMeans(X)#
+  S <- var(X)#
+  T2 <- NA#
+  if(det(S) > 0)#
+    T2 <- n * (X_bar - mu_0) %*% solve(S) %*% (X_bar - mu_0)#
+#
+  return(T2)#
+}#
+#
+boot_out <- boot(container.df[1:10, -c(1, 5)], stat_f, R = 100, mu_0 = mu_0)
+container.df[1:10, ]
+1 / (2/10)
+S_po <- ((p - 1) * var(container.df[1:10, -c(1, 5)]) + #
+  (p - 1) * var(container.df[11:20, -c(1, 5)])) / (2 * p - 2)#
+#
+c_1 <- 1 / (1 / n + 1 / n)#
+c_2 <- (n + n - p - 1) / ((n + n - 2) * p)#
+T2 <- c_1 * (X_bar_1 - X_bar_2) %*% solve(S_po) %*% (X_bar_1 - X_bar_2)#
+p_value <- 1 - pf(c_2 * T2, p, 11)#
+qf(0.05, p, 2 * n - p)
+print(hotelling.test(. ~ gp, data = container.df[, -5]))
+T2
+p_value
+c_2 * T2
+X_bar_1
+mu_0 <- c(0.035, 0.9, 0.15)#
+p_0 <- 3#
+#
+## Compute mean vector and covariance matrix for the three variables.#
+X_bar <- colMeans(container.df[1:10, 2:4)])#
+S <- var(container.df[1:10, 2:4])#
+#
+T2 <- n * (X_bar - mu_0) %*% solve(S) %*% (X_bar - mu_0)#
+p_value <- 1 - pf((n - p_0) * T2 / ((n - 1) * p_0), p_0, n - p_0)#
+qf(0.05, p_0, n - p_0)#
+#
+HotellingsT2Test(container.df[1:10, 2:4], mu = mu_0)#
+((n - p_0) / ((n - 1) * p_0)) * T2
+X_bar <- colMeans(container.df[1:10, 2:4])#
+S <- var(container.df[1:10, 2:4])#
+#
+T2 <- n * (X_bar - mu_0) %*% solve(S) %*% (X_bar - mu_0)#
+p_value <- 1 - pf((n - p_0) * T2 / ((n - 1) * p_0), p_0, n - p_0)#
+qf(0.05, p_0, n - p_0)#
+#
+HotellingsT2Test(container.df[1:10, 2:4], mu = mu_0)#
+((n - p_0) / ((n - 1) * p_0)) * T2
+p_value
+X_bar
+mu_0
+mu_0 <- c(0.035, 0.9, 0.15, 0.25, 7, 0.02, 0.015, 0.011)#
+T2 <- n * (X_bar_1 - mu_0) %*% solve(S_1) %*% (X_bar_1 - mu_0)#
+p_value <- 1 - pf((n - p) * T2 / ((n - 1) * p), p, n - p)#
+qf(0.05, p, n - p)#
+#
+HotellingsT2Test(container.df[1:10, -c(1, 5)], mu = mu_0)#
+((n - p) / ((n - 1) * p)) * T2
+S
+9 * S
+mu_0
+T2
+qf(0.05, p_0, n - p_0)
+(n-1) * 3 / (n-3)
+(n-1) * 3 / (n-3) * qf(0.05, 3, 10-3)
+(n-1) * 3 / (n-3) * qf(0.95, 3, 10-3)
+qf(0.95, 3, 7)
+3.8571 * 4.3468
+7 / (3 * 9) * T2
+T2 <- n * (X_bar - mu_0) %*% solve(S) %*% (X_bar - mu_0)#
+p_value <- 1 - pf((n - p_0) * T2 / ((n - 1) * p_0), p_0, n - p_0)#
+qf(0.05, p_0, n - p_0)#
+#
+HotellingsT2Test(container.df[1:10, 2:4], mu = mu_0)#
+((n - p_0) / ((n - 1) * p_0)) * T2
+mu_0 <- c(0.035, 0.9, 0.15)#
+p_0 <- 3#
+#
+## Compute mean vector and covariance matrix for the three variables.#
+X_bar <- colMeans(container.df[1:10, 2:4])#
+S <- var(container.df[1:10, 2:4])#
+#
+T2 <- n * (X_bar - mu_0) %*% solve(S) %*% (X_bar - mu_0)#
+p_value <- 1 - pf((n - p_0) * T2 / ((n - 1) * p_0), p_0, n - p_0)#
+qf(0.05, p_0, n - p_0)#
+#
+HotellingsT2Test(container.df[1:10, 2:4], mu = mu_0)#
+((n - p_0) / ((n - 1) * p_0)) * T2
+T2
+7 / (3 * 9) * T2
+7 / (3 * 9) * 93.0278
+p_value
+q()
+N <- 1e3#
+n <- 30#
+p <- 2#
+mu <- rep(1, p)#
+rho <- 0.9#
+Sigma <- matrix(rho, nrow = p, ncol = p); diag(Sigma) <- 1#
+alpha <- 0.2#
+#
+F_crit <- (n - 1) * p * qf(1 - alpha, p, n - p) / (n - p)#
+t_crit <- qt(1 - alpha / 2, n - 1)#
+bon_crit <- qt(1 - alpha / (2 * p), n - 1)#
+#
+cov_reg <- cov_t_1 <- cov_t_2 <- cov_sim_1 <- cov_sim_2 <- cov_sim_diff <- cov_bon_1 <- #
+  cov_bon_2 <- rep(NA, N)#
+for(i in 1:N) {#
+  X <- rmvnorm(n, mu, Sigma)#
+  x_bar <- colMeans(X)#
+  S <- var(X)#
+#
+  a <- c(1, -1, rep(0, p - 2))#
+  ci_t_1 <- x_bar[1] + c(-1, 1) * t_crit * sqrt(S[1, 1] / n)#
+  ci_t_2 <- x_bar[2] + c(-1, 1) * t_crit * sqrt(S[2, 2] / n)#
+  ci_sim_1 <- x_bar[1] + c(-1, 1) * sqrt(F_crit * S[1, 1] / n)#
+  ci_sim_2 <- x_bar[2] + c(-1, 1) * sqrt(F_crit * S[2, 2] / n)#
+  ci_sim_diff <- t(a) %*% x_bar + c(-1, 1) * sqrt(F_crit * t(a) %*% S %*% a / n)#
+  ci_bon_1 <- x_bar[1] + c(-1, 1) * bon_crit * sqrt(S[1, 1] / n)#
+  ci_bon_2 <- x_bar[2] + c(-1, 1) * bon_crit * sqrt(S[2, 2] / n)#
+#
+  cov_reg[i] <- n * t(x_bar - mu) %*% solve(S) %*% (x_bar - mu) <= c2#
+  cov_t_1[i] <- (ci_t_1[1] <= mu[1]) & (mu[1] <= ci_t_1[2])#
+  cov_t_2[i] <- (ci_t_2[1] <= mu[2]) & (mu[2] <= ci_t_2[2])#
+  cov_sim_1[i] <- (ci_sim_1[1] <= mu[1]) & (mu[1] <= ci_sim_1[2])#
+  cov_sim_2[i] <- (ci_sim_2[1] <= mu[2]) & (mu[2] <= ci_sim_2[2])#
+  cov_sim_diff[i] <- (ci_sim_diff[1] <= (t(a) %*% mu)) & #
+    ((t(a) %*% mu) <= ci_sim_diff[2])#
+  cov_bon_1[i] <- (ci_bon_1[1] <= mu[1]) & (mu[1] <= ci_bon_1[2])#
+  cov_bon_2[i] <- (ci_bon_2[1] <= mu[2]) & (mu[2] <= ci_bon_2[2])#
+}#
+#
+## The confidence region contains mu with probability 1 - alpha. The simultaneous #
+## intervals are conservative. The Bonferroni intervals are too, but not by quite as #
+## much.#
+mean(cov_reg)#
+mean(cov_t_1)#
+mean(cov_t_2)#
+mean(cov_sim_1)#
+mean(cov_sim_2)#
+mean(cov_sim_diff)#
+mean(cov_bon_1)#
+mean(cov_bon_2)
+library(mvtnorm)#
+library(plotrix)
+N <- 1e3#
+n <- 30#
+p <- 2#
+mu <- rep(1, p)#
+rho <- 0.9#
+Sigma <- matrix(rho, nrow = p, ncol = p); diag(Sigma) <- 1#
+alpha <- 0.2#
+#
+F_crit <- (n - 1) * p * qf(1 - alpha, p, n - p) / (n - p)#
+t_crit <- qt(1 - alpha / 2, n - 1)#
+bon_crit <- qt(1 - alpha / (2 * p), n - 1)#
+#
+cov_reg <- cov_t_1 <- cov_t_2 <- cov_sim_1 <- cov_sim_2 <- cov_sim_diff <- cov_bon_1 <- #
+  cov_bon_2 <- rep(NA, N)#
+for(i in 1:N) {#
+  X <- rmvnorm(n, mu, Sigma)#
+  x_bar <- colMeans(X)#
+  S <- var(X)#
+#
+  a <- c(1, -1, rep(0, p - 2))#
+  ci_t_1 <- x_bar[1] + c(-1, 1) * t_crit * sqrt(S[1, 1] / n)#
+  ci_t_2 <- x_bar[2] + c(-1, 1) * t_crit * sqrt(S[2, 2] / n)#
+  ci_sim_1 <- x_bar[1] + c(-1, 1) * sqrt(F_crit * S[1, 1] / n)#
+  ci_sim_2 <- x_bar[2] + c(-1, 1) * sqrt(F_crit * S[2, 2] / n)#
+  ci_sim_diff <- t(a) %*% x_bar + c(-1, 1) * sqrt(F_crit * t(a) %*% S %*% a / n)#
+  ci_bon_1 <- x_bar[1] + c(-1, 1) * bon_crit * sqrt(S[1, 1] / n)#
+  ci_bon_2 <- x_bar[2] + c(-1, 1) * bon_crit * sqrt(S[2, 2] / n)#
+#
+  cov_reg[i] <- n * t(x_bar - mu) %*% solve(S) %*% (x_bar - mu) <= c2#
+  cov_t_1[i] <- (ci_t_1[1] <= mu[1]) & (mu[1] <= ci_t_1[2])#
+  cov_t_2[i] <- (ci_t_2[1] <= mu[2]) & (mu[2] <= ci_t_2[2])#
+  cov_sim_1[i] <- (ci_sim_1[1] <= mu[1]) & (mu[1] <= ci_sim_1[2])#
+  cov_sim_2[i] <- (ci_sim_2[1] <= mu[2]) & (mu[2] <= ci_sim_2[2])#
+  cov_sim_diff[i] <- (ci_sim_diff[1] <= (t(a) %*% mu)) & #
+    ((t(a) %*% mu) <= ci_sim_diff[2])#
+  cov_bon_1[i] <- (ci_bon_1[1] <= mu[1]) & (mu[1] <= ci_bon_1[2])#
+  cov_bon_2[i] <- (ci_bon_2[1] <= mu[2]) & (mu[2] <= ci_bon_2[2])#
+}#
+#
+## The confidence region contains mu with probability 1 - alpha. The simultaneous #
+## intervals are conservative. The Bonferroni intervals are too, but not by quite as #
+## much.#
+mean(cov_reg)#
+mean(cov_t_1)#
+mean(cov_t_2)#
+mean(cov_sim_1)#
+mean(cov_sim_2)#
+mean(cov_sim_diff)#
+mean(cov_bon_1)#
+mean(cov_bon_2)
+cov_reg <- cov_t_1 <- cov_t_2 <- cov_sim_1 <- cov_sim_2 <- cov_sim_diff <- cov_bon_1 <- #
+  cov_bon_2 <- rep(NA, N)#
+for(i in 1:N) {#
+  X <- rmvnorm(n, mu, Sigma)#
+  x_bar <- colMeans(X)#
+  S <- var(X)#
+#
+  a <- c(1, -1, rep(0, p - 2))#
+  ci_t_1 <- x_bar[1] + c(-1, 1) * t_crit * sqrt(S[1, 1] / n)#
+  ci_t_2 <- x_bar[2] + c(-1, 1) * t_crit * sqrt(S[2, 2] / n)#
+  ci_sim_1 <- x_bar[1] + c(-1, 1) * sqrt(F_crit * S[1, 1] / n)#
+  ci_sim_2 <- x_bar[2] + c(-1, 1) * sqrt(F_crit * S[2, 2] / n)#
+  ci_sim_diff <- t(a) %*% x_bar + c(-1, 1) * sqrt(F_crit * t(a) %*% S %*% a / n)#
+  ci_bon_1 <- x_bar[1] + c(-1, 1) * bon_crit * sqrt(S[1, 1] / n)#
+  ci_bon_2 <- x_bar[2] + c(-1, 1) * bon_crit * sqrt(S[2, 2] / n)#
+#
+  cov_reg[i] <- n * t(x_bar - mu) %*% solve(S) %*% (x_bar - mu) <= F_crit#
+  cov_t_1[i] <- (ci_t_1[1] <= mu[1]) & (mu[1] <= ci_t_1[2])#
+  cov_t_2[i] <- (ci_t_2[1] <= mu[2]) & (mu[2] <= ci_t_2[2])#
+  cov_sim_1[i] <- (ci_sim_1[1] <= mu[1]) & (mu[1] <= ci_sim_1[2])#
+  cov_sim_2[i] <- (ci_sim_2[1] <= mu[2]) & (mu[2] <= ci_sim_2[2])#
+  cov_sim_diff[i] <- (ci_sim_diff[1] <= (t(a) %*% mu)) & #
+    ((t(a) %*% mu) <= ci_sim_diff[2])#
+  cov_bon_1[i] <- (ci_bon_1[1] <= mu[1]) & (mu[1] <= ci_bon_1[2])#
+  cov_bon_2[i] <- (ci_bon_2[1] <= mu[2]) & (mu[2] <= ci_bon_2[2])#
+}#
+#
+## The confidence region contains mu with probability 1 - alpha. The simultaneous #
+## intervals are conservative. The Bonferroni intervals are too, but not by quite as #
+## much.#
+mean(cov_reg)#
+mean(cov_t_1)#
+mean(cov_t_2)#
+mean(cov_sim_1)#
+mean(cov_sim_2)#
+mean(cov_sim_diff)#
+mean(cov_bon_1)#
+mean(cov_bon_2)
+p <- 5#
+mu <- rep(1, p)#
+rho <- 0.9#
+Sigma <- matrix(rho, nrow = p, ncol = p); diag(Sigma) <- 1#
+alpha <- 0.2#
+#
+F_crit <- (n - 1) * p * qf(1 - alpha, p, n - p) / (n - p)#
+t_crit <- qt(1 - alpha / 2, n - 1)#
+bon_crit <- qt(1 - alpha / (2 * p), n - 1)#
+#
+cov_reg <- cov_t_1 <- cov_t_2 <- cov_sim_1 <- cov_sim_2 <- cov_sim_diff <- cov_bon_1 <- #
+  cov_bon_2 <- rep(NA, N)#
+for(i in 1:N) {#
+  X <- rmvnorm(n, mu, Sigma)#
+  x_bar <- colMeans(X)#
+  S <- var(X)#
+#
+  a <- c(1, -1, rep(0, p - 2))#
+  ci_t_1 <- x_bar[1] + c(-1, 1) * t_crit * sqrt(S[1, 1] / n)#
+  ci_t_2 <- x_bar[2] + c(-1, 1) * t_crit * sqrt(S[2, 2] / n)#
+  ci_sim_1 <- x_bar[1] + c(-1, 1) * sqrt(F_crit * S[1, 1] / n)#
+  ci_sim_2 <- x_bar[2] + c(-1, 1) * sqrt(F_crit * S[2, 2] / n)#
+  ci_sim_diff <- t(a) %*% x_bar + c(-1, 1) * sqrt(F_crit * t(a) %*% S %*% a / n)#
+  ci_bon_1 <- x_bar[1] + c(-1, 1) * bon_crit * sqrt(S[1, 1] / n)#
+  ci_bon_2 <- x_bar[2] + c(-1, 1) * bon_crit * sqrt(S[2, 2] / n)#
+#
+  cov_reg[i] <- n * t(x_bar - mu) %*% solve(S) %*% (x_bar - mu) <= F_crit#
+  cov_t_1[i] <- (ci_t_1[1] <= mu[1]) & (mu[1] <= ci_t_1[2])#
+  cov_t_2[i] <- (ci_t_2[1] <= mu[2]) & (mu[2] <= ci_t_2[2])#
+  cov_sim_1[i] <- (ci_sim_1[1] <= mu[1]) & (mu[1] <= ci_sim_1[2])#
+  cov_sim_2[i] <- (ci_sim_2[1] <= mu[2]) & (mu[2] <= ci_sim_2[2])#
+  cov_sim_diff[i] <- (ci_sim_diff[1] <= (t(a) %*% mu)) & #
+    ((t(a) %*% mu) <= ci_sim_diff[2])#
+  cov_bon_1[i] <- (ci_bon_1[1] <= mu[1]) & (mu[1] <= ci_bon_1[2])#
+  cov_bon_2[i] <- (ci_bon_2[1] <= mu[2]) & (mu[2] <= ci_bon_2[2])#
+}#
+#
+## The confidence region contains mu with probability 1 - alpha. The simultaneous #
+## intervals are conservative. The Bonferroni intervals are too, but not by quite as #
+## much.#
+mean(cov_reg)#
+mean(cov_t_1)#
+mean(cov_t_2)#
+mean(cov_sim_1)#
+mean(cov_sim_2)#
+mean(cov_sim_diff)#
+mean(cov_bon_1)#
+mean(cov_bon_2)
+n <- 30#
+p <- 10#
+mu <- rep(1, p)#
+rho <- 0.9#
+Sigma <- matrix(rho, nrow = p, ncol = p); diag(Sigma) <- 1#
+alpha <- 0.2#
+#
+F_crit <- (n - 1) * p * qf(1 - alpha, p, n - p) / (n - p)#
+t_crit <- qt(1 - alpha / 2, n - 1)#
+bon_crit <- qt(1 - alpha / (2 * p), n - 1)#
+#
+cov_reg <- cov_t_1 <- cov_t_2 <- cov_sim_1 <- cov_sim_2 <- cov_sim_diff <- cov_bon_1 <- #
+  cov_bon_2 <- rep(NA, N)#
+for(i in 1:N) {#
+  X <- rmvnorm(n, mu, Sigma)#
+  x_bar <- colMeans(X)#
+  S <- var(X)#
+#
+  a <- c(1, -1, rep(0, p - 2))#
+  ci_t_1 <- x_bar[1] + c(-1, 1) * t_crit * sqrt(S[1, 1] / n)#
+  ci_t_2 <- x_bar[2] + c(-1, 1) * t_crit * sqrt(S[2, 2] / n)#
+  ci_sim_1 <- x_bar[1] + c(-1, 1) * sqrt(F_crit * S[1, 1] / n)#
+  ci_sim_2 <- x_bar[2] + c(-1, 1) * sqrt(F_crit * S[2, 2] / n)#
+  ci_sim_diff <- t(a) %*% x_bar + c(-1, 1) * sqrt(F_crit * t(a) %*% S %*% a / n)#
+  ci_bon_1 <- x_bar[1] + c(-1, 1) * bon_crit * sqrt(S[1, 1] / n)#
+  ci_bon_2 <- x_bar[2] + c(-1, 1) * bon_crit * sqrt(S[2, 2] / n)#
+#
+  cov_reg[i] <- n * t(x_bar - mu) %*% solve(S) %*% (x_bar - mu) <= F_crit#
+  cov_t_1[i] <- (ci_t_1[1] <= mu[1]) & (mu[1] <= ci_t_1[2])#
+  cov_t_2[i] <- (ci_t_2[1] <= mu[2]) & (mu[2] <= ci_t_2[2])#
+  cov_sim_1[i] <- (ci_sim_1[1] <= mu[1]) & (mu[1] <= ci_sim_1[2])#
+  cov_sim_2[i] <- (ci_sim_2[1] <= mu[2]) & (mu[2] <= ci_sim_2[2])#
+  cov_sim_diff[i] <- (ci_sim_diff[1] <= (t(a) %*% mu)) & #
+    ((t(a) %*% mu) <= ci_sim_diff[2])#
+  cov_bon_1[i] <- (ci_bon_1[1] <= mu[1]) & (mu[1] <= ci_bon_1[2])#
+  cov_bon_2[i] <- (ci_bon_2[1] <= mu[2]) & (mu[2] <= ci_bon_2[2])#
+}#
+#
+## The confidence region contains mu with probability 1 - alpha. The simultaneous #
+## intervals are conservative. The Bonferroni intervals are too, but not by quite as #
+## much.#
+mean(cov_reg)#
+mean(cov_t_1)#
+mean(cov_t_2)#
+mean(cov_sim_1)#
+mean(cov_sim_2)#
+mean(cov_sim_diff)#
+mean(cov_bon_1)#
+mean(cov_bon_2)
+head(cov_t_1)
+table(cov_t_1, cov_t_2)
+mean(cov_t_1 * cov_t_2)
+N <- 1e3#
+n <- 30#
+p <- 2#
+mu <- rep(1, p)#
+rho <- 0.9#
+Sigma <- matrix(rho, nrow = p, ncol = p); diag(Sigma) <- 1#
+alpha <- 0.2#
+#
+F_crit <- (n - 1) * p * qf(1 - alpha, p, n - p) / (n - p)#
+t_crit <- qt(1 - alpha / 2, n - 1)#
+bon_crit <- qt(1 - alpha / (2 * p), n - 1)#
+#
+cov_reg <- cov_t_1 <- cov_t_2 <- cov_sim_1 <- cov_sim_2 <- cov_sim_diff <- cov_bon_1 <- #
+  cov_bon_2 <- rep(NA, N)#
+for(i in 1:N) {#
+  X <- rmvnorm(n, mu, Sigma)#
+  x_bar <- colMeans(X)#
+  S <- var(X)#
+#
+  a <- c(1, -1, rep(0, p - 2))#
+  ci_t_1 <- x_bar[1] + c(-1, 1) * t_crit * sqrt(S[1, 1] / n)#
+  ci_t_2 <- x_bar[2] + c(-1, 1) * t_crit * sqrt(S[2, 2] / n)#
+  ci_sim_1 <- x_bar[1] + c(-1, 1) * sqrt(F_crit * S[1, 1] / n)#
+  ci_sim_2 <- x_bar[2] + c(-1, 1) * sqrt(F_crit * S[2, 2] / n)#
+  ci_sim_diff <- t(a) %*% x_bar + c(-1, 1) * sqrt(F_crit * t(a) %*% S %*% a / n)#
+  ci_bon_1 <- x_bar[1] + c(-1, 1) * bon_crit * sqrt(S[1, 1] / n)#
+  ci_bon_2 <- x_bar[2] + c(-1, 1) * bon_crit * sqrt(S[2, 2] / n)#
+#
+  cov_reg[i] <- n * t(x_bar - mu) %*% solve(S) %*% (x_bar - mu) <= F_crit#
+  cov_t_1[i] <- (ci_t_1[1] <= mu[1]) & (mu[1] <= ci_t_1[2])#
+  cov_t_2[i] <- (ci_t_2[1] <= mu[2]) & (mu[2] <= ci_t_2[2])#
+  cov_sim_1[i] <- (ci_sim_1[1] <= mu[1]) & (mu[1] <= ci_sim_1[2])#
+  cov_sim_2[i] <- (ci_sim_2[1] <= mu[2]) & (mu[2] <= ci_sim_2[2])#
+  cov_sim_diff[i] <- (ci_sim_diff[1] <= (t(a) %*% mu)) & #
+    ((t(a) %*% mu) <= ci_sim_diff[2])#
+  cov_bon_1[i] <- (ci_bon_1[1] <= mu[1]) & (mu[1] <= ci_bon_1[2])#
+  cov_bon_2[i] <- (ci_bon_2[1] <= mu[2]) & (mu[2] <= ci_bon_2[2])#
+}#
+#
+## The confidence region contains mu with probability 1 - alpha. The simultaneous #
+## intervals are conservative. The Bonferroni intervals are too, but not by quite as #
+## much.#
+mean(cov_reg)#
+mean(cov_t_1 * cov_t_2)#
+mean(cov_sim_1 * cov_sim_2 * cov_sim_diff)#
+mean(cov_bon_1 * cov_bon_2)
+0.8 ^ 2
+N <- 1e3#
+n <- 30#
+p <- 2#
+mu <- rep(1, p)#
+rho <- 0.0#
+Sigma <- matrix(rho, nrow = p, ncol = p); diag(Sigma) <- 1#
+alpha <- 0.2#
+#
+F_crit <- (n - 1) * p * qf(1 - alpha, p, n - p) / (n - p)#
+t_crit <- qt(1 - alpha / 2, n - 1)#
+bon_crit <- qt(1 - alpha / (2 * p), n - 1)#
+#
+cov_reg <- cov_t_1 <- cov_t_2 <- cov_sim_1 <- cov_sim_2 <- cov_sim_diff <- cov_bon_1 <- #
+  cov_bon_2 <- rep(NA, N)#
+for(i in 1:N) {#
+  X <- rmvnorm(n, mu, Sigma)#
+  x_bar <- colMeans(X)#
+  S <- var(X)#
+#
+  a <- c(1, -1, rep(0, p - 2))#
+  ci_t_1 <- x_bar[1] + c(-1, 1) * t_crit * sqrt(S[1, 1] / n)#
+  ci_t_2 <- x_bar[2] + c(-1, 1) * t_crit * sqrt(S[2, 2] / n)#
+  ci_sim_1 <- x_bar[1] + c(-1, 1) * sqrt(F_crit * S[1, 1] / n)#
+  ci_sim_2 <- x_bar[2] + c(-1, 1) * sqrt(F_crit * S[2, 2] / n)#
+  ci_sim_diff <- t(a) %*% x_bar + c(-1, 1) * sqrt(F_crit * t(a) %*% S %*% a / n)#
+  ci_bon_1 <- x_bar[1] + c(-1, 1) * bon_crit * sqrt(S[1, 1] / n)#
+  ci_bon_2 <- x_bar[2] + c(-1, 1) * bon_crit * sqrt(S[2, 2] / n)#
+#
+  cov_reg[i] <- n * t(x_bar - mu) %*% solve(S) %*% (x_bar - mu) <= F_crit#
+  cov_t_1[i] <- (ci_t_1[1] <= mu[1]) & (mu[1] <= ci_t_1[2])#
+  cov_t_2[i] <- (ci_t_2[1] <= mu[2]) & (mu[2] <= ci_t_2[2])#
+  cov_sim_1[i] <- (ci_sim_1[1] <= mu[1]) & (mu[1] <= ci_sim_1[2])#
+  cov_sim_2[i] <- (ci_sim_2[1] <= mu[2]) & (mu[2] <= ci_sim_2[2])#
+  cov_sim_diff[i] <- (ci_sim_diff[1] <= (t(a) %*% mu)) & #
+    ((t(a) %*% mu) <= ci_sim_diff[2])#
+  cov_bon_1[i] <- (ci_bon_1[1] <= mu[1]) & (mu[1] <= ci_bon_1[2])#
+  cov_bon_2[i] <- (ci_bon_2[1] <= mu[2]) & (mu[2] <= ci_bon_2[2])#
+}#
+#
+## The confidence region contains mu with probability 1 - alpha. The simultaneous #
+## intervals are conservative. The Bonferroni intervals are too, but not by quite as #
+## much.#
+mean(cov_reg)#
+mean(cov_t_1 * cov_t_2)#
+mean(cov_sim_1 * cov_sim_2 * cov_sim_diff)#
+mean(cov_bon_1 * cov_bon_2)
+sim_f <- function(n, p, rho, alpha, N = 1000) {#
+  mu <- rep(0, p)#
+#
+  ## Covariance matrix, assuming compound symmetry and unit variance.#
+  Sigma <- matrix(rho, nrow = p, ncol = p); diag(Sigma) <- 1#
+#
+  ## Critical values for the different regions / intervals.#
+  F_crit <- (n - 1) * p * qf(1 - alpha, p, n - p) / (n - p)#
+  t_crit <- qt(1 - alpha / 2, n - 1)#
+  bon_crit <- qt(1 - alpha / (2 * p), n - 1)#
+#
+  cov_reg <- cov_t_1 <- cov_t_2 <- cov_sim_1 <- cov_sim_2 <- cov_sim_diff <- #
+    cov_bon_1 <- cov_bon_2 <- rep(NA, N)#
+  for(i in 1:N) {#
+    X <- rmvnorm(n, mu, Sigma)#
+    x_bar <- colMeans(X)#
+    S <- var(X)#
+#
+    a <- c(1, -1, rep(0, p - 2))#
+    ci_t_1 <- x_bar[1] + c(-1, 1) * t_crit * sqrt(S[1, 1] / n)#
+    ci_t_2 <- x_bar[2] + c(-1, 1) * t_crit * sqrt(S[2, 2] / n)#
+    ci_sim_1 <- x_bar[1] + c(-1, 1) * sqrt(F_crit * S[1, 1] / n)#
+    ci_sim_2 <- x_bar[2] + c(-1, 1) * sqrt(F_crit * S[2, 2] / n)#
+    ci_sim_diff <- t(a) %*% x_bar + c(-1, 1) * sqrt(F_crit * t(a) %*% S %*% a / n)#
+    ci_bon_1 <- x_bar[1] + c(-1, 1) * bon_crit * sqrt(S[1, 1] / n)#
+    ci_bon_2 <- x_bar[2] + c(-1, 1) * bon_crit * sqrt(S[2, 2] / n)#
+#
+    cov_reg[i] <- n * t(x_bar - mu) %*% solve(S) %*% (x_bar - mu) <= F_crit#
+    cov_t_1[i] <- (ci_t_1[1] <= mu[1]) & (mu[1] <= ci_t_1[2])#
+    cov_t_2[i] <- (ci_t_2[1] <= mu[2]) & (mu[2] <= ci_t_2[2])#
+    cov_sim_1[i] <- (ci_sim_1[1] <= mu[1]) & (mu[1] <= ci_sim_1[2])#
+    cov_sim_2[i] <- (ci_sim_2[1] <= mu[2]) & (mu[2] <= ci_sim_2[2])#
+    cov_sim_diff[i] <- (ci_sim_diff[1] <= (t(a) %*% mu)) & #
+      ((t(a) %*% mu) <= ci_sim_diff[2])#
+    cov_bon_1[i] <- (ci_bon_1[1] <= mu[1]) & (mu[1] <= ci_bon_1[2])#
+    cov_bon_2[i] <- (ci_bon_2[1] <= mu[2]) & (mu[2] <= ci_bon_2[2])#
+  }#
+#
+  ## Summarize results.#
+  cat(paste("Region coverage = " round(mean(cov_reg), 2), "\n", sep = ""))#
+}
+sim_f <- function(n, p, rho, alpha, N = 1000) {#
+  mu <- rep(0, p)#
+#
+  ## Covariance matrix, assuming compound symmetry and unit variance.#
+  Sigma <- matrix(rho, nrow = p, ncol = p); diag(Sigma) <- 1#
+#
+  ## Critical values for the different regions / intervals.#
+  F_crit <- (n - 1) * p * qf(1 - alpha, p, n - p) / (n - p)#
+  t_crit <- qt(1 - alpha / 2, n - 1)#
+  bon_crit <- qt(1 - alpha / (2 * p), n - 1)#
+#
+  cov_reg <- cov_t_1 <- cov_t_2 <- cov_sim_1 <- cov_sim_2 <- cov_sim_diff <- #
+    cov_bon_1 <- cov_bon_2 <- rep(NA, N)#
+  for(i in 1:N) {#
+    X <- rmvnorm(n, mu, Sigma)#
+    x_bar <- colMeans(X)#
+    S <- var(X)#
+#
+    a <- c(1, -1, rep(0, p - 2))#
+    ci_t_1 <- x_bar[1] + c(-1, 1) * t_crit * sqrt(S[1, 1] / n)#
+    ci_t_2 <- x_bar[2] + c(-1, 1) * t_crit * sqrt(S[2, 2] / n)#
+    ci_sim_1 <- x_bar[1] + c(-1, 1) * sqrt(F_crit * S[1, 1] / n)#
+    ci_sim_2 <- x_bar[2] + c(-1, 1) * sqrt(F_crit * S[2, 2] / n)#
+    ci_sim_diff <- t(a) %*% x_bar + c(-1, 1) * sqrt(F_crit * t(a) %*% S %*% a / n)#
+    ci_bon_1 <- x_bar[1] + c(-1, 1) * bon_crit * sqrt(S[1, 1] / n)#
+    ci_bon_2 <- x_bar[2] + c(-1, 1) * bon_crit * sqrt(S[2, 2] / n)#
+#
+    cov_reg[i] <- n * t(x_bar - mu) %*% solve(S) %*% (x_bar - mu) <= F_crit#
+    cov_t_1[i] <- (ci_t_1[1] <= mu[1]) & (mu[1] <= ci_t_1[2])#
+    cov_t_2[i] <- (ci_t_2[1] <= mu[2]) & (mu[2] <= ci_t_2[2])#
+    cov_sim_1[i] <- (ci_sim_1[1] <= mu[1]) & (mu[1] <= ci_sim_1[2])#
+    cov_sim_2[i] <- (ci_sim_2[1] <= mu[2]) & (mu[2] <= ci_sim_2[2])#
+    cov_sim_diff[i] <- (ci_sim_diff[1] <= (t(a) %*% mu)) & #
+      ((t(a) %*% mu) <= ci_sim_diff[2])#
+    cov_bon_1[i] <- (ci_bon_1[1] <= mu[1]) & (mu[1] <= ci_bon_1[2])#
+    cov_bon_2[i] <- (ci_bon_2[1] <= mu[2]) & (mu[2] <= ci_bon_2[2])#
+  }#
+#
+  ## Summarize results.#
+  cat(paste("Region coverage = ", round(mean(cov_reg), 2), "\n", sep = ""))#
+}
+sim_f(n = 30, p = 2, rho = 0.9, alpha = 0.2)
+prod(1:5)
+factorial(5)
+? apply
+sim_f <- function(n, p, rho, alpha, N = 1000) {#
+  mu <- rep(0, p)#
+#
+  ## Covariance matrix, assuming compound symmetry and unit variance.#
+  Sigma <- matrix(rho, nrow = p, ncol = p); diag(Sigma) <- 1#
+#
+  ## Critical values for the different regions / intervals.#
+  F_crit <- (n - 1) * p * qf(1 - alpha, p, n - p) / (n - p)#
+  t_crit <- qt(1 - alpha / 2, n - 1)#
+  bon_crit <- qt(1 - alpha / (2 * p), n - 1)#
+#
+  cov_reg <- rep(NA, N)#
+  cov_t <- cov_T2 <- cov_bon <- matrix(NA, nrow = N, ncol = p)#
+  for(i in 1:N) {#
+    X <- rmvnorm(n, mu, Sigma)#
+    x_bar <- colMeans(X)#
+    S <- var(X)#
+#
+    cov_reg[i] <- n * t(x_bar - mu) %*% solve(S) %*% (x_bar - mu) <= F_crit#
+    for(k in 1:p) {#
+      ci_t <- x_bar[k] + c(-1, 1) * t_crit * sqrt(S[k, k] / n)#
+      ci_T2 <- x_bar[k] + c(-1, 1) * sqrt(F_crit * S[k, k] / n)#
+      ci_bon <- x_bar[k] + c(-1, 1) * bon_crit * sqrt(S[k, k] / n)#
+#
+      cov_t[i, k] <- (ci_t[1] <= mu[k]) & (mu[k] <= ci_t[2])#
+      cov_T2[i, k] <- (ci_T2[1] <= mu[k]) & (mu[k] <= ci_T2[2])#
+      cov_bon[i, k] <- (ci_bon[1] <= mu[k]) & (mu[k] <= ci_bon[2])#
+    }#
+  }#
+#
+  ## Summarize results.#
+  cat(paste("Region coverage = ", round(mean(cov_reg), 2), "\n", sep = ""))#
+  cat(paste("Simultaneous coverage of the p t-intervals = ", #
+    round(mean(apply(cov_t, 1, prod)), 2), "\n", sep = ""))#
+  cat(paste("Simultaneous coverage of the p T2-intervals = ", #
+    round(mean(apply(cov_T2, 1, prod)), 2), "\n", sep = ""))#
+  cat(paste("Simultaneous coverage of the p Bonferroni-intervals = ", #
+    round(mean(apply(cov_bon, 1, prod)), 2), "\n", sep = ""))#
+}
+## Bivariate case.#
+sim_f(n = 30, p = 2, rho = 0.9, alpha = 0.2)
+sim_f(n = 30, p = 10, rho = 0.9, alpha = 0.2)
+sim_f(n = 30, p = 5, rho = 0.9, alpha = 0.2)
+sim_f(n = 30, p = 2, rho = 0.0, alpha = 0.2); 0.8 ^ 2
+sim_f(n = 30, p = 5, rho = 0.9, alpha = 0.2)
+sim_f(n = 30, p = 5, rho = 0.9, alpha = 0.2)#
+sim_f(n = 100, p = 5, rho = 0.9, alpha = 0.2)
+qt(0.975, 10)
+qt(0.975, inf)
+infinity
+infin
+infty
+alpha <- 0.05#
+n <- c(15, 25, 50, 100, inf)#
+p <- c(2, 4, 10)#
+#
+int_wid <- matrix(NA, nrow = length(n), ncol = 1 + 2 * p)#
+rownames(int_wid) <- n#
+colnames(int_wid) <- p
+int_wid <- matrix(NA, nrow = length(n), ncol = 1 + 2 * p)#
+rownames(int_wid) <- n#
+colnames(int_wid) <- c("t", as.character(p))
+paste(c("a", "b"), 1:2)
+int_wid <- matrix(NA, nrow = length(n), ncol = 1 + 2 * p)#
+rownames(int_wid) <- n#
+colnames(int_wid) <- c("t", paste(rep(c("T2", "bon"), each = length(p)), rep(p, 2), #
+  sep = ""))
+c("t", paste(rep(c("T2", "bon"), each = length(p)), rep(p, 2), #
+  sep = ""))
+p
+int_wid <- matrix(NA, nrow = length(n), ncol = 1 + 2 * length(p))#
+rownames(int_wid) <- n#
+colnames(int_wid) <- c("t", paste(rep(c("T2", "bon"), each = length(p)), rep(p, 2), #
+  sep = "_"))
+int_wid
+n
+alpha <- 0.05#
+n <- c(15, 25, 50, 100, inf)#
+p <- c(2, 4, 10)#
+#
+int_wid <- matrix(NA, nrow = length(n), ncol = 1 + 2 * length(p))#
+rownames(int_wid) <- n#
+colnames(int_wid) <- c("t", paste(rep(c("T2", "bon"), each = length(p)), rep(p, 2), #
+  sep = "_"))
+int_wid
+n
+alpha <- 0.05#
+n <- c(15, 25, 50, 100)#
+p <- c(2, 4, 10)#
+#
+int_wid <- matrix(NA, nrow = length(n) + 1, ncol = 1 + 2 * length(p))#
+rownames(int_wid) <- c(as.character(n), "inf")#
+colnames(int_wid) <- c("t", paste(rep(c("T2", "bon"), each = length(p)), rep(p, 2), #
+  sep = "_"))
+int_wid
+alpha <- 0.05#
+n <- c(15, 25, 50, 100)#
+p <- c(2, 4, 10)#
+#
+crit_vals <- matrix(NA, nrow = length(n) + 1, ncol = 1 + 2 * length(p))#
+rownames(crit_vals) <- c(as.character(n), "inf")#
+colnames(crit_vals) <- c("t", paste(rep(c("T2", "bon"), each = length(p)), rep(p, 2), #
+  sep = "_"))#
+for(i in 1:length(n)) {#
+  crit_vals[i, "t"] <- qt(1 - alpha / 2, n[i] - 1)#
+  for(j in 1:length(p)) {#
+    crit_vals[i, paste("T2", p[j], sep = "_")] <- #
+      sqrt((p[j] * (n[i] - 1) / (n[i] - p[j])) * qf(alpha, p[j], n[i] - p[j]))#
+    crit_vals[i, paste("bon", p[j], sep = "_")] <- qt(1 - alpha / (2 * p[j]), n[i] - 1)#
+  }#
+}
+crit_vals
+crit_vals <- matrix(NA, nrow = length(n) + 1, ncol = 1 + 2 * length(p))#
+rownames(crit_vals) <- c(as.character(n), "inf")#
+colnames(crit_vals) <- c("t", paste(rep(c("T2", "bon"), each = length(p)), rep(p, 2), #
+  sep = "_"))#
+for(i in 1:length(n)) {#
+  crit_vals[i, "t"] <- qt(1 - alpha / 2, n[i] - 1)#
+  for(j in 1:length(p)) {#
+    crit_vals[i, paste("T2", p[j], sep = "_")] <- #
+      sqrt((p[j] * (n[i] - 1) / (n[i] - p[j])) * qf(1 - alpha, p[j], n[i] - p[j]))#
+    crit_vals[i, paste("bon", p[j], sep = "_")] <- qt(1 - alpha / (2 * p[j]), n[i] - 1)#
+  }#
+}
+crit_vals
+round(crit_vals, 2)
+alpha <- 0.05#
+n <- c(15, 25, 50, 100)#
+p <- c(2, 4, 10)#
+#
+crit_vals <- matrix(NA, nrow = length(n) + 1, ncol = 1 + 2 * length(p))#
+rownames(crit_vals) <- c(as.character(n), "inf")#
+colnames(crit_vals) <- c("t", paste(rep(c("T2", "bon"), each = length(p)), rep(p, 2), #
+  sep = "_"))#
+for(i in 1:length(n)) {#
+  crit_vals[i, "t"] <- qt(1 - alpha / 2, n[i] - 1)#
+  for(j in 1:length(p)) {#
+    crit_vals[i, paste("T2", p[j], sep = "_")] <- #
+      sqrt((p[j] * (n[i] - 1) / (n[i] - p[j])) * qf(1 - alpha, p[j], n[i] - p[j]))#
+    crit_vals[i, paste("bon", p[j], sep = "_")] <- qt(1 - alpha / (2 * p[j]), n[i] - 1)#
+  }#
+}#
+crit_vals[length(n) + 1, "t"] <- qnorm(1 - alpha / 2)#
+for(j in 1:length(p)) {#
+  crit_vals[length(n) + 1, paste("T2", p[j], sep = "_")] <- qchisq(1 - alpha, p[j])#
+  crit_vals[length(n) + 1, paste("bon", p[j], sep = "_")] <- #
+    qnorm(1 - alpha / (2 * p[j]))#
+}#
+round(crit_vals, 2)
+crit_vals[length(n) + 1, "t"] <- qnorm(1 - alpha / 2)#
+for(j in 1:length(p)) {#
+  crit_vals[length(n) + 1, paste("T2", p[j], sep = "_")] <- sqrt(qchisq(1 - alpha, p[j]))#
+  crit_vals[length(n) + 1, paste("bon", p[j], sep = "_")] <- #
+    qnorm(1 - alpha / (2 * p[j]))#
+}#
+round(crit_vals, 2)
+library(Hotelling)#
+library(DescTools)#
+library(plotrix)#
+#
+## Load data.#
+data(container.df)#
+attach(container.df)#
+container.df#
+#
+n <- 10
+p <- 2#
+#
+X_bar <- colMeans(container.df[1:10, 3:4])#
+S <- var(container.df[1:10, 3:4])
+sqrt(diag(S))
+X_bar
+diag(S)
+sqrt(diag(S)) / n
+sqrt(10.0327)
+conf_region_f <- function(n, X_bar, S, alpha) {#
+  p <- length(X_bar)#
+#
+  c2 <- (n - 1) * p * qf(1 - alpha, p, n - p) / (n - p)#
+  ee <- eigen(S)#
+  lambda <- ee$values#
+  ee <- ee$vectors#
+  theta <- atan(ee[2, 1] / ee[1, 1]) * 57.2957795#
+#
+  xlim <- X_bar[1] + c(-1, 1) * 3.5 * sqrt(S[1, 1] / n)#
+  ylim <- X_bar[2] + c(-1, 1) * 2 * sqrt(S[2, 2] / n)#
+  plot(xlim, ylim, xlab = expression(mu[1]), ylab = expression(mu[2]), asp = 1, type = "n")#
+  title(main = paste((1 - alpha) * 100, "% Confidence Region", sep = ""))#
+  draw.ellipse(X_bar[1], X_bar[2], sqrt(c2 * lambda[1] / n), sqrt(c2 * lambda[2] / n), #
+    angle = theta, lwd = 2)#
+}#
+#
+## Two possible values for mu: (1) mu' = [0.9, 0.13] is a plausible value at 95% #
+## confidence, but (2) mu' = [0.9, 0.15] is not. We could equivalently assess these #
+## candidate values of mu with the T2 test.#
+c2#
+print(T2_1 <- n * t(X_bar - c(0.9, 0.13)) %*% solve(S) %*% (X_bar - c(0.9, 0.13)))#
+print(T2_2 <- n * t(X_bar - c(0.9, 0.15)) %*% solve(S) %*% (X_bar - c(0.9, 0.15)))#
+1 - pf((n - p) * T2_1 / ((n - 1) * p), p, n - p) > 0.05#
+1 - pf((n - p) * T2_2 / ((n - 1) * p), p, n - p) < 0.05
+print(c2 <- (n - 1) * p * qf(1 - alpha, p, n - p) / (n - p))
+a <- c(1, -1)#
+ci_T2_1 <- X_bar[1] + c(-1, 1) * sqrt(c2 * S[1, 1] / n)#
+ci_T2_2 <- X_bar[2] + c(-1, 1) * sqrt(c2 * S[2, 2] / n)#
+ci_T2_diff <- t(a) %*% X_bar + c(-1, 1) * sqrt(c2 * t(a) %*% S %*% a / n)
+ci_T2_1
+ci_T2_2
+0.8802 + c(-1, 1) * 3.1674 * 0.0052
+c2
+sqrt(c2)
+sqrt(S[1, 1] / n)
+sqrt(S[2, 2] / n)
+sqrt(diag(S) / n)
+0.8802 + c(-1, 1) * 3.1674 * 0.0163
+0.1237 + c(-1, 1) * 3.1674 * 0.0053
+qt(0.975, 9)
+(3.1674 / 2.2622) * 100
+(3.1674 / 2.2622 - 1) * 100
+a <- c(1, -1)
+t(a) %*% S %*% a
+sqrt(S[1, 1] / n)
+sqrt(S[2, 2] / n)
+0.8802 - 0.1237
+sqrt((S[1, 1] + S[2, 2] - 2 * S[1, 2]) / n)
+sqrt(t(a) %*% S %*% s / n)
+sqrt(t(a) %*% S %*% a / n)
+ci_T2_diff
+0.7565 + c(-1, 1) * sqrt(10.0327) * 0.0156
+q()
+? manova
+? npk2
+? npk
+q()
+n_1 <- 271#
+n_2 <- 138#
+n_3 <- 107#
+n <- n_1 + n_2 + n_3#
+p <- 4#
+g <- 3#
+#
+x_bar_1 <- c(2.066, 0.480, 0.082, 0.360)#
+x_bar_2 <- c(2.167, 0.596, 0.124, 0.418)#
+x_bar_3 <- c(2.273, 0.521, 0.125, 0.383)#
+S_1 <- matrix(c(0.291, -0.001, 0.002, 0.010, -0.001, 0.011, 0.000, 0.003, 0.002, 0.000, #
+  0.001, 0.000, 0.010, 0.003, 0.000, 0.010), nrow = p)#
+S_2 <- matrix(c(0.561, 0.011, 0.001, 0.037, 0.011, 0.025, 0.004, 0.007, 0.001, 0.004, #
+  0.005, 0.002, 0.037, 0.007, 0.002, 0.019), nrow = p)#
+S_3 <- matrix(c(0.261, 0.030, 0.003, 0.018, 0.030, 0.017, 0.000, 0.006, 0.003, 0.000, #
+  0.004, 0.001, 0.018, 0.006, 0.001, 0.013), nrow = p)
+S_1
+S_2
+S_3
+n_1 <- 271#
+n_2 <- 138#
+n_3 <- 107#
+n <- n_1 + n_2 + n_3#
+p <- 4#
+g <- 3#
+#
+## Summary statistics.#
+x_bar_1 <- c(2.066, 0.480, 0.082, 0.360)#
+x_bar_2 <- c(2.167, 0.596, 0.124, 0.418)#
+x_bar_3 <- c(2.273, 0.521, 0.125, 0.383)#
+x_bar <- (n_1 * x_bar_1 + n_2 * x_bar_2 + n_3 * x_bar_3) / n#
+S_1 <- matrix(c(0.291, -0.001, 0.002, 0.010, -0.001, 0.011, 0.000, 0.003, 0.002, 0.000, #
+  0.001, 0.000, 0.010, 0.003, 0.000, 0.010), nrow = p)#
+S_2 <- matrix(c(0.561, 0.011, 0.001, 0.037, 0.011, 0.025, 0.004, 0.007, 0.001, 0.004, #
+  0.005, 0.002, 0.037, 0.007, 0.002, 0.019), nrow = p)#
+S_3 <- matrix(c(0.261, 0.030, 0.003, 0.018, 0.030, 0.017, 0.000, 0.006, 0.003, 0.000, #
+  0.004, 0.001, 0.018, 0.006, 0.001, 0.013), nrow = p)#
+#
+## MANOVA.#
+W <- (n_1 - 1) * S_1 + (n_2 - 1) * S_2 + (n_3 - 1) * S_3#
+B <- n_1 * (x_bar_1 - x_bar) %*% t(x_bar_1 - x_bar) + #
+  n_2 * (x_bar_2 - x_bar) %*% t(x_bar_2 - x_bar) + #
+  n_3 * (x_bar_3 - x_bar) %*% t(x_bar_3 - x_bar)
+W
+L
+Lambda <- det(W) / det(B + W)
+Lambda
+((n - p - 2) / p) * ((1 - sqrt(Lambda)) / sqrt(Lambda))
+p_value <- 1 - pf(((n - p - 2) / p) * ((1 - sqrt(Lambda)) / sqrt(Lambda)), 2 * p, #
+  2 * (n - p - 2))
+p_value
+x_bar_1[3] - x_bar_3[3] + c(-1, 1) * qt(1 - 0.05 / (12 * 2), n - g) * #
+  sqrt((W[3, 3] / (n - g)) * (1 / n_1 + 1 / n_3))
+S_1
+S_2
+S_3
+B
+round(B, 3)
+W
+Lambda
+1 - pchisq(-(n - 1 - (p + g) / 2) * log(Lambda), p * (g - 1))#
+1 - pf(((n - p - 2) / p) * ((1 - sqrt(Lambda)) / sqrt(Lambda)), 2 * p, 2 * (n - p - 2))
+x_bar_1[1] - x_bar_3[1] + c(-1, 1) * qt(1 - 0.05 / (12 * 2), n - g) * #
+  sqrt((W[1, 1] / (n - g)) * (1 / n_1 + 1 / n_3))#
+x_bar_1[2] - x_bar_3[2] + c(-1, 1) * qt(1 - 0.05 / (12 * 2), n - g) * #
+  sqrt((W[2, 2] / (n - g)) * (1 / n_1 + 1 / n_3))#
+x_bar_1[3] - x_bar_3[3] + c(-1, 1) * qt(1 - 0.05 / (12 * 2), n - g) * #
+  sqrt((W[3, 3] / (n - g)) * (1 / n_1 + 1 / n_3))#
+x_bar_1[4] - x_bar_3[4] + c(-1, 1) * qt(1 - 0.05 / (12 * 2), n - g) * #
+  sqrt((W[4, 4] / (n - g)) * (1 / n_1 + 1 / n_3))
+n
+p
+g
+Lambda
+-(n - 1 - (p + g) / 2) * log(Lambda)
+-(516 - 1 - 7/2) * log(0.763)
+n-g
+qt(1 - 0.05 / 24, 513)
+x_bar_1[3] - x_bar_3[3] + c(-1, 1) * qt(1 - 0.05 / (12 * 2), n - g) * #
+  sqrt((W[3, 3] / (n - g)) * (1 / n_1 + 1 / n_3))
+0.082 - 0.125 + c(-1, 1) * qt(1 - 0.05 / 24, 513) * sqrt((1.379 / 513) * (1 / 271 + 1 / 107))
+qnorm(1 - 0.05 / 24)
+q()
+n_1 <- 271#
+n_2 <- 138#
+n_3 <- 107#
+n <- n_1 + n_2 + n_3#
+p <- 4#
+g <- 3#
+#
+## Summary statistics.#
+x_bar_1 <- c(2.066, 0.480, 0.082, 0.360)#
+x_bar_2 <- c(2.167, 0.596, 0.124, 0.418)#
+x_bar_3 <- c(2.273, 0.521, 0.125, 0.383)#
+x_bar <- (n_1 * x_bar_1 + n_2 * x_bar_2 + n_3 * x_bar_3) / n#
+S_1 <- matrix(c(0.291, -0.001, 0.002, 0.010, -0.001, 0.011, 0.000, 0.003, 0.002, 0.000, #
+  0.001, 0.000, 0.010, 0.003, 0.000, 0.010), nrow = p)#
+S_2 <- matrix(c(0.561, 0.011, 0.001, 0.037, 0.011, 0.025, 0.004, 0.007, 0.001, 0.004, #
+  0.005, 0.002, 0.037, 0.007, 0.002, 0.019), nrow = p)#
+S_3 <- matrix(c(0.261, 0.030, 0.003, 0.018, 0.030, 0.017, 0.000, 0.006, 0.003, 0.000, #
+  0.004, 0.001, 0.018, 0.006, 0.001, 0.013), nrow = p)#
+#
+## MANOVA. Reject H_0: tau_1 = tau_2 = tau_3 = 0 (no differences in the mean cost vectors #
+## between the nursing home types) at alpha = 0.05. Also see 'manova' function.#
+W <- (n_1 - 1) * S_1 + (n_2 - 1) * S_2 + (n_3 - 1) * S_3#
+B <- n_1 * (x_bar_1 - x_bar) %*% t(x_bar_1 - x_bar) + #
+  n_2 * (x_bar_2 - x_bar) %*% t(x_bar_2 - x_bar) + #
+  n_3 * (x_bar_3 - x_bar) %*% t(x_bar_3 - x_bar)#
+Lambda <- det(W) / det(B + W)#
+1 - pchisq(-(n - 1 - (p + g) / 2) * log(Lambda), p * (g - 1))#
+1 - pf(((n - p - 2) / p) * ((1 - sqrt(Lambda)) / sqrt(Lambda)), 2 * p, 2 * (n - p - 2))#
+#
+## Bonferroni 95% intervals. There are 4(3)(2)/2 = 12 possible pairwise comparisons. Here #
+## are intervals for comparing mean costs between private and government-owned nursing #
+## homes. The government-owned homes tend to spend more on both nursing labor and plant #
+## operation and maintenance than privately-owned homes.#
+x_bar_1[1] - x_bar_3[1] + c(-1, 1) * qt(1 - 0.05 / (12 * 2), n - g) * #
+  sqrt((W[1, 1] / (n - g)) * (1 / n_1 + 1 / n_3))#
+x_bar_1[2] - x_bar_3[2] + c(-1, 1) * qt(1 - 0.05 / (12 * 2), n - g) * #
+  sqrt((W[2, 2] / (n - g)) * (1 / n_1 + 1 / n_3))#
+x_bar_1[3] - x_bar_3[3] + c(-1, 1) * qt(1 - 0.05 / (12 * 2), n - g) * #
+  sqrt((W[3, 3] / (n - g)) * (1 / n_1 + 1 / n_3))#
+x_bar_1[4] - x_bar_3[4] + c(-1, 1) * qt(1 - 0.05 / (12 * 2), n - g) * #
+  sqrt((W[4, 4] / (n - g)) * (1 / n_1 + 1 / n_3))#
+#
+## Test for equality of covariance matrices.#
+S_po <- W / (n - g)#
+M <- (n - g) * log(det(S_po)) - (n_1 - 1) * log(det(S_1)) - (n_2 - 1) * log(det(S_2)) - #
+  (n_3 - 1) * log(det(S_3))#
+u <- (1 / (n_1 - 1) + 1 / (n_2 - 1) + 1 / (n_3 - 1) - 1 / (n - g)) * #
+  ((2 * p ^ 2 + 3 * p - 1) / (6 * (p + 1) * (g - 1)))#
+1 - pchisq((1 - u) * M, p * (p + 1) * (g - 1) / 2)
+M
+u
+(1-u) * M
+S_1
+S_2
+S_3
+(1 - 0.013) * 244.146
+p * (p + 1) * (g - 1) / 2
+q()
+X <- read.delim("T6-4.DAT", header = FALSE, sep = "")#
+n <- 5#
+p <- 3#
+g <- b <- 2#
+colnames(X) <- c("Factor_1", "Factor_2", "X_1", "X_2", "X_3")#
+attach(X)#
+#
+## Summary statistics.#
+x_bar <- colMeans(X[, 3:5])#
+x_bar_lk <- rbind(colMeans(X[Factor_1 == 0 & Factor_2 == 0, 3:5]), #
+  colMeans(X[Factor_1 == 0 & Factor_2 == 1, 3:5]),#
+  colMeans(X[Factor_1 == 1 & Factor_2 == 0, 3:5]),#
+  colMeans(X[Factor_1 == 1 & Factor_2 == 1, 3:5]))#
+x_bar_l_dot <- rbind(colMeans(X[Factor_1 == 0, 3:5]), colMeans(X[Factor_1 == 1, 3:5]))#
+x_bar_dot_k <- rbind(colMeans(X[Factor_2 == 0, 3:5]), colMeans(X[Factor_2 == 1, 3:5]))
+SSP_cor <- SSP_fac_1 <- SSP_fac_2 <- SSP_int <- SSP_res <- matrix(0, nrow = p, ncol = p)#
+for(l in 1:g) {#
+  SSP_fac_1 <- SSP_fac_1 + b * n * t(x_bar_l_dot[l, , drop = FALSE] - x_bar) %*% #
+    (x_bar_l_dot[l, , drop = FALSE] - x_bar)#
+  SSP_fac_2 <- SSP_fac_2 + g * n * t(x_bar_dot_k[l, , drop = FALSE] - x_bar) %*% #
+    (x_bar_dot_k[l, , drop = FALSE] - x_bar)#
+  for(k in 1:b) {#
+    SSP_int <- SSP_int + n * t(x_bar_lk[(l - 1) * 2 + k, , drop = FALSE] - #
+      x_bar_l_dot[l, , drop = FALSE] - x_bar_dot_k[k, , drop = FALSE] + x_bar) %*% #
+      (x_bar_lk[(l - 1) * 2 + k, , drop = FALSE] - x_bar_l_dot[l, , drop = FALSE] - #
+      x_bar_dot_k[k, , drop = FALSE] + x_bar)#
+    for(r in 1:n) {#
+      SSP_res <- SSP_res + t(as.matrix(X[(l - 1) * 2 * n + (k - 1) * n + r, 3:5]) - #
+        x_bar_lk[(l - 1) * 2 + k, , drop = FALSE]) %*% #
+        (as.matrix(X[(l - 1) * 2 * n + (k - 1) * n + r, 3:5]) - #
+        x_bar_lk[(l - 1) * 2 + k, , drop = FALSE])#
+      SSP_cor <- SSP_cor + t(as.matrix(X[(l - 1) * 2 * n + (k - 1) * n + r, 3:5]) - #
+        x_bar) %*% (as.matrix(X[(l - 1) * 2 * n + (k - 1) * n + r, 3:5]) - x_bar)#
+    }#
+  }#
+}
+fit <- manova(as.matrix(X[, 3:5]) ~ Factor_1 + Factor_2 + Factor_1 * Factor_2)#
+fit_0 <- manova(as.matrix(X[, 3:5]) ~ Factor_2)
+anova(fit_0, fit)
+? anova
+? anova.manova
+x_bar_l_dot
+m <- p * g * (g - 1)#
+nu <- g * b * (n - 1)#
+x_bar_l_dot[1, 1] - x_bar_l_dot[2, 1] + c(-1, 1) * qt(1 - 0.05 / m, nu) * #
+  sqrt(2 * SSP_res[1, 1] / (nu * b * n))#
+x_bar_l_dot[1, 2] - x_bar_l_dot[2, 2] + c(-1, 1) * qt(1 - 0.05 / m, nu) * #
+  sqrt(2 * SSP_res[2, 2] / (nu * b * n))#
+x_bar_l_dot[1, 3] - x_bar_l_dot[2, 3] + c(-1, 1) * qt(1 - 0.05 / m, nu) * #
+  sqrt(2 * SSP_res[3, 3] / (nu * b * n))
+m <- p * b * (b - 1)#
+x_bar_dot_k[1, 1] - x_bar_dot_k[2, 1] + c(-1, 1) * qt(1 - 0.05 / m, nu) * #
+  sqrt(2 * SSP_res[1, 1] / (nu * g * n))#
+x_bar_dot_k[1, 2] - x_bar_dot_k[2, 2] + c(-1, 1) * qt(1 - 0.05 / m, nu) * #
+  sqrt(2 * SSP_res[2, 2] / (nu * g * n))#
+x_bar_dot_k[1, 3] - x_bar_dot_k[2, 3] + c(-1, 1) * qt(1 - 0.05 / m, nu) * #
+  sqrt(2 * SSP_res[3, 3] / (nu * g * n))
+summary(manova(as.matrix(X[, 3:5]) ~ Factor_1 + Factor_2 + Factor_1 * Factor_2), #
+  test = "Wilks")
+q()

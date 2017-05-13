@@ -1,0 +1,180 @@
+---
+output:
+  pdf_document:
+    fig_height: 5
+    fig_width: 8
+    highlight: pygments
+    latex_engine: xelatex
+mainfont: Calibri
+sansfont: Calibri
+fontsize: 12pt
+geometry: margin=1in
+---
+
+**Homework 06**  
+**Joseph Blubaugh**  
+jblubau1@tamu.edu  
+**STAT 636-720**  
+
+\newpage
+
+
+1)
+
+```{r q1, warning=FALSE, comment=NA, message=FALSE}
+## a)
+X1 = read.delim("T8-4.DAT", header=FALSE)
+colnames(X1) = c("x1", "x2", "x3", "x4", "x5")
+
+head(X1)
+
+## Sample Variance
+S1 = var(X1)
+
+## Pricipal Components
+(pca.1 = prcomp(X1))
+
+## Multiply the data with the eigen vectors
+PC.1 = as.matrix(X1) %*% eigen(S1)$vectors
+head(PC.1, 5)
+
+## b)
+## Proportion of variance explained by PCA
+diag(var(PC.1)) / sum(diag(S1)); summary(pca.1)
+
+```
+
+In the first component all of the variables have the same sign and so it can be interpreted as a weighted average linear combination.  The ammount of total variance explained by the first component is 53% with the first 3 explaining 90% of the variance in the data. Depending on the application PC4 and PC5 may not be useful since they do not explain the variance very well.
+
+\newpage
+
+2)
+a)
+```{r q2, warning=FALSE, comment=NA, message=FALSE}
+
+X2 = read.delim("T8-5.DAT", header=FALSE)
+colnames(X2) = c("x1", "x2", "x3", "x4", "x5")
+
+## Sample Variance
+S2 = var(X2)
+
+## PCA on Variance Matrix
+(pca.2s = prcomp(X2))
+summary(pca.2s)
+
+PCA.2s = as.matrix(X2) %*% pca.2s$rotation
+round(cor(X2, PCA.2s), 3)
+
+##confirm correlation
+(eigen(S2)$vectors[1,1] * sqrt(eigen(S2)$values[1])) / sqrt(S2[1,1])
+
+## PCA on Correlation Matrix
+(pca.2r = prcomp(X2, center = TRUE, scale. = TRUE))
+summary(pca.2r)
+
+PCA.2r = as.matrix(X2) %*% pca.2r$rotation
+round(cor(X2, PCA.2r), 3)
+
+```
+
+b)
+
+##### PCA.2s
+93% of the variation can be explained by the first 2 pricipal components. The first components looks primarily to be made up of the weighted differences between x3 anx x4. The second component looks to be a weighted average of x2, x3, and x4.
+
+##### PCA.2r
+67% of the variation can be explained by the first 2 principal components. The first component is made up of a weighted difference between (x1,x3) and (x2,x4,x5). The second component is also a weighted difference between (x1,x2,x3,5) and (x4)
+
+I would recommend using the PCA.2s because it explains a lot more variation with fewer variables.
+
+\newpage
+
+3)
+
+```{r q3, warning=FALSE, comment=NA, message=FALSE}
+## a)
+X3 = read.table("T1-10.DAT", quote="\"", comment.char="")
+colnames(X3) = c("Breed", "SalePr", "YrHgt", "FtFrBody", "PrctFFB", "Frame", 
+                 "BkFat", "SaleHt", "SaleWt")
+
+head(X3)
+
+## Sample variance
+S3 = var(X3[, 2:9])
+
+## pricipal components
+## the first 3 PC explain 86% of the variation
+pca.3r = prcomp(X3[, 2:9], center = TRUE, scale. = TRUE)
+summary(pca.3r)
+
+## b) The scree plot significantly levels off after 2 components however
+##    the first 2 components only account for 74% of the data so I would
+##    include the 3rd component since it will get you to 86%
+plot(x = 1:8, y = eigen(S3)$values, type = "b", main = "Scree Plot")
+
+## c)
+pca.3r
+
+## PC1 could be viewed as a weighted difference between all variables and 
+##     BkFat, or BkFat could small enough that we can drop it and say we 
+##     have a weighted average between all variables
+##
+## PC2 is a weighted difference between (SalePrc, BkFat, SaleWt) and (PrctFB) 
+##     after we drop the variables near 0
+
+## d)
+PC.3 = as.matrix(X3[, 2:9]) %*% pca.3r$rotation
+dta = data.frame(BREED = X3$Breed, PC.3[, 1:2])
+
+plot(x = dta$PC1, y = dta$PC2, col = factor(dta$BREED))
+legend(x = -1800, y = -1000, unique(dta$BREED), col = 1:3, pch = 1)
+
+```
+
+\newpage
+
+```{r q4, warning=FALSE, comment=NA, message=FALSE}
+
+## You can definetely see that breed 5 is difference from breed 8. And Breed 1
+## has a lot of variation. The 3 outliers are in terms of price.  These are
+## the top 3 priced bulls. The summary statistics indicate that they are in the
+## upper percentiles (except for the fat measurements) compared to their same 
+## breed.
+
+## outliers 
+outliers = order(dta$PC1)[1:3]
+X3[outliers, ]
+
+
+## Breed 1
+summary(subset(X3, Breed == 1, 2:9))
+        
+## Breed 8
+summary(subset(X3, Breed == 8, 2:9))
+
+## Breed 5
+summary(subset(X3, Breed == 5, 2:9))
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

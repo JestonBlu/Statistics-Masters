@@ -1,0 +1,101 @@
+---
+output: pdf_document
+mainfont: Bitstream Vera Sans Mono
+sansfont: Bitstream Vera Sans Mono
+geometry: margin=1in
+---
+
+# STAT 626 HW02 BLUBAUGH
+
+### 1.8
+
+a)
+ $x_t = \delta + x_{t - 1} + w_t$  
+ $x_t - x_{t-1} = \delta + w_t \rightarrow E[w_t] = 0$  
+ $x_t = \delta t + \sum_{k=1}^t w_k$  
+
+b) $\text{Since } E[w_t] = 0, \mu_{xt} = E(x_t) = \delta t + \sum_{k=1}^t E(w_k) = \delta t$  
+   $\lambda_x(t-1,t) = cov(t-1,t) = cov(\sum_{k=1}^{t-1} \delta w_k, \sum_{j=1}^t \delta w_j) = min(t-1, t) \sigma_w^2$
+   
+c) $x_t$ is not stationary because there are no parameters that do not depend on t.
+
+d) $t - (t - 1) = 1 \rightarrow \rho_x(t-1,t) = \sqrt{(t-1)/t} = 1$
+The implication is that $t, t-1$ are perfectly correlated
+ 
+e) I would suggest taking the difference between each observation $t$ and $t-1$. The example below uses a $\delta = 1$
+
+```{r a, echo=FALSE, fig.height=3}
+delta = 1
+w = rnorm(100)
+x = 0
+
+for(t in 2:100) x[t] = delta + x[t - 1] + w[t]
+
+par(mfrow = c(1,2))
+plot.ts(x, main = "Random Walk with Drift")
+plot.ts(diff(x), main = "Random Walk with Drift\nDifferencing")
+```
+
+### 1.9
+
+\begin{align*}
+  \lambda_x{t-1, t} = & cov_x(t,t) = cov(U_1 sin(2\pi W_o t) + U_2 cos(2\pi W_o t), U_1 sin(2\pi W_o t) + U_2 cos(2\pi W_o t)) \\
+  = & U_1^2 [.5 (1 - cos(4 \pi W_o t))] + U_2^2 [.5 (1 + cos(4 \pi W_o t))] \\
+  \lambda(h) = & \sigma^2 cos(2 \pi W_0h) \\
+\end{align*}
+
+\newpage
+
+### 1.10
+
+a)
+
+
+b)
+
+
+c)
+
+
+
+### 1.15
+
+The time series is stationary
+
+Mean Function: $\mu_{xt} = E[x_t] = \frac{1}{2}(w_t + w_{t-1}) = 0 \rightarrow E[w_t] = 0$  
+Autocovariance Function: $\gamma(x_{t-1}, x_t) = cov(w_{t-1}w_{t-2}, w_{t}w_{t-2}) = \sigma_w^2$
+
+
+### 2.3
+
+In the following plots, the regression line is plotted in red and the drift constant is plotted in green. Because the drift constant is small, the white noise has more of an effect on the shift of the time series than the drift constant does.
+
+```{r b, echo=FALSE, fig.height=5}
+par(mfrow = c(2,3))
+
+for (i in 1:6) {
+  
+  delta = .1
+  w = rnorm(100)
+  x = 0
+  
+  for(t in 2:100) x[t] = delta + x[t-1] + w[t]
+  
+  mdl = lm(x ~ 0 + time(x))
+  
+  plot.ts(x, main = "Random Walk with Drift", col = 1)
+  abline(mdl, col = 2)
+  abline(a = 0, b = .1, col = 3)
+}
+
+```
+
+
+
+
+
+
+
+
+
+

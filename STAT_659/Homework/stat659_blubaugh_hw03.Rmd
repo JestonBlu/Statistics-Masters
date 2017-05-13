@@ -1,0 +1,518 @@
+---
+output:
+  pdf_document:
+    latex_engine: xelatex
+    highlight: pygments
+mainfont: Calibri Light
+sansfont: Calibri Light
+fontsize: 11pt
+geometry: margin=1in
+---
+
+**Homework 03**  
+**Joseph Blubaugh**  
+jblubau1@tamu.edu  
+**STAT 659-700**  
+
+
+#### 2.16
+  a) Response: Have Smoked (Yes, No), Explanatory: Lung Cancer (Cases, Controls)
+  b) Case-Control Study
+  c) Yes because the sample size is large
+  d) The odds ratio of cancer patients is 5.8% higher than cancer patients that do not smoke. The 95% confidence iterval of the odds ratio crosses 1 so there is not enough evidence to support that smoking and lung cancer are related.  
+  Odds Ratio:$((688/709) * (21/709)) / ((21/709) * (650/709)) = 1.058$  
+  95% Confidence: $log(1.058) \pm 1.96 \sqrt{\frac{1}{688} + \frac{1}{650} + \frac{1}{21} + \frac{1}{58}} = (-.053, .967) \rightarrow (e^{-.053}, e^{1.76}) = (.634, 1.76)$
+  
+```{r a, comment=NA, echo=FALSE, results='asis'}
+
+library(pander)
+
+dta = data.frame(
+  "Cancer" = c(688, 21, 709),
+  "No Cancer" = c(650, 58, 709),
+  "Total" = c(1338, 79, 1418),
+  row.names = c("Smoker Yes", "Smoker No", "Total")
+)
+
+pandoc.table(dta, caption = "Smokers and Lung Cancer")
+
+```
+
+#### 2.18
+  a) $(168/1362) * (290/1362) * 1362 = 35.8$
+  
+```{r b, comment=NA, echo=FALSE, results='asis'}
+
+dta = data.frame(
+  "Not too Happy" = c(21, 53, 94, 21+53+94),
+  "Pretty Happy" = c(159, 372, 249, 159+372+249),
+  "Very Happy" = c(110, 221, 83, 110+221+83),
+  "Total" = c(21+159+110, 53+372+221, 94+249+83, 21+159+110+53+372+221+94+249+83),
+  row.names = c("Above Average", "Average", "Below Average", "Total")
+)
+
+pandoc.table(dta, caption = "Happiness and Income")
+
+```
+  
+  b) DF: $(3-1) * (3-1) = 4$,  pvalue: `1 - pchisq(73.4, 4) = 0`
+  c) 21: The standardized error is nearly 3 times less than the standard error of the expected probability  
+  83: The standardized error is nearly 6 times less than the standard error of the expected probability
+  
+  \newpage
+  
+  d) 110: the standardized error is approximately 3.1 times larger than the standard error of the expected probability  
+  94: the standardized error is approximately 7.5 times larger than the standardized error of the expected probability
+  e) 
+  
+```sas
+proc freq order=data data=happy; weight count;
+tables happiness*income/chisq expected norow nocol nopercent deviation cmh1;
+run;
+
+```
+```{r b22, echo=FALSE, comment=NA, results='asis'}
+
+dta = data.frame(
+  Statistic = c("Chi-Squared", "Likelihood Ratio Chi-Sq", "CMH"),
+  DF = c(4, 4, 1),
+  Value = c(73.3, 71.3, 55.9),
+  Pvalue = c("<.001", "<.001", "<.001")
+)
+
+pandoc.table(dta, caption = "Output from SAS")
+
+```
+
+  f)
+
+```{r b2, echo=FALSE, comment=NA, fig.width=8, fig.height=6, message=FALSE}
+
+library(vcd)
+
+dta = data.frame(
+  Happiness = c("Not too Happy", "Not too Happy", "Not too Happy",
+                "Pretty Happy", "Pretty Happy", "Pretty Happy",
+                "Very Happy", "Very Happy", "Very Happy"),
+  Income = c("Above Average", "Average", "Below Average",
+             "Above Average", "Average", "Below Average", 
+             "Above Average", "Average", "Below Average"),
+  Count = c(21, 53, 94, 159, 372, 249, 110, 221, 83)
+)
+
+mosaic(xtabs(Count ~ Income + Happiness, data = dta),  shade=TRUE, legend=TRUE)
+
+```
+
+\newpage
+
+#### 2.19
+  a) $X^2 = 167.83$, pvalue = $0$, conclusion is that race and political affiliation are related
+  
+```{r c, echo=FALSE, comment=NA, results='asis'}
+
+dta = data.frame(
+  "Democrat" = c(871, 302, 871+302),
+  "Independent" = c(444, 80, 444+80),
+  "Republican" = c(873, 43, 873+43),
+  "Total" = c(871+444+873, 302+80+43, 2188+425),
+  row.names = c("White", "Black", "Total")
+)
+
+dta.e = data.frame(
+  "Democrat" = c((2188/2613)*(1173/2613)*2613,
+                 (425/2613)*(1173/2613)*2613),
+  "Independent" = c((2188/2613)*(524/2613)*2613,
+                    (425/2613)*(524/2613)*2613),
+  "Republican" = c((2188/2613)*(916/2613)*2613,
+                   (425/2613)*(916/2613)*2613),
+  row.names = c("White", "Black")
+)
+
+dta.ch = data.frame(
+  "Democrat" = c( (871-982.2)^2 / 982.2,
+                  (302-190.8)^2 / 190.8),
+  "Independent" = c( (444-438.8)^2 / 438.3,
+                     (80-85.23)^2 / 85.23),
+  "Republican" = c( (873-767.0)^2 / 767.0, 
+                    (43-149)^2 / 149),
+  row.names = c("White", "Black"))
+
+pandoc.table(dta, caption = "Race vs Party Affiliation")
+pandoc.table(dta.e, caption = "Expected Values")
+pandoc.table(dta.ch, caption = "Chi-squared Values")
+
+```
+
+  b) There are much fewer white democrats and black republicans than what is expected under the null hypothesis. There are also many more black democrats and white republicans than what is expected. The portion of independents is close to what is expected under the null hypothesis.
+  
+```{r d, echo=FALSE, comment=NA, results='asis'}
+
+dta.se = data.frame(
+  "Democrat" = c( (871-982.2)/sqrt(982.2*(1-(1173/2613))*(1-(2188/2613))), 
+                  (302-190.8)/sqrt(190.8*(1-(1173/2613))*(1-(425/2613)))),
+  "Independent" = c( (444-438.3)/sqrt(438.8*(1-(534/2613))*(1-(2188/2613))),
+                     (80-85.23)/sqrt(85.23*(1-(524/2613))*(1-(425/2613)))),
+  "Republican" = c( (873-767)/sqrt(767*(1-(916/2613)*(2188/2613))),
+                    (43-149)/sqrt(149*(1-(916/2613)*(425/2613)))),
+  row.names = c("White", "Black")
+)
+
+pandoc.table(dta.se, caption = "Standardized Residuals")
+
+```
+
+\newpage
+  
+  c) Conclude that republican and democrat affiliation by race are not independent however independent affiliation is independent `1 - pchisq(.3825, 1) = .536`
+
+```{r e, echo=FALSE, comment=NA, results='asis'}
+
+dta.prt = data.frame(
+  "Chi-squared" = c(167.46, .3825, 167.83),
+  "DF" = c(1, 1, 2),
+  row.names = c("Democrat and Republican", "Independent", "Total")
+)
+
+pandoc.table(dta.prt, caption = "Partitioned Chi-squares")
+
+```
+
+
+#### 2.20
+
+```sas
+data cancer;
+input stage $ living $ count;
+cards;
+advanced spouse 109
+advanced alone 59
+advanced other 53
+local spouse 100
+local alone 85
+local other 36
+;
+
+proc freq order=data data=cancer; weight count;
+tables stage*living/chisq expected norow nocol nopercent deviation cmh1;
+run;
+
+```
+```{r e2, echo=FALSE, comment=NA, results='asis'}
+
+dta = data.frame(
+  Statistic = "Chi-Square", 
+  DF = 2,
+  Value = 8.32,
+  Pvalue = 0.0155
+)
+
+pandoc.table(dta, caption = "Output from SAS")
+
+```
+
+
+#### 2.21
+  a) Yes the chi-squared independence test is appropriate for this table because all expected values are greater than 5 and the responses are not correlated.
+  
+  \newpage
+  
+  b) You can compare the responses to the 3 questions by gender by computing the Chi-Squared statistic based on the expected values of each cell.  Overall the difference in responses are not significantly different. You can also isolate the response to question A by breaking out the chi-squared values and comparing it to the combined answers of B and C. That relationship is also not significant.
+
+```{r f, echo=FALSE, comment=NA, results='asis'}
+
+dta = data.frame(
+  Gender = c("Male", "Female", "Total"),
+  A = c(60, 75, 60+75),
+  B = c(81, 87, 81+87),
+  C = c(75, 86, 75+86),
+  Total = c(60+81+75, 75+87+86, 135+168+161)
+)
+
+pandoc.table(dta, caption = "Data")
+
+dta.exp = data.frame(
+  Gender = c("Male", "Female"),
+  A = c( (216/464)*(135/464)*464, (248/464)*(135/464)*464 ),
+  B = c( (216/464)*(168/464)*464, (248/464)*(168/464)*464 ),
+  C = c( (216/464)*(161/464)*464, (248/464)*(161/464)*464 )
+)
+
+pandoc.table(dta.exp, caption = "Expected Values")
+
+dta.ch = data.frame(
+  Gender = c("Male", "Female"),
+  A = c( (60-62.8)^2 / 62.8, (75-72.1)^2 / 72.1),
+  B = c( (81-78.2)^2 / 78.2, (87-89.8)^2 / 89.8),
+  C = c( (75-74.9)^2 / 74.9, (86-86.0)^2 / 86.0)
+)
+
+pandoc.table(dta.ch, caption = "Chi-squared values")
+
+dta.con = data.frame(
+  Gender = c("Male", "Female"),
+  A = c(.1248, .1166),
+  BC = c(.1004, .08731)
+)
+
+pandoc.table(dta.con, caption = "Contingency Table")
+
+
+cat("Test for whether Response A is significantly different: 1 - pchisq(.2414, 1) = ", 1-pchisq(.2414, 1))
+
+```
+
+\newpage
+
+#### 2.22
+  a) Since the not all of the expected frequencies are > 5 we can use Fishers Exact Test. Because the pvalue is near 0 we conclude that Drug use and Diagnosis are related.
+
+```{r g, echo=FALSE, comment=NA, results='asis'}
+
+dta = data.frame(
+  Diagnosis = c("Drugs", "No Drugs", "Total"),
+  Schizophrenia = c(105, 8, 105+8),
+  Affective = c(12, 2, 12+2),
+  Neurosis = c(18, 19, 18+19),
+  Personality = c(47, 52, 47+52),
+  Special = c(0, 13, 13),
+  Total = c(182, 94, 276)
+)
+
+pandoc.table(dta, split.tables = Inf)
+
+dta.exp = data.frame(
+  Diagnosis = c("Drugs", "No Drugs"),
+  Schizophrenia = c( (113/276)*(182/276)*276, (113/276)*(94/276)*276  ),
+  Affective = c( (14/276)*(182/276)*276, (14/276)*(94/276)*276 ),
+  Neurosis = c( (37/276)*(182/276)*276, (37/276)*(94/276)*276 ),
+  Personality = c( (99/276)*(182/276)*276, (99/276)*(94/276)*276 ),
+  Special = c( (13/276)*(182/276)*276, (13/276)*(94/276)*276 )
+)
+
+pandoc.table(dta.exp, caption = "Expected Frequencies")
+
+x = dta[1:2, 2:6]
+row.names(x) = c("Drugs", "No Drugs")
+
+```
+
+
+```{r g2, echo=FALSE, comment=NA}
+fisher.test(x)
+```
+  
+  b) The value for Schizophrenia is much higher than expected and much lower than expected for No Drug use suggesting that Drug use and schizophrenia are related. The opposite is true for Neurosis, Personality, and Special. The large standard errors in the table suggest that as a whole drug use and diagnosis are related.
+
+```{r g3, echo=FALSE, comment=NA, results='asis'}
+
+dta = data.frame(
+  Diagnosis = c("Drugs", "No Drugs"),
+  Schizophrenia = c( (105-74.5)/sqrt(74.5*(1-(182/276))*(1-(113/276))), (8-38.5)/sqrt(38.5*(1-(94/276))*(1-(113/276))) ),
+  Affective = c( (12-9.2)/sqrt(9.2*(1-(182/276))*(1-(14/276))), (2-4.7)/sqrt(4.7*(1-(94/276))*(1-(14/276)))  ),
+  Neurosis = c( (18-24.4)/sqrt(24.4*(1-(182/276))*(1-(37/276))), (19-12.6)/sqrt(12.6*(1-(94/276))*(1-(37/276)))  ),
+  Personality = c( (47-65.3)/sqrt(65.3*(1-(182/276))*(1-(99/276))), (52-33.7)/sqrt(33.7*(1-(94/276))*(1-(99/276))) ),
+  Special = c( (0-8.6)/sqrt(8.6*(1-(182/276))*(1-(13/276))), (13-4.4)/sqrt(4.4*(1-(94/276))*(1-(13/276)))  )
+)
+
+pandoc.table(dta, caption = "Standard Errors")
+
+```
+  
+  c)
+  
+```{r g4, echo=FALSE, comment=NA, results='asis'}
+
+dta = data.frame(
+  Diagnosis = c("Drugs", "No Drugs"),
+  Schizophrenia = c( (105-74.5)^2 /74.5,  (8-38.5)^2 /38.5),
+  Affective = c( (12-9.2)^2 /9.2,  (2-4.7)^2 /4.7),
+  Neurosis = c( (18-24.4)^2 /24.4,  (19-12.6)^2 /12.6),
+  Personality = c( (47-62.3)^2 /65.3,  (52-33.7)^2 /33.7),
+  Special = c( (0-8.6)^2 /8.6,  (13-4.4)^2 /4.4)
+)
+
+pandoc.table(dta, caption = "Chi-Squared Values")
+
+dta.prt = data.frame(
+  Diagnosis = c("Drugs", "No Drugs"),
+  Schizophrenia = c( 12.49, 24.16),
+  Affective = c( .8522, 1.55)
+)
+
+dta.prt2 = data.frame(
+  Diagnosis = c("Drugs", "No Drugs"),
+  Neurosis = c( 1.7, 3.2),
+  Personality = c( 3.6, 9.9)
+)
+
+dta.prt3 = data.frame(
+  Diagnosis = c("Drugs", "No Drugs"),
+  Schiz.Affect = c( 12.5+.85, 24.16+1.55),
+  Neuro.Person = c( 1.7+3.6, 3.25+9.9),
+  Special = c(8.6, 16.8)
+)
+
+pandoc.table(dta.prt, caption = "Partitioned Table (i)")
+pandoc.table(dta.prt, caption = "Partitioned Table (ii)")
+pandoc.table(dta.prt, caption = "Partitioned Table (iii)")
+
+```
+
+```{r g5, echo=TRUE, comment=NA}
+## Chi-Squared (i)
+1 - pchisq(sum(dta.prt[, 2:3]), 1)
+## Chi-Squared (ii)
+1 - pchisq(sum(dta.prt2[, 2:3]), 1)
+## Chi-Squared (iii)
+1 - pchisq(sum(dta.prt3[, 2:4]), 2)
+```
+
+
+\newpage
+
+#### 2.23
+
+People with less than HS education tend to be heavily into the fundamental religious category. Those with HS or JC tend to be in the Fundamentalist or Moderate category. And those with a college degree tend to be liberal. It appears that the relationship between those with a bachelors degree or higher is significantly related to religious beliefs.
+  
+```{r h, echo=FALSE, comment=NA, results='asis', fig.height=7}
+
+dta = data.frame(
+  Degree = c(rep("Less than HS", 3), rep("HS or JC", 3), rep("Bach or Grad", 3)),
+  Religious = rep(c("Fundamentalist", "Moderate", "Liberal"), 3),
+  Count = c(178, 138, 108, 570, 648, 442, 138, 252, 252)
+)
+
+dta$Degree = factor(dta$Degree, levels = c("Less than HS", "HS or JC", "Bach or Grad"))
+dta$Religious = factor(dta$Religious, levels = c("Fundamentalist", "Moderate", "Liberal"))
+
+mosaic(xtabs(Count ~ Degree + Religious, data = dta),  shade=TRUE, legend=TRUE)
+
+```
+
+
+#### 2.27
+  a)
+  
+```{r i, echo=FALSE, comment=NA, results='asis'}
+
+dta.cst = data.frame(
+  "." = c("< HS", "HS", "< Grad", "Grad", "Total"),
+  "Low" = c(9, 43, 13, 10, 75),
+  "Medium" = c(11, 52, 23, 22, 108),
+  "High" = c(9, 41, 12, 27, 89),
+  "Total" = c(29, 136, 48, 59, 272)
+)
+
+pandoc.table(dta.cst, caption = "Apsiration and Income")
+
+```
+  
+  b)
+  
+```{r j, echo=FALSE, comment=NA, results='asis'}
+
+dta.se = data.frame(
+  "." = c("< HS", "HS", "< Grad", "Grad"),
+  "Low" = c( ( 9-7.9)/sqrt(7.9*(1-( 29/272))*(1-(75/272))), 
+             (43-37.5)/sqrt(37.5*(1-(136/272))*(1-(75/271))), 
+             (13-13.2)/sqrt(13.2*(1-( 48/272))*(1-(75/271))), 
+             (10-16.2)/sqrt(16.2*(1-( 59/272))*(1-(75/271)))),
+  "Medium" = c((11-11.5)/sqrt(11.5*(1-( 29/272))*(1-(108/272))), 
+               (52-54)/sqrt(54*(1-(136/272))*(1-(108/272))), 
+               (23-19)/sqrt(19*(1-( 48/272))*(1-(108/272))), 
+               (22-23.4)/sqrt(23.4*(1-( 59/272))*(1-(108/272)))),
+  "High" = c(( 9-9.5)/sqrt(9.5*(1-( 29/272))*(1-(89/272))), 
+             (41-44.5)/sqrt(44.5*(1-(136/272))*(1-(89/272))), 
+             (12-15.7)/sqrt(15.7*(1-( 48/272))*(1-(89/272))), 
+             (27-19.3)/sqrt(19.3*(1-( 59/272))*(1-(89/272))))
+)
+
+pandoc.table(dta.se, caption = "Standard Error")
+
+```
+  
+  c)
+  
+```{r k2, echo=FALSE, comment=NA, results='asis'}
+
+dta = data.frame(
+  "Chi-Square" = 8.5930,
+  "DF" = 6 ,
+  "Asymptotic.Pr.>.ChiSq" = 0.1978 ,
+  "Exact.Pr.>=.ChiSq" = 0.1990
+)
+
+pandoc.table(dta, caption = "Exact Chi-Squared from SAS")
+
+```
+
+  d) The exact Chi-Squared test confirms that that relationship between aspiration and income is not significant and All of the standard errors of the expected values are reasonably close the actual values.
+
+```{r k, echo=FALSE, comment=NA}
+
+dta.mos = structure(list(aspiration = structure(c(1L, 2L, 3L, 4L, 1L, 2L, 
+3L, 4L, 1L, 2L, 3L, 4L), .Label = c("< HS", "HS", "< Grad", "Grad"
+), class = "factor"), income = structure(c(1L, 1L, 1L, 1L, 2L, 
+2L, 2L, 2L, 3L, 3L, 3L, 3L), .Label = c("low", "middle", "high"
+), class = "factor"), count = c(9, 43, 13, 10, 11, 52, 23, 22, 
+9, 41, 12, 27)), .Names = c("aspiration", "income", "count"), row.names = c(NA, 
+-12L), class = "data.frame")
+
+mosaic(xtabs(count ~ aspiration + income, data = dta.mos), shade = TRUE, legend = TRUE)
+
+```
+
+
+#### 2.25
+  a) 
+  
+```{r k3, echo=FALSE, comment=NA, results='asis'}
+
+dta1 = data.frame(
+  n.1 = c("n11", "n21", "n+1"),
+  n.2 = c("n12", "n22", "n+2"),
+  Total = c("n1+", "n2+", "N"),
+  row.names = c("n1.", "n2.", "Total")
+)
+
+
+dta2 = data.frame(
+  mu.1 = c("n+1/N * n1+/N * N", "n+1/N * n2+/N * N", "n+1/N * N"),
+  mu.2 = c("n+2/N * n1+/N * N", "n+2/N * n2+/N * N", "n+2/N * N"),
+  Total = c("n1+/N * N", "n2+/N * N", "N++/N * N"),
+  row.names = c("mu1.", "mu2.", "Total")
+  
+)
+
+pandoc.table(dta1, caption = "N")
+pandoc.table(dta2, caption = "Mu")
+
+```
+  
+  b) 
+\begin{align*}
+  \frac{(\frac{n_{+1}}{N} \frac{n_{1+}}{N} N) (\frac{n_{+2}}{N} \frac{n_{2+}}{N} N)}{(\frac{n_{+1}}{N} \frac{n_{2+}}{N} N) (\frac{n_{+2}}{N} \frac{n_{1+}}{N} N) }  = 1\\
+\end{align*}
+
+#### 2.26
+  a) A Chi-squared distribution with DF degrees of freedom
+  
+  b) The DF for the sum of two chi-squared variables is equal to the sum of the DF for each variable:   
+  $X^2_1 + X^2_2 = X^2_3$
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  

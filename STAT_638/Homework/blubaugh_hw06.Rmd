@@ -1,0 +1,300 @@
+---
+output:
+  pdf_document:
+    latex_engine: xelatex
+    highlight: pygments
+mainfont: DejaVu Sans Mono
+sansfont: DejaVu Sans Mono
+fontsize: 11pt
+geometry: margin=1in
+---
+  
+Homework 06  
+Joseph Blubaugh      
+jblubau1@tamu.edu    
+
+a)
+
+```{r a, echo=TRUE, comment=NA}
+library(MASS)
+
+blue = read.table(file = "../Data/bluecrab.dat", sep = " ")
+orange = read.table(file = "../Data/orangecrab.dat", sep = " ")
+
+## Gibbs Sampling Blue
+Mu.0 = colMeans(blue); S.o = cov(blue); V.o = 4
+
+blue.sim = data.frame(); blue.cor = c()
+
+for(i in 1:10000) {
+  A.o = matrix(rWishart(n = 1, df = V.o, Sigma = S.o), nrow = 2)
+  
+  A.n = solve(A.o) + (50 * solve(S.o))
+  B.n = solve(A.o) %*% Mu.0 + (50 * solve(S.o) %*% colMeans(blue))
+  
+  x = mvrnorm(n = 1, mu = solve(A.n) %*% B.n, Sigma = solve(A.n))
+  
+  blue.sim = rbind(blue.sim, x) 
+  blue.cor = c(blue.cor, A.o[1,2] / (sqrt(A.o[1,1]) * sqrt(A.o[2,2])))
+}
+
+colnames(blue.sim) = c("depth", "width")
+
+## Gibbs Sampling Orange
+Mu.0 = colMeans(orange); S.o = cov(orange); V.o = 4
+
+orange.sim = data.frame(); orange.cor = c()
+
+for(i in 1:10000) {
+  A.o = matrix(rWishart(n = 1, df = V.o, Sigma = S.o), nrow = 2)
+  
+  A.n = solve(A.o) + (50 * solve(S.o))
+  B.n = solve(A.o) %*% Mu.0 + (50 * solve(S.o) %*% colMeans(orange))
+  
+  x = mvrnorm(n = 1, mu = solve(A.n) %*% B.n, Sigma = solve(A.n))
+  
+  orange.sim = rbind(orange.sim, x) 
+  orange.cor = c(orange.cor, A.o[1,2] / (sqrt(A.o[1,1]) * sqrt(A.o[2,2])))
+}
+
+colnames(orange.sim) = c("depth", "width")
+
+```
+
+
+b) The orange crabs are much larger than the blue crabs. The orange crabs also have more variate in size, but their features are slightly more correlated than the blue crabs.
+
+```{r b, echo=FALSE, comment=NA, fig.height=4}
+par(mfrow = c(1,2))
+plot(blue.sim, xlim = c(10, 14), ylim = c(11, 18), main = "Crab Simulations", col = "blue")
+points(orange.sim, xlim = c(10, 14), ylim = c(11, 18), col = "orange")
+
+plot(density(orange.cor), col = "orange", main = "Correlation Densities")
+lines(density(blue.cor), col = "blue")
+
+```
+
+
+c) The proportion of simulations where the correlations of the blue crab feature were less than the correlation of the orange crab features was `r round(length(which(blue.cor < orange.cor)) / 1000, 3)`. On average the orange crabs have a larger width and depth compared to blue crabs. Their features are also more correlated than that of blue crabs. 
+
+
+
+```{r d, echo=FALSE}
+missing = function(Y, theta, Sigma, nreps) {
+#
+# For fun we'll save the generated values that replace the missing
+# data.  We'll put them in an nreps x 2 matrix called output.   
+#  
+  output = matrix(0, nreps, 2)
+  Theta = matrix(0, nreps, 3)
+#
+# Initialize the three-dimensional array where the values of Sigma will
+# be saved.   
+#  
+  Sigma.out = array(0, c(3, 3, nreps))
+  n = nrow(Y)
+#
+# Specify the nonmissing data in the two rows that have missing data.   
+#
+  y1 = matrix(Y[42, 1:2], 2, 1)
+  y2 = matrix(Y[85, c(1,3)], 2, 1)
+#
+# Generate two observations that will be used in place of the missing
+# values.  In doing so we use the starting parameters theta and Sigma. 
+#
+  V = Sigma[1:2,1:2]
+  V = solve(V)
+  Cov = matrix(Sigma[3,1:2], 1, 2)
+  v = Sigma[3, 3]
+  mu = theta[3] + as.vector(Cov %*% V %*% (as.numeric(y1) - matrix(theta[1:2], 2, 1)))
+  var1 = v - as.vector(Cov %*% V %*% t(Cov))
+  Y[42,3] = rnorm(1, mean = mu, sd = sqrt(var1))
+  V = Sigma[c(1,3),c(1,3)]
+  V = solve(V)
+  Cov = matrix(Sigma[2, c(1,3)], 1, 2)
+  v = Sigma[2,2]
+  mu = theta[2] + as.vector(Cov %*% V %*% (as.numeric(y2) - matrix(theta[c(1,3)], 2, 1)))
+  var1 = v - as.vector(Cov %*% V %*% t(Cov))
+  Y[85,2] = rnorm(1, mean = mu, sd = sqrt(var1))
+  theta = matrix(theta, 1, 3)
+#
+# Generate the nreps observations using Gibbs sampling.
+#  
+  for(j in 1:nreps){
+#
+#  Compute the sample mean vector using the n x 3 "data" matrix that
+#  includes the two most recently generated pseudo observations.
+#
+    ybar = matrix(1, 1, n) %*% as.matrix(Y/n)
+#
+#   Generate theta given Y, Sigma and Ymiss, where Ymiss is a 2-vector
+#   containing the current pseudo observations.  
+#    
+    theta = rjmvnorm(1, as.vector(ybar), Sigma/n)
+#
+#   Compute the covariance matrix of the current n x 3 data matrix.
+#    
+    S2 = (n - 1) * cov(Y)/n
+#
+#   Generate Sigma given Y, theta and Ymiss. 
+#    
+    param = theta - ybar
+    param = n * S2 + n * t(param) %*% param
+    param = solve(param)
+    Sigma = rjWishart(1, n, param)
+    Sigma = solve(Sigma[1:3,1:3,1])
+#
+#   Generate Ymiss given Y, theta and Sigma.  
+#    
+    V = Sigma[1:2,1:2]
+    V = solve(V)
+    Cov = matrix(Sigma[3,1:2],1,2)
+    v = Sigma[3,3]
+    mu = theta[1,3] + as.vector(Cov %*% V %*% (as.numeric(y1) - matrix(theta[1,1:2],2,1)))
+    var1 = v - as.vector(Cov %*% V %*% t(Cov))
+    Y[42,3] = rnorm(1, mean = mu, sd = sqrt(var1))
+    V = Sigma[c(1,3),c(1,3)]
+    V = solve(V)
+    Cov = matrix(Sigma[2, c(1,3)], 1, 2)
+    v = Sigma[2,2]
+    mu = theta[1,2] + as.vector(Cov %*% V %*% (as.numeric(y2) - matrix(theta[1, c(1,3)], 2, 1)))
+    var1 = v - as.vector(Cov %*% V %*% t(Cov))
+    Y[85,2] = rnorm(1, mean = mu, sd = sqrt(var1))
+    output[j,] = c(Y[42,3], Y[85,2])
+    Theta[j,] = theta[1, 1:3]
+#
+#   Note how we assign Sigma to the jth tier of Sigma.out.    
+#
+    Sigma.out[1:3, 1:3, j] = Sigma
+  }
+#
+# The three components of the output are put in a list.
+#  
+  list(output, Theta, Sigma.out)
+}
+
+rjmvnorm = function(n, mu, Sigma){
+  p = length(mu)
+  X = matrix(rnorm(p*n),p,n)
+  Sigroot = t(chol(Sigma))
+  X = Sigroot %*% X + mu
+  t(X)
+}
+
+rjWishart = function(n, nu, M){
+  p = nrow(M)
+  out = array(0, c(p, p, n))
+  
+  for(j in 1:n) {
+    Z = rjmvnorm(nu, rep(0, len = p), M)
+    out[1:p, 1:p, j] = t(Z) %*% Z
+  }
+  out
+ }
+ 
+bloodwork = read.table("../Data/bloodwork.txt", quote="\"", na.strings = c(-1))
+
+```
+
+\newpage
+
+## Missing Data
+
+## Summary of Mean Vectors
+
+```{r e, echo=FALSE, comment=NA, fig.height=6}
+
+x = missing(Y = bloodwork, 
+            theta = colMeans(bloodwork, na.rm = TRUE), 
+            Sigma = cov(na.omit(bloodwork)), nreps = 10000)
+
+Sim.Missing = x[[1]]
+Sim.Thetas = x[[2]]
+Sim.Cov = x[[3]]
+
+par(mfrow = c(3, 2))
+plot(x = Sim.Thetas[, 1], y = Sim.Thetas[, 2], xlab = "Theta.1", ylab = "Theta.2", 
+     main = "Theta.1 vs Theta.2")
+plot(x = Sim.Thetas[, 1], y = Sim.Thetas[, 3], xlab = "Theta.1", ylab = "Theta.3", 
+     main = "Theta.1 vs Theta.3")
+plot(x = Sim.Thetas[, 2], y = Sim.Thetas[, 3], xlab = "Theta.2", ylab = "Theta.3", 
+     main = "Theta.2 vs Theta.3")
+plot(density(Sim.Thetas[, 1]), xlab = "Theta.1", main = "Kernel Estimate Theta.1")
+plot(density(Sim.Thetas[, 2]), xlab = "Theta.2", main = "Kernel Estimate Theta.2")
+plot(density(Sim.Thetas[, 3]), xlab = "Theta.3", main = "Kernel Estimate Theta.3")
+
+```
+
+\newpage
+
+## Summary of SD Vectors
+
+```{r f, echo=FALSE, comment=NA, fig.height=6}
+par(mfrow = c(3, 2))
+plot(x = sqrt(Sim.Cov[1, 1, 1:10000]), y = sqrt(Sim.Cov[2, 2, 1:10000]), 
+     xlab = "Sigma.1", ylab = "Sigma.2", main = "Sigma.1 vs Sigma.2")
+plot(x = sqrt(Sim.Cov[1, 1, 1:10000]), y = sqrt(Sim.Cov[3, 3, 1:10000]), 
+     xlab = "Sigma.1", ylab = "Sigma.3", main = "Sigma.1 vs Sigma.3")
+plot(x = sqrt(Sim.Cov[2, 2, 1:10000]), y = sqrt(Sim.Cov[3, 3, 1:10000]), 
+     xlab = "Sigma.2", ylab = "Sigma.3", main = "Sigma2 vs Sigma.3")
+plot(density(sqrt(Sim.Cov[1, 1, 1:10000])), xlab = "Sigma.1", main = "Kernel Estimate Sigma.1")
+plot(density(sqrt(Sim.Cov[2, 2, 1:10000])), xlab = "Sigma.2", main = "Kernel Estimate Sigma.2")
+plot(density(sqrt(Sim.Cov[3, 3, 1:10000])), xlab = "Sigma.3", main = "Kernel Estimate Sigma.3")
+
+```
+
+\newpage
+
+## Are any of the variables correlated?
+
+```{r g, echo=FALSE, comment=NA, fig.height=6}
+
+corr.v1v2 = Sim.Cov[1, 2, 1:10000] / (sqrt(Sim.Cov[1, 1, 1:10000]) * sqrt(Sim.Cov[2, 2, 1:10000]))
+corr.v1v3 = Sim.Cov[1, 3, 1:10000] / (sqrt(Sim.Cov[1, 1, 1:10000]) * sqrt(Sim.Cov[3, 3, 1:10000]))
+corr.v2v3 = Sim.Cov[2, 3, 1:10000] / (sqrt(Sim.Cov[2, 2, 1:10000]) * sqrt(Sim.Cov[3, 3, 1:10000]))
+
+par(mfrow = c(2, 2))
+
+plot(density(corr.v1v2), xlab = "rho.12", 
+     main = paste("P(rho.12 < 0) = ", length(which(corr.v1v2 < 0))/10000))
+abline(v = 0, lty = 2)
+plot(density(corr.v1v3), xlab = "rho.13", 
+     main = paste("P(rho.13 < 0) = ", length(which(corr.v1v3 < 0))/10000))
+abline(v = 0, lty = 2)
+plot(density(corr.v2v3), xlab = "rho.23", 
+     main = paste("P(rho.23 < 0) = ", length(which(corr.v2v3 < 0))/10000))
+abline(v = 0, lty = 2)
+
+```
+
+\newpage
+
+For the most part it appears that the two estimates are very close, but for missing value 1, the confidence interval built from the estimated parameters appears to be wider than the confidence interval built from the simulated values. For the second missing value, the confidence interval from the simulated values appear to be wider than the confidence interval construted from the parameter estimates. This could be because there is some correlation between theta.2 and theta.3
+
+```{r h, echo=FALSE, comment=NA, fig.height=6}
+
+cat("Missing Value 1: \n")
+cat("Credible Region from Predicted Missing Values: ")
+quantile(Sim.Missing[, 1], c(.025, .975))
+cat("Credible Region from mean +/- 1.96 * sd of estimated parameters: ")
+mean(Sim.Thetas[,3]) + c(-1, 1) * 1.96 * sqrt(mean(Sim.Cov[3,3,]))
+
+
+cat("Missing Value 2: \n")
+cat("Credible Region from Predicted Missing Values: ")
+quantile(Sim.Missing[, 2], c(.025, .975))
+cat("Credible Region from mean +/- 1.96 * sd of estimated parameters: ")
+mean(Sim.Thetas[,2]) + c(-1, 1) * 1.96 * sqrt(mean(Sim.Cov[2,2,]))
+
+
+
+```
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,332 @@
+---
+output:
+  pdf_document:
+    latex_engine: xelatex
+    highlight: pygments
+mainfont: Calibri Light
+sansfont: Calibri Light
+fontsize: 11pt
+geometry: margin=1in
+---
+
+**Homework 01**  
+**Joseph Blubaugh**  
+jblubau1@tamu.edu  
+**STAT 608-720**  
+
+\newpage
+
+**Matrix Algebra Review**
+\begin{displaymath}
+\mathbf{A} = 
+  \begin{bmatrix}
+    1 & 0 & 2 & 3 \\ 
+    -1 & 2 & 0 & -2 \\ 
+  \end{bmatrix}
+\mathbf{B} = 
+  \begin{bmatrix}
+    0 & -1 \\ 
+    3 &  0 \\ 
+    2 &  1 \\ 
+    0 & -2 \\ 
+  \end{bmatrix}
+\mathbf{C} = 
+  \begin{bmatrix}
+    1 & 0 \\ 
+    0 & 1 \\ 
+    0 & 0 \\ 
+  \end{bmatrix}
+\end{displaymath}
+
+1. 
+\begin{displaymath}
+\mathbf{A'} = 
+  \begin{bmatrix}
+    1 & -1 \\ 
+    0 &  2 \\
+    2 &  0 \\
+    3 & -2 \\ 
+  \end{bmatrix}
+\end{displaymath}
+
+2.
+\begin{displaymath}
+\mathbf{A' + B} = 
+  \begin{bmatrix}
+    1 & -2 \\ 
+    3 &  2 \\
+    4 &  1 \\
+    3 & -4 \\ 
+  \end{bmatrix}
+\end{displaymath}
+
+3.
+\begin{displaymath}
+\mathbf{AB} = 
+  \begin{bmatrix}
+    4 & -5 \\ 
+    6 &  5 \\ 
+  \end{bmatrix}
+\end{displaymath}
+
+4.  **AB** is not equal to **BA**
+\begin{displaymath}
+\mathbf{BA} = 
+  \begin{bmatrix}
+    1 & -2 & 0 & 2 \\ 
+    3 &  0 & 6 & 9 \\
+    1 &  2 & 4 & 4 \\
+    2 & -4 & 0 & 4 \\
+  \end{bmatrix}
+\end{displaymath}
+
+5.  The determinant of matrix **AB** is not equal to 0, $|AB| = 4(5) + 5(6) = 50$ so its not singular
+
+6.  Tr(AB) = 4 + 5 = 9
+
+7.  
+\begin{displaymath}
+\mathbf{(BA)'} =
+ \mathbf{A'B'} =  
+  \begin{bmatrix}
+    1 & -1 \\
+    0 &  2 \\
+    2 &  0 \\
+    3 & -2 \\ 
+  \end{bmatrix}
+  \begin{bmatrix}
+     0 & 3 & 2 & 0 \\
+    -1 & 0 & 1 & 2 \\
+  \end{bmatrix}
+\end{displaymath}
+
+8.
+\begin{displaymath}
+\mathbf{(AB)^{-1}} =
+ \begin{bmatrix}
+    4 & -5 \\ 
+    6 &  5 \\ 
+ \end{bmatrix}^{-1} =
+  \frac{1}{(4)(5) - (-5)(6)}
+  \begin{bmatrix}
+     5 & 5 \\
+    -6 & 4 \\
+  \end{bmatrix} =
+  \begin{bmatrix}
+     \frac{1}{10}  & \frac{1}{10} \\
+     \\
+     \frac{-3}{25} & \frac{2}{25} \\
+  \end{bmatrix}
+\end{displaymath}
+
+9.  
+\begin{displaymath}
+\mathbf{I_2} = 
+ \begin{bmatrix}
+  1 & 0 \\ 
+  0 & 1 \\ 
+ \end{bmatrix}
+\end{displaymath}
+
+10. In each multiplication operation, one of the elements are being multiplied by 0 and the other is multiplied by 1 which multiplies out to be the original matrix.
+\begin{displaymath}
+\mathbf{I_{2}A} = 
+ \begin{bmatrix}
+  1 & 0 \\ 
+  0 & 1 \\ 
+ \end{bmatrix}
+  \begin{bmatrix}
+  1 & 0 & 2 & 3  \\ 
+ -1 & 2 & 0 & -2 \\ 
+ \end{bmatrix} = 
+ \begin{bmatrix}
+  1 & 0 & 2 & 3  \\ 
+ -1 & 2 & 0 & -2 \\ 
+ \end{bmatrix}
+\end{displaymath}
+
+11.  Since we are considering three dimensional space, we can assign each row of the matrix to one of the 3 axis. In this case only x and y have values greater than 0 so the geometric space represented would be a flat triangle if we are looking at the shape underneath the line of points x: 1,0 to y: 0,1
+
+```{r, space, fig.width=5, fig.height=4, comment=NA}
+library(scatterplot3d)
+
+matrix = matrix(c(1, 0, 0, 1, 0, 0), nrow = 3, byrow = TRUE)
+row.names(matrix) = c("x", "y", "z")
+
+print(matrix)
+
+scatterplot3d(x = matrix["x",], y = matrix["z",], z = matrix["y",], 
+    type = "l", main="Matrix Plot", color = "blue",
+    xlim = c(0, 1), ylim = c(0, 1), zlim = c(0, 1),
+    xlab = "x", ylab = "z", zlab = "y")
+
+```
+
+12.
+
+\begin{displaymath}
+\mathbf{P = C (C'C)^{-1} C'} = 
+\begin{bmatrix}
+    1 & 0 \\
+    0 & 1 \\
+    0 & 0 \\
+\end{bmatrix}
+\Bigg(\begin{bmatrix}
+    1 & 0 & 0 \\
+    0 & 1 & 0 \\
+\end{bmatrix}
+\begin{bmatrix}
+    1 & 0 \\
+    0 & 1 \\
+    0 & 0 \\
+\end{bmatrix}\Bigg)^{-1}
+\begin{bmatrix}
+    1 & 0 & 0 \\
+    0 & 1 & 0 \\
+\end{bmatrix}
+\end{displaymath}
+
+\begin{displaymath}
+\mathbf{=}
+\begin{bmatrix}
+    1 & 0 \\
+    0 & 1 \\
+    0 & 0 \\
+\end{bmatrix}
+\begin{bmatrix}
+    1 & 0 \\
+    0 & 1 \\
+\end{bmatrix}
+\begin{bmatrix}
+    1 & 0 & 0 \\
+    0 & 1 & 0 \\
+\end{bmatrix}
+\end{displaymath}
+
+\begin{displaymath}
+\mathbf{=}
+\begin{bmatrix}
+    1 & 0 \\
+    0 & 1 \\
+    0 & 0 \\
+\end{bmatrix}
+\begin{bmatrix}
+    1 & 0 & 0 \\
+    0 & 1 & 0 \\
+\end{bmatrix}
+\end{displaymath}
+
+\begin{displaymath}
+\mathbf{=}
+\begin{bmatrix}
+    1 & 0 & 0\\
+    0 & 1 & 0\\
+    0 & 0 & 0\\
+\end{bmatrix}
+\end{displaymath}
+
+13.
+\begin{displaymath}
+\mathbf{Pd'=}
+\begin{bmatrix}
+    1 & 0 & 0\\
+    0 & 1 & 0\\
+    0 & 0 & 0\\
+\end{bmatrix}
+\begin{bmatrix}
+    2 \\
+    2 \\
+    2 \\
+\end{bmatrix} = 
+\begin{bmatrix}
+    2 \\
+    2 \\
+    0 \\
+\end{bmatrix}
+\end{displaymath}
+
+14. By computing matrix multiplication of d onto the projection matrix of C, I essentially projected d onto the line through C.
+
+15. The dot product of the two vectors is not 0 so the two vectors are not orthagonal. $(2)(1) + (2)(0) + (2)(0) = 2$
+
+16. The dot product of vector 1 of length n with itself is = n. 
+\begin{align*}
+    1 &= [1, 1, 1, 1, ..., + n] \\
+    1 * 1 &= [1 + 1 + 1 + ... + n] \\
+    &= n
+\end{align*}
+
+17. The dot product of x * 1...
+\begin{align*}
+    1 &= [1, 1, 1, 1 + ... + n] \\
+    x &= [x_1, x_2, x_3 + ... + x_n] \\
+    x * 1 &= 1x_1 + 1x_2 + 1x_3 + ... + 1x_n] \\
+\end{align*}
+
+18. The dot product of x * x...
+\begin{align*}
+    x &= [x_1, x_2, x_3 + ... + x_n] \\
+     x * x &= x_1^2 + x_2^2 + x_3^2 + ... + x_n^2] \\
+\end{align*}
+
+19. For $f(x,y) = 3x^2 + 2xy^2 - y$
+\begin{align*}
+    \frac{d}{dx} f(x,y) = 6x + 2y^2 \\
+\end{align*}
+
+20. For $f(x,y) = 3x^2 + 2xy^2 - y$
+\begin{align*}
+    \frac{d}{dy} f(x,y) = 4xy - 1 \\
+\end{align*}
+
+21. $log(e) = 1$
+
+22. $log(\frac{x}{y}) = log(x) - log(y)$
+
+23. $log(x^n) = n * log(x)$
+
+24. 
+\begin{align*}
+    log(x) & = y \\
+    e^{log(x)} & = e^y \\
+    x & = e^y \\
+\end{align*}
+
+25. $\hat{y} = -129.1667 + 1.1667x$
+
+26. The model predicts a weight of 57.5kg
+
+```{r wgt, comment=NA}
+mdl = function(x) { y = -129.1667 + 1.1667*x; return(y) }
+mdl(160)
+
+```
+
+27.  For every unit increase in cm the predicted increase in weight is 1.16kg
+
+28.  The standard error of the height coefficient is calculated by dividing the standard deviation of height divided by the square root of the sample size. The predicted average increase in weight for each unit increase in cm is 1.166 with a standard error range of 1.014 to 1.318. This standard error will decrease as the sample size increases.
+
+29. 2.447 based on 6 degrees of freedom
+
+```{r t}
+qt(.975, 6)
+
+```
+
+30. Height and Weight are related based on the p-value in the model summary. A p-value of .0002 means that there is there is a .02 percent chance that they are only related by chance.
+
+31. The pvalue represents the chance that height and weight are related by accident. Since the value is so low, there is strong evidence that the relationship between height and weight are statistically significant. It doesn't neccesarily tell you how significant height is on weight, just that the relationship is significant.
+
+32. The 95 percent confidence range is between .75 and 1.47
+
+```{r se, comment=NA}
+sd = .1521 * sqrt(8)
+mean = 1.1167
+confidence = 2.36 * (sd / sqrt(8))
+
+(lower = mean - confidence)
+(upper = mean + confidence)
+
+```
+
+33. The confidence interval speaks to the uncertainty in the estimate. Our estimate for the influence of height on weight is an approximation of 1.1. The 95 percent confidence interval of .75 to 1.47 means that would expect 95 percent of observations to fall within that range.   

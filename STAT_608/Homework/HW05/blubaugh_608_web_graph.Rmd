@@ -1,0 +1,30 @@
+---
+title: "Webassign Graph"
+geometry: margin=1in
+mainfont: Calibri Light
+output:
+  html_document:
+    highlight: tango
+sansfont: Calibri Light
+fontsize: 11pt
+---
+
+The ad "Under 60 days or your money back!!!!" might be okay for residential bills under $300, but a regression model shows that anymore than that comes pretty close to hitting the 60 days line.  For commercial bills, the larger the amount the quicker the payment and nearly all bills less than $300 will take more than 60 days to collect.
+
+
+```{r, echo=FALSE}
+overdue <- read.csv("C:/Users/Joseph/Projects/learning/Statistics/STAT_608/Data Sets/overdue.csv")
+
+library(ggplot2)
+library(scales)
+
+ggplot(data = overdue, aes(x = BILL, y = LATE)) +
+  geom_point(aes(color = Type)) +
+  geom_smooth(aes(color = Type), method = "lm", se = F) +
+  scale_x_continuous("Bill ($)", labels = dollar) +
+  scale_y_continuous("Days Late") +
+  ggtitle("Bill Amount vs Days Late") +
+  theme(plot.title = element_text(face = "bold", size = 14))
+
+```
+

@@ -1,0 +1,207 @@
+---
+output:
+  pdf_document: default
+  theme: united
+---
+
+ **Joseph Blubaugh**  
+ jblubau1@tamu.edu  
+ **STAT 630-720**  
+ **HW 02**
+ 
+
+1.5.7) Pitcher: fastball 80% Curveball 20%, Batter Homerun: fastball 8%, curveball 5%  
+
+ a) suppose a batter hits a homerun, what is the conditional probability that he was thrown a curve ball?
+
+    Event A: Homerun, Event B: Curveball
+ 
+    $P({B|A}) = \frac{P({A \cap B})}{P({A})} = \frac{.05}{.20} = .25$
+
+    |       | Fastball | Curveball | Total |
+    |-------+----------+-----------+-------|
+    | HR    |   .08    |   .05     | .13   |
+    | No HR |   .72    |   .15     | .87   |
+    | Total |   .80    |   .20     | 1.0   |
+
+ b) suppose the batter does not hit a homerun, what is the conditional probability that he was thrown a curve ball
+ 
+    | $P({B|A^c}) = \frac{P({B \cap A^c})}{P({A^c})}$
+    |
+    |             $= \frac{P({B}) - P({A \cap B})}{1 - P({A})}$
+    |
+    |             $= \frac{.2 - .05}{1 - .13}$
+    |
+    |             $= .172$
+
+1.5.9) Roll 2 dice, Event A: 2 dice show the same value, Event B: the sum of the two dice are equal to 12, Event C: the red die shows 4, Event D: the blue die shows 4.
+    a) Are A and B independent? No, P(B) = 1/36, on any given roll, but if both dice are the save value, P(B) = 1/6
+    b) Are A and C independent? Yes
+    c) Are A and D independent? Yes
+    d) Are C and D independent? Yes
+    e) Are A, C, D independent? No
+
+1.5.13) There are 3 cards, one is red on both sides, one is black on both sides, and one is black and red on each side. One card is placed at random on one side
+ 
+  a) what is the probability that this one side is red? $1/2$
+  
+  b) Conditional on one side being red, what is the probability that the other side is red? $2/3$
+ 
+  c) How could you verify with with an actual experiment?  
+  You can write down all of the possible outcomes. The condition that the one side is red, means the all black card is irrelevant. So that leaves one all red card and one black/red card. Since the face up side is red you know there are 2 reds and 1 black left so the probability of the other side being red is 2/3
+
+1.5.14) Prove that A and B are independent if and only if $A^c$ and B are independent
+  
+| $P({A^c \cap B}) = P(B) - P(A \cap B)$  
+|
+|                 $= P(B) - P(A) * P(B)$  
+|
+|                 $= P(B) - (1 - P(A))$  
+|
+|                 $= P(B) * P(A^c)$  
+  
+
+1.5.18 
+ a) If you stick with your original choice conditional on the host opening door B, what is the probability of winning? $\frac{1/2 * 1/3}{1/2} = \frac{1}{3}$  
+ b) If you switch to the remaining door C, what is the probability of winning? $1/3$  
+ c) Do you find the results of A and B surprising? How could you design an experiment to verify your probability of winning?  
+ You could list out all of the incomes in a table. In this case calculating the conditional probability comes out to the same probability the intial probability of the choice being correct.
+ 
+1.5.21) READ ONLY
+
+Problem A) If a parent has genotype Aa, he transmits either gene A or gene a to an offspring
+(each with probability 1/2). The gene he transmits to one offspring is independent of the
+one he transmits to another. Consider a parent with three children and the following events:  
+ B = children 1 and 2 have the same gene  
+ C = children 2 and 3 have the same gene  
+ D = children 1 and 3 have the same gene  
+  
+ Show that all these events are pairwise independent, but not mutually independent.  
+
+  Event B: $P(Child1 \cap Child2) = \frac{2}{8}$ Independent  
+  Event C: $P(Child2 \cap Child3) = \frac{2}{8}$ Independent  
+  Event D: $P(Child1 \cap Child3) = \frac{2}{8}$ Independent  
+  $P(Child1 \cap Child2 \cap Child3) = \frac{1}{8}$ Not Mutually Independent  
+  
+  $P(Child1 \cap Child2^c) = \frac{2}{8}$  
+  $P(Child2 \cap Child3^c) = \frac{2}{8}$  
+  $P(Child1 \cap Child3^c) = \frac{2}{8}$  
+
+  $P(B | CD) = \frac{P(B \cap C \cap D)}{P(C \cap D)} = \frac{\frac{1}{8}}{\frac{2}{8}} = \frac{1}{2} \neq P(B)$
+
+
+Problem B, 1.5.22) 
+
+  If the probability of any component failing is 1/10, then
+  
+  $P(Event1 \cup Event2) = \frac{1}{10} * \frac{1}{10} = \frac{1}{100} = \frac{19}{100}$  
+  $P(Event4 \cup Event5) = \frac{1}{10} * \frac{1}{10} = \frac{1}{100} = \frac{19}{100}$  
+  $P(Event3) = \frac{1}{10} = \frac{10}{100}$
+  
+  $P(Failure) = 1 - (1 - .19) (1 - .19) (1 - .1) = 1 - (.81 * .81 * .1) = .41$  
+  
+  
+2.1.5) A and B are events, $X = I_{A} * I_{B}$, is X and indicator function? If yes, then of what event?  Yes, of $A \cap B$  
+ b) Show that $I_{A \cup B} = max({I_{A}, I_{B}})$: $I_{A \cup B} = 1 - (1 - I_{A}) (1 - I_{B}) = 1$, Where $I_{A}$ and $I_{B}$ can only equal 1 or 0  
+ c) Show that $I_{A^c} = 1 - I_{A}$: $1 - (1 - I_{A}) = 1$  
+
+2.1.8) Let S = {1,2,3,4,5}, $X = I_{1,2,3}$, $Y = I_{2,3}$, and  $Z = I_{3,4,5}$. Let $W = X -Y + Z$  
+ a) compute W(1): $X(1) - Y(1) + Z(1) = 1 - 0 + 0 = 1$  
+ b) compute W(2): $X(2) - Y(2) + Z(2) = 1 - 1 + 1 = 1$  
+ c) compute W(5): $X(5) - Y(5) + Z(5) = 1 - 0 + 0 = 1$  
+
+2.2.4) Roll 1 die, let Z be the number showing, Let $W = Z^3 + 4$ and $V = Sqrt(Z)$  
+ 
+ a) Compute P(W = w) for every real number w  
+ 
+    |    w   | 1 | 2  | 3  |  4 |   5 |   6 |  
+    |--------+---+----+----+----+-----+-----|  
+    |P(W = w)| 5 | 12 | 31 | 68 | 129 | 220 |  
+ 
+ b) Compute P(V = v) for every real number v  
+ 
+    |    v   | 1 |  2  |   3  | 4 |  5   |  6   |  
+    |--------+---+-----+------+---+------+------|  
+    |P(V = v)| 1 | 1.4 | 1.73 | 2 | 2.23 | 2.44 |  
+ 
+ c) Compute P(ZW = x) for every real number x  
+ 
+    |     x    | 1 |  2 |  3 |  4  |  5  |  6   |  
+    |----------+---+----+----+-----+-----+------|  
+    |P(ZW = w) | 5 | 24 | 93 | 272 | 645 | 1320 |  
+ 
+ d) Compute P(VW = y) for every real number y  
+ 
+    |     y    | 1 |   2  |   3  |  4  |   5   |   6   |  
+    |----------+---+------+------+-----+-------+-------|  
+    |P(VW = w) | 5 | 16.9 | 53.7 | 136 | 288.4 | 538.8 |  
+ 
+ e) Compute P(V + W = r) for every real number r  
+ 
+    |       r     | 1 |   2  |   3  |  4 |   5   |   6   |  
+    |-------------+---+------+------+----+-------+-------|  
+    |P(V + W = w) | 6 | 13.4 | 32.7 | 70 | 131.2 | 222.4 |  
+
+2.3.4) Flip two coins, let X = 1 if the first coin is heads and X = 0 if the first coin is tails. Let Y = 1 if the second coin is heads and Y = 5 if the second coin is tails. Let Z = XY. What is the probability of Z?  
+
+  S(HH, HT, TH, TT), Z = (1, 5, 0, 0), 
+    
+  |     z    |  0 |  1  |  5  |  
+  |----------+----+-----+-----|  
+  | P(Z = z) | .5 | .25 | .25 |  
+
+2.3.8) Let W ~ Poisson($\lambda$). For what value of lambda is P(W = 11) maximized? 5.5  
+
+2.3.10) Let X ~ Geometric(1/5). Compute P(X^2 <= 15). $(1 - \theta)^k \theta$, $\frac{.8^k}{5}$  
+
+
+  |   1 |   2  |  3   |    4 |    5 |    6 |    7 |    8 |    9 |   10 |   11 |   12 |   13 |   14 |   15 |
+  |-----+------+------+------+------+------+------+------+------+------+------+------+------+------+------|
+  | .16 | .128 | .102 | .082 | .066 | .052 | .042 | .034 | .027 | .021 | .017 | .014 | .011 | .009 | .007 |
+
+
+2.3.13) Let X ~ Hypergeometric(20, 7, 8). What is the probability that X = 3? What is the probability that X = 8?  
+
+  Hypergeometric Function: $\frac{{M \choose x} {N-M \choose n-x}}{{N \choose n}}$  
+  
+  N = Population 20  
+  M = Choosing 7  
+  n = 8   
+  x = 3  or 8
+  
+  $P(X = 3) = \frac{{7 \choose 3} {20-7 \choose 8-3}}{{20 \choose 8}} = .357$  
+  $P(X = 8) = 0$
+    
+
+2.3.14) Suppose a die is rolled 20 independent times, and each time we record whether the event {2, 3, 5, 6} occurred.  
+ 
+ a) what is the distribution of the number of times this event occurs in 20?  
+  The binomial distribution ${n \choose x} \theta^x (1 - \theta)^{(n - x)}$  
+ 
+ b) what is the probability that the event occurs 5 times:   
+    The probability of this occurring exactly 5 times is very close to 0: ${20 \choose 5} \theta^5 (1 - \frac{2}{3})^{(20 - 5)} = .0001$  
+    The probability of this occurring 5 or more times is .999  
+    
+
+2.3.15) Suppose a basketball player scores from a certain position with a probability of .35
+
+ a) what is the probability that the player scores 3 times from the same position in 10 tries  
+  Using the binomial distribution: ${10 \choose 3} .35^3 (1 - .35)^{(10 - 3)} = .252$  
+
+ b) What is the probability that the player obtains the first basket on the tenth throw?  
+  For this we use the Negative Binomial distribution: ${r - 1 + y \choose r - 1} \theta^r (1 - \theta)^y$  
+  Stopping after 2 successes, the probability of making the second basket on the 10th try is .018
+
+ c) What is the probability that the player obtains the second basket on the tenth throw?  
+ Stopping after 1 success, the probability of making the first basket on the 10th try is .004
+
+
+2.3.18) Suppose telephone calls arrive at a help line at the rate of 2 per minute. A Poisson provides a good model.  
+ 
+ a) what is the probability that five calls arrive in the next 2 minutes?  
+   $\frac{e^{-\lambda} \lambda^y}{y!}$  
+   $\frac{e^{-4} 4^5}{5!} = .156$  
+ 
+ b) what is the probability that five calls arrive in the next 2 minutes and then 5 more calls arrive in the following 2 minutes?  
+  These are independent events so multiplying .156 by 2 gives us the probability of the intersection: .024
+ 

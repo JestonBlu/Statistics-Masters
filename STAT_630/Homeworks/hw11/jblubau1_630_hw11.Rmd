@@ -1,0 +1,117 @@
+---
+title: ''
+output:
+  pdf_document: default
+---
+  
+Joseph Blubaugh  
+STAT 630  
+HW11  
+
+
+##### 6.3.1
+When $\alpha = .05$ we do not reject the null hypothesis.
+```{r q1}
+data = c(4.7, 5.5, 4.4, 3.3, 4.6, 5.3, 5.2, 4.8, 5.7, 5.3)
+x = (mean(data) - 5) / (sqrt(.5 / 10))
+2 * pnorm(x)
+```
+
+##### 6.3.2
+When $\alpha = .05$ we do not reject the null hypothesis.
+```{r q2}
+data = c(4.7, 5.5, 4.4, 3.3, 4.6, 5.3, 5.2, 4.8, 5.7, 5.3)
+x = (mean(data) - 5) / (sqrt(sd(data) / 10))
+2 * pnorm(x)
+
+```
+
+
+
+##### 6.3.8
+Using the $Binomial(250, .62)$ distribution
+```{r q3}
+## Wald Test
+x = (250  * (.62 - .65)^2) / (.62 * (1 - .62))
+1 - pnorm(x)
+
+## Score Test
+y = (250  * (.62 - .65)^2) / (.65 * (1 - .65))
+1 - pnorm(y)
+```
+
+
+
+
+##### 8.2.16
+for $N(0,\sigma_0)$
+
+\begin{align*}
+  L(\theta) &= \frac{1}{2 \pi \theta}^{\frac{n}{2}} e^{\frac{-1}{2}} \sum_{i=1}^n \frac{X_i^2}{\theta}           \\
+  \\
+  \frac{L(\theta_0 | x_1, ..., x_n)}{L(\theta_a | x_1, ..., x_n)} &\le K \\
+  \frac{\theta_a}{\theta_0}^{\frac{n}{2}} e^{\frac{-1}{2}} \sum_{i=1}^n X_i^2 \frac{(\theta_a - \theta_0)}{(\theta_0 \theta_a)} &\le K \\
+  \alpha &= P(\sum_{i=1}^2 \frac{X_i^2}{\theta_0} \ge \frac{c}{\theta_0} | H_0)
+\end{align*}
+
+
+##### 8.2.20
+\begin{align*}
+  P(X = x | \theta) &= \frac{1}{\Pi_{i=1}^n x_i!} e^{-n \theta} \theta \sum_{i=1}^n x_i \\
+  &= \frac{1}{\Pi_{i=1}^n x_i!} e^{\sum_{i=1}^n x_i log(\theta) - n \theta}
+\end{align*}
+
+
+
+##### Additional A
+Likelihood ratio test
+\begin{align*}
+  L(\lambda) &= -n\lambda + \sum_{i=1}^n x_i log(\lambda) - \sum_{i=1}^n log(x_i!) \\
+  \\
+  LR &= \frac{L(\lambda_1 | x_1, ..., x_n)}{L(\lambda_0 | x_1, ..., x_n)} \\
+  \\
+  &= \frac{-n\lambda_1 + \sum_{i=1}^n x_i log(\lambda_1) - \sum_{i=1}^n log(x_i!)}{-n\lambda_0 + \sum_{i=1}^n x_i log(\lambda_0) - \sum_{i=1}^n log(x_i!)} \\
+  &= \frac{\lambda_1}{\lambda_0} \\
+\end{align*}
+Substitute the MLE for $\lambda_1$
+\begin{align*}
+  \frac{\sum_{i=1}^n x_i}{n \lambda_0} \\
+\end{align*}
+Wald Statistic
+\begin{align*}
+  Z &= \frac{(\hat{\lambda} - \lambda_0)}{\lambda_0} \\
+\end{align*}
+Score Statistic
+\begin{align*}
+  l(\lambda | x) &= \sum_{i=1}^n x_i log(\lambda - n \lambda) \\
+  dl(\lambda | x) &= \frac{1}{\lambda} \sum_{i=1}^n x_i - n = 0 \\
+\end{align*}
+
+##### Additional B
+\begin{align*}
+  \frac{L(\theta_0 | x_1, ..., x_n)}{L(\theta_a | x_1, ..., x_n)} &= \frac{\Pi_{i=1}^n \frac{1}{\sqrt{2 \pi \sigma_0}} e^{\frac{-x_i^2}{2 \sigma_0^2}}}{\Pi_{i=1}^n \frac{1}{\sqrt{2 \pi \sigma_0}} e^{\frac{-x_i^2}{2 \sigma_0^2}}} \\
+  \\
+  &= e^{\frac{-1}{2 \sigma_0^2} \sum_{i=1}^n x_i^2 - \sum_{i=1}^n x_i^2} \\
+  LR &= e^{\frac{n}{2 \sigma_0^2} \hat{x^2}} \\
+  2 log LR &= \frac{nx^2}{\sigma} \\
+\end{align*}
+
+##### Additional C
+\begin{align*}
+  MLE (\hat{\theta}) &= \frac{2x_1 + x_2}{2x_1 + 2x_2 + 2x_3} \\
+  \\
+  \frac{L(\theta_1 | y_1,...,y_n)}{L(\theta_0 | y_1,...,y_n)} &= \frac{(\theta^2)^{x_1} (2 \theta (1 - \theta))^{x_2} (1 - \theta)^{x_3}}{.25^{x_1} (.5)^{x_2} (.5)^{x_3}} \\
+  \\
+  2 log LR &= 2 log(\frac{(\theta^2)^{x_1} (2 \theta (1 - \theta))^{x_2} (1 - \theta)^{x_3}}{.25^{x_1} (.5)^{x_2} (.5)^{x_3}}) \\
+  Reject H_0 for 2logLR &> X_{.95}^2(1) \\
+\end{align*}
+
+
+##### Additional D
+\begin{align*}
+  \bar{x} - z_{1 - \alpha/2} \frac{2}{\sqrt{16}} &< \mu < \bar{x} + z_{1 - \alpha/2} \frac{2}{\sqrt{16}} \\
+  \bar{x} - \frac{1.96}{2} &< \mu < \bar{x} + \frac{1.96}{2} \\
+\end{align*}
+
+
+

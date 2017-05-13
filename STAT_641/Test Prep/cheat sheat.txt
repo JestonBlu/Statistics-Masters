@@ -1,0 +1,207 @@
+Follows an exponential distribution with mean m years. Suppose that 5 such batteries are randomly chosen, and their lifetimes are recorded as X1, · · · ,X5. The sample average and sample variance of these 5 observations are denoted by ¯X and S2. Answer the next four questions.
+
+1. Find the probability that a randomly chosen battery will not survive more than 3 years? Assume that m = 7.2.
+
+    Here lifetime X » Exponential such that mean is 7.2, therefore, f(x) = 7.2 exp(−x/7.2).
+    pr(will not survive more than 3 years) = pr(X · 3) = 1 − exp(−3/7.2) = 0.3407. pexp(3, 1/7.2)
+
+2. What is the distribution of the average lifetime of these 5 batteries? Use m = 7.2. Due to additive property \sum i=1 Xi will follow Gamma(5, 7.2). The average \sum i=1 Xi/5 will follow Gamma(5, 7.2/5).
+
+4. Suppose that ¯X = 6.6 years. A 95% confidence interval for m is
+    2*n*6.6/qchisq(0.025, 2*n)   [1] 20.32663 chisquared n*s
+    > 2*n*6.6/qchisq(0.975, 2*n) [1] 3.222156
+
+5. Suppose that we know 0 · p · 0.15. Find n such that we are 99% confident that bp is within 0.01 units of p (use Wald’s formula, and choose the best possible answer).
+
+    Z®/2p(1 − p)/d2: qnorm(0.005)^2*0.15*(1-0.15)/0.01^2
+
+In an extrasensory perception expreiment (ESP), five choices were offered for each question. Assume that a person without ESP gusses and thus correctly answers with probability (1/5). Assume that responses are independent from question to question, and altogether 100 questions were asked. Answer the next two questions.
+
+6. What are the mean and standard deviation of the proportion of correct answers?
+    E(ˆp) = p = 1/5 = 0.2 and var(ˆp) = p(1 p − p)/n = 0.2(1 − 0.2)/100. So, the standard error is 0.2 × 0.8/100 = 0.04.
+
+7. What is the probability that a person without ESP will correctly answer at least 30 questions out of 100 questions (use normal approximation, and use 1 − pr(X · 29)).
+    X ~ Binomial(100, 0.2) --> 1 - pbinom(29, 100, .2)
+
+8. Suppose that Y1, · · · , Y10 are iid observations from a normal distribution. The prediction interval for a future observation will be: \bar{Y} ± t_{\alpha/2, n−1} S \sqrt{1 + 1/n}, confidence interval no (1+)
+
+Suppose that for testing H0: \mu = 2 vs Ha : \mu > 2 for a normal population with . = 1, 16 observations are drawn at random. Assume that the rule is that we reject H0 when \bar{X} > 2.5. Answer the next three questions.
+
+9. What is the probability of Type-I error?
+    pr(type-I error) = pr(Reject H0|μ = 2) = pr(\bar{X} > 2.5|μ = 2). Note that when μ = 2, \bar{X} ~ Normal(2, 1/16). Thus pr(\bar{X} > 2.5|μ = 2) = 1 − \iota{Z} = 0.0227.  Z = \sqrt(n) (\bar{x} - H_0)/sd (1 - pnorm(z))
+
+10. What is the probability of Type-II error when μ = 2.5?
+    pr(type-II error) = pr(fail to reject H0|μ = 2.5) = pr(\bar{X} < 2.5|μ = 2.5) = \iota{(2.5 − 2.5) × 4} = \iota(0) = 0.5.
+
+11. Suppose the observed value of \bar{X} = 2.45. What is the p-value of the test?
+    p-value= pr(\bar{X} > 2.45|H0 is true) = pr(\bar{X} > 2.45|μ = 2) = 1 − \iota{(2.45 − 2) × 4} = 0.0359.
+
+12. What sample size is necessary if we want to reject H0 : μ = 2 against Ha : μ > 2 with 80% probability when μ = 2.2 along with probability of type-I error 0.01? Use \sigma = 1.
+    pwr.norm.test(h = diff, sig.level = .01, power = .8, alternative = "greater")
+
+13. Which of the following statements is correct regarding bootstrap precedure?
+    The simulation error is controlled by the number of bootstrap samples B.
+
+14. Which of the following statements is correct regarding hypothesis testing?
+    Rejecting H0 when in fact H0 is true is the type-I error.
+
+15. Suppose that for testing H0 : μ = 5 versus Ha : μ > 5 of a symmetric population that has heavy tails, 16 observations are drawn at random, and we reject H0 if 4(\bar{X} − 5)/S > t_0.05,15. Which of the following statements is most likely to hold?
+    Probability of type-I error is likely to smaller than 0.05.
+
+16. Suppose n observations are drawn at random from a population with unknown mean μ, variance \sigma^2, and corr(X_i,X_j) = p E (0, 1) for i \ne j. Which of the following statements is correct?
+    SE(\bar{X} ) is underestimated by S / \sqrt{n}
+
+Suppose that Y1, · · · , Y10 are drawn from a population. Using sign test we reject H0 : ˜μ = 2 against ˜μ > 2 when S^+ > k with a level of significance 0.05. Answer the next two questions.
+
+17. Find the value of k.
+    Under H0 S+ ~ Binomial(10, 0.5). 1 - pbinom(7, 10, .5) = .054, 1 - pbinom(8, 10, .5) = .01, k = 8
+
+18. For the time being assume that k = 8 (this may not be the correct value of k). What is the power of the test when ˜μ = 2.2? Assume that pr(Y > 2.2) = 0.5 and pr(Y > 2) = 0.56.
+    Note that here k is given to you. power= pr(Reject H0|Ha holds) = pr(S+ > 8|˜μ = 2.2).
+    1 - pbinom(2.2, 10, .56)
+
+19. Suppose that X1, · · · ,Xn are iid observations from a Normal(1, sigma^2) distribution. Which of the following statistics is a pivot? (i.e., its distribution is free from \sigma^2).
+    T1 = (X1 −X2) ~ N(0, 2\sigma^2) and T2 = (X3 −X4) ~ N(0, 2\sigma^2), and they are independent. Also, T1/ \sqrt{2} \sigma ~ N(0, 1) and T2/ \sqrt{2} \sigma ~ N(0, 1). Note that T1/T2 = (T1/ \sqrt{2} \sigma)/(T2/ \sqrt{2} \sigma). Thus it is the ratio of two normal(0, 1) random variables, hence it is free from \sigma.
+
+Drug  Success Failure Total
+PV    38      4       42
+P     14      7       21
+Total 52      11      63
+
+20. The appropriate way of testing the equality of the success probabilities due to two drugs is via:
+    Fisher’s exact test (not paired study)
+
+21. Estimate the odds of success due to drug PV ()
+    odds of success due to PV= pr(success due to PV)/{1 − pr(success due to PV)} = (38/42)/(4/42) = 38/4 = 9.5.
+
+    Tonsil        Carrier Status
+    Size        Carrier Noncarrier   Total
+    --------------------------------------
+    Normal      19      497        | 516
+    Large       29      560        | 589
+    Very Large  24      269        | 293
+    --------------------------------------
+    Total       72      1326       | 1398
+
+22. What is the expected frequency for the cell ‘Carrier and Normal’ under the independence of carrier status and tonsil size?
+    (72/1398)*(516/1398)*1398
+
+23. What is the degrees of freedom of the Chi-square test for independence of the two factors?
+df= (3 − 1) × (2 − 1) = 2.
+
+24. An alternative method of testing independence of the two factors based on the above data is (none)
+    paired t-test: mcnemars test: cochran matel haenszel test: pooled t-test: fishers exact test: pearson chi-square independence:
+
+25. Suppose that X1, · · · ,Xm are iid from a Normal(μ1, \sigma_1^2) distribution and Y1, · · · , Yn are iid from a Normal(μ2, \sigma_2^2) and the two samples are independent. An appropriate 100(1 − \alpha)% confidence interval for p = \sigma_2^2 / \sigma_1^2
+    (S_1^2 / \sigma_1^2) / (S_2^2 / \sigma_2^2) ~ F(m−1),(n−1)
+
+--------------------------------------------------------------------------------------------
+
+Defendant  Death penalty
+race        Yes     No      Total
+White       19      141     160
+Black       17      149     166
+----------------------------------
+Total       36      290     362
+
+Let pw and pb be the probability of receiving death penalty when the defendant is a White and Black, respectively. Answer the next 4 questions
+
+1. The null hypothesis for testing the dependence between death penalty and defendant’s race is
+    pw = pb
+
+2. The Z test statistic for testing the above hypothesis is
+    Z = p_w - P_b / (\sqrt{p_c(1 - p_c) (1/m + 1/m)})), m = 160, n = 166, p_c = 36/362
+
+3. For testing the above hypothesis one may also use
+    Chi-square test
+
+4. A reasonable estimate of the probability that a White defendant receives a death penalty is
+    19/160
+
+In a hypothestical problem suppose that we test H0 : μ · 10 versus Ha : μ > 10 at the 5% level of significance.Suppose that the observations are normally distributed with ¾ = 1. Also, given that you reject H0 if X > 1.96/ p n + 10, where X denotes the average of n random observations from that sample. Answer the next 3 questions.
+
+*** 5. What is the probability of rejecting H0 when the true value of μ is 11 and n = 9?
+    (1.96 / \sqrt(9) + (10 - 11)) / (1/\sqrt(n))
+
+*** 6. Determine the sample sample size to have power 0.95 when the true value of μ is 11.
+    pwr.norm.test(d = 1, sig.level = .05, power = .95, alternative = "two")
+
+*** 7. Suppose that \sigma = 2 but we would still reject H0 when X > 1.96/ \sqrt{n} + 10. What is the probability of Type-I error
+
+            Carrier status
+Disease     Yes     No     | Total
+-----------------------------------
+Cancer      45      400    | 445
+No cancer   50      700    | 750
+-----------------------------------
+Total       95      1100    1195
+
+11. The odds of the disease among the BRCA carrier is pG/(1 − pG)
+
+12. The estimate of the odds ratio is
+    (45/95)/(1 - (45/95)) = odds1, (400/100)/(1 - (400/1100)) = odds2, oddsRatio = odds1/odds2
+
+13. To test equality of two odds ratios one may use Breslow test
+
+14. Suppose that X1, · · · ,Xn are highly positively correlated with a Normal(μ, \sigma^2) distribution. A 95% confidence interval for μ was constructed using the formula X± t_0.025,n−1 s/ \sqrt{n}. The true coverage probability of this confidence interval will be much less than 0.95
+
+15. Let X1, · · · ,Xn be iid observations from a population having pdf f. The researcher wants a 95% confidence interval on the population variance. The researcher does know that the distribution is right skewed. What is the best way of constructing confidence interval for a sample of size n = 25.
+    using bootstrap method
+
+16. Mantel-Haenszel estimator is used to estimate the common odds ratio
+
+17. A researcher is attempting to estimate the average number of miles between recharging of the batteries for a battery operated car. There are several potential estimators of the average. The best approach for selecting an estimator would be to
+    select the estimator with the smallest average squared distance from the parameter (smallest MSE)
+
+18. The Anderson-Darling (AD) GOF statistic is prefered to the Kolmogorov-Smirnov (KS) GOF statistic for testing the goodness-of-fit of a continuous pdf because
+    AD is more likely to declare that a distribution function does not fit the edf, especially in the tails of the distribution
+
+19. A pivot g(x, \theta) in constructing confidence interval is a quantity whose
+    distribution is free from \theta.
+
+20. Suppose that based on a given data you obtain a 95% CI for the population proportion p, and that is (0.224, 0.358). Which of the following statements is correct?
+    If we repeatedly construct the confidence interval using the same formula and by drawing random sample from this population with the same size, then on average, 95% of those intervals will contain p, and (0.224, 0.358) is one such interval.
+
+21. Determine a lower bound on the time to failure of a device having Exponential failure times such that we are 95% confident that at least 90% of the devices will have failure times greater than the lower bound.Use n=30. Here area above X^2_{r,k} under the X^2 distribution with k degrees of freedom is r, for any 0 < r < 1 and k > 0.
+    −T{60 log(0.9) / X^2_{0.05, 60}} -- remember to multiply n by 2 so 30 becomes 60
+
+22. A study was designed to compare the mean yield of a genetically engineered variety of broccoli to the most widely cultivated variety. In 100 one acre plots of land, the genetically engineered variety of broccoli was raised and the annual broccoli yields were recorded: B1, B2, . . . , B100. From USDA records, the broccoli yields per acre of 103,259 farms were recorded: Y1, Y2, . . . , Y103259. The sample means ¯B and ¯ Y are computed from the two samples. Which of the following statements is true about the bias of ¯B and ¯ Y as estimators of μB and μY , respectively?
+    (a) ¯B and ¯ Y have the same positive bias
+    (b) ¯B has a larger bias than ¯ Y
+    (c) ¯B has a smaller bias than ¯ Y
+    (d) the estimator having largest bias depends on the shape of the population pdf’s
+    (e) none of the above statements are true •
+
+23. Which one of the following statements is true?
+    The Kaplan-Meier estimator is an estimator of the survival function when the data contain right censored observations.
+
+24. A kinesiology researcher is studying the stress placed on older (50-70 years) long distance runners. In order to diagnosis potential problems in this group of runners, it is necessary to establish a range of values for their resting pulse rate such that with a very high degree of confidence this range would contain 95% of the resting pulse rates for this group of runners.
+    The computed interval would be a tolerance interval.
+
+25. A large corporation is evaluating two different suppliers of a raw material. The corporation’s engineers obtain a random sample of 20 units from each of the suppliers and determine a crucial product characteristic from the samples: X1, . . . ,X20 and Y1, . . . , Y20. Let ˜μ1 and ˜μ2 be the median for each supplier’s product characteristic. It is desired to test Ho : ˜μ1 = ˜μ2 versus H1 : ˜μ1 6= ˜μ2. An evaluation of the two data sets reveals the following:
+    • The width of the box in the box plot for supplier 1 is much wider than the width for supplier 2.
+    • The normal reference plots have the data values very close to a straight line for both data sets.
+    • The two data sets are independent.
+The preferred test statistic is
+(a) Wilcoxon Rank Sum test
+(b) Wilcoxon signed rank test
+(c) Pooled t-test
+(d) Separate variance t-test •
+(e) Sign test
+
+Statistical tests and estimators:
+    - Wilcoxon Rank sum: comparing two related samples, matched samples, or repeated measurements on a single sample to assess whether their population mean ranks differ, allows for different sample sizes
+    - Wilcoxon Sign rank: used for matched pairs
+    - Pooled t-test: equal sample size, equal variance
+    - Sign Test: difference in the median is 0, paired, not as powerful as wilcoxon or paired t-test
+    - Anderson Darling GOF: test to see if a sample is from a specific distribution
+    - KS GOF: same as AD, not a good in the tails
+    - Mantel-Haenszel: estimate of association
+    - Pearson Chisquared Test: applied to categorical data for liklihood that differences happened by chance, good with unpaired, large datasets
+    - Breslow test: test for homogeneity of odds ratios
+    - T-test: test differences in means
+    - Mcnemars Test: paired nominal data, 2x2 contingency tables, matched pairs to test row/column marginal frequencies
+    - Paired T-test: normal dist, difference in stdev unknown
+    - Agresti-Coull CI: binomial confidence interval
+    - Fishers Exact Test: used with small sample sizes on contingency 2x2 tables, hypergeometric dist
+    - Shapiro Wilks: tests for normality

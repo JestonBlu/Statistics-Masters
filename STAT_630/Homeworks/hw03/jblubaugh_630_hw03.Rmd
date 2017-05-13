@@ -1,0 +1,245 @@
+---
+output:
+  pdf_document: default
+  theme: united
+---
+
+ **Joseph Blubaugh**  
+ jblubau1@tamu.edu  
+ **STAT 630-720**  
+ **HW 03**
+ 
+#### 1) 2.4.2: let W ~ Uniform[1, 4]. Compute each of the following
+
+a) $P(W \ge 5)$: since 5 is outside of L and R, $P(W \ge 5) = 0$
+b) $P(W \ge 2)$: $\frac{1}{4 - 1} = \frac{1}{3}$
+c) $P(W^2 \le 9)$: Then $P(W \le 3) = \frac{1}{3}$
+
+#### 2) 2.4.4: Establish for which constants c the following functions are densities
+
+a) $f(x) = cx$ on (0,1) and 0 otherwise: To solve for c:
+  \begin{align*}
+    c \int^1_0 x\, dx = c \frac{1^2}{2} - \frac{0^2}{2} = \frac{c}{2} &= 1 \\
+    c &= 2  \\
+  \end{align*}
+
+b) $f(x) = cx^n$ on (0,1) and 0 otherwise, for n a nonnegative interger
+  \begin{align*}
+    c \int^1_0 x^n\, dx = c  \frac{1^{n + 1}}{n + 1} - \frac{0^{n + 1}}{n + 1} = c \frac{1}{n + 1} &= 1\\
+    c &= n + 1
+  \end{align*}
+
+c) $f(x) = cx^\frac{1}{2}$ on (0,2) and 0 otherwise
+  \begin{align*}
+    c \int^1_0 x^.5\, dx = c (1.5 2^1.5 - 0) = c (1.5 * \sqrt 8) &= 1 \\
+    c &= \frac{3}{2 \sqrt 8}
+  \end{align*}
+
+#### 3) 2.4.6: Let X ~ Exponential(3). Compute each of the following.
+
+b) $P(0 < X < 3)$
+  \begin{align*}
+    \int^3_0 \lambda e^{-\lambda x}\, dx &= (-e^{-\lambda 3}) - (-e^{-\lambda 0}) \\
+    &= (-e^{-(3) 3}) - (-e^{-(3) 0}) \\
+    &= 1 - e^{-9} \\
+    &= ~ .9998
+  \end{align*}
+
+e) $P(2 < X < 10)$
+  \begin{align*}
+    \int^{10}_2 \lambda e^{-\lambda x}\, dx &= (-e^{-\lambda 10}) - (-e^{-\lambda 2}) \\
+    &= (-e^{-(3) 10}) - (-e^{-(3) 2}) \\
+    &= e^{-6} - e^{-30} \\
+    &= .002
+  \end{align*}
+
+#### 4) 2.4.19: (Weibuill($\alpha$) distribution) Consider, for $\alpha > 0$ fixed, the function given by $f(x) = \alpha (1 + x)^{\alpha - 1} e^{-x^\alpha}$ for $0 < x < \infty$ and 0 otherwise. Prove that f is a density function.
+
+Plug in any positive integer for $\alpha$, this case I will use $\alpha = 1$. $1 \alpha^{1 - 1} e^{-x^1} = e^{-x}$ so now we need to integrate $e^{-x}$ between 0 and infinity
+
+  \begin{align*}
+    \int^\infty_0 e^{-x}\, dx &= \lim_{t \to \infty} \int^t_0 e^{-x}\, dx \\
+    &= \lim_{t \to \infty} (-e^{-t}) - (-e^{-0}) \\
+    &= \lim_{t \to \infty} (1 - e^{-t}) \\
+    &= 1
+  \end{align*}  
+    
+
+#### 5) 2.4.22: (Laplace distribution) Consider the function given by $f(x) = \frac{e^{-|x|}}{2}$ for $-\infty < x < \infty$ and 0 otherwise. Prove that f is a density function.
+
+  \begin{align*}
+    f(x) &= \frac{e^{-|x|}}{2}, for (-\infty < x < \infty) \\
+    &= \frac{e^{-x}}{2}, for (x \ge 0) + \frac{e^{-|x|}}{2}, for (x < 0) \\
+    &= e^{-x}, for (x \ge 0)
+  \end{align*}
+
+
+#### 6) 2.5.3: For each of the following functions F, determine whether or not F is a valid cumulative distribution function satisfying properties a-d of theorem 2.5.2
+
+a) F(x) = x for all $x \in R^1$: Yes, R -> [0, 1] so all x's are between [0,1]
+c) Yes, all x's between [0,1] for x^2 are less than or equal to 1
+d) No, when x is > 1 f(x) is > 1 so it does not satify the cdf requirement
+f) Yes, if you plug in the max $3^2 /9 = 1$ so this satisfies the cdf requirement
+g) No, as x increases from -1 to 0, F(x) decreases to the cdf requirement is not satisfied
+
+#### 7) 2.5.5 (use R): Let Y ~ N(-8, 4). Compute each of the following in terms of the function $\Phi$ of definition 2.5.2
+
+a) $P(Y \le -5)$:
+    ```{r, norm}
+    pnorm(q = -5, mean = -8, sd = 4)
+    ```
+
+b) $P(-2 \le Y \le 7)$
+    ```{r}
+    d2 = pnorm(q = -2, mean = -8, sd = 4)
+    d7 = pnorm(q = 7, mean = -8, sd = 4)
+    d7 - d2
+    ```
+
+c) $P(Y \ge 3)$
+    ```{r}
+    1 - pnorm(q = 3, mean = -8, sd = 4)
+    ```
+
+d) Obtain the 35th and 84th percentiles of the distribution of Y
+    ```{r}
+    qnorm(p = c(.35, .84), mean = -8, sd = 4)
+    ```
+
+#### 8) 2.5.7: Suppose $F_x(x) = x^2$ for $0 \le x \le 1$. Compute the following.
+
+a) $P(X < \frac{1}{3})$: $\frac{1}{3}^2 = \frac{1}{9}$
+b) $P(\frac{1}{4} < X < \frac{1}{2})$: $\frac{1}{2}^2 - \frac{1}{4}^2 = \frac{3}{16}$
+f) $P(X < -1)$: Outside the bounds of [0,1] so 0
+g) $P(X < 3)$: 1
+h) $P(X = \frac{3}{7})$: 0, the probability of a single value in a continuous distribution is 0.
+i) Obtain the 40th and 72nd percentiles of the distribution of X:  
+  40th percentile: $.4^2 = .16$  
+  72th percentile: $.72^2 = .518$  
+  
+#### 9) 2.5.8: Suppose $F_y(y) = y^3$ for $0 \le y < \frac{1}{2}$, and $F_y(y) = 1 - y^3$ for $\frac{-1}{2} \le y \le 1$. Comput the following
+
+a)
+\begin{align*}
+    P(\frac{1}{3} < Y < \frac{3}{4}) &= \\
+    &= P(\frac{2}{6} \le Y < \frac{3}{6}) = \frac{3}{6}^3 - \frac{2}{6}^3 \\
+    &= \frac{27}{216} - \frac{8}{216} \\
+    &= .087
+    \\
+    P(\frac{2}{4} \le Y \le \frac{3}{4}) &= (1 - (1 - \frac{3}{4})^3) - (1 - (1 - \frac{2}{4})^3 \\
+    &= (1 - \frac{1}{64}) - (1 - \frac{1}{8}) \\
+    &= .109 \\
+    \\
+  .087 + .109 &= .196
+\end{align*}
+
+b) $P(Y = \frac{1}{3})$: $P(\frac{1}{3}) = \frac{1}{3}^3 = \frac{1}{27} = .037$
+
+c) $P(Y = \frac{1}{2})$: $P(\frac{1}{2}) = \frac{1}{2}^3 = \frac{1}{8} = .125$
+
+#### 10) 2.5.21: Using problem 4
+a) Determine the distribution function For the Weibuill($\alpha$) distribution.
+  \begin{align*}
+    F(x) &= \int^{\infty}_0 \alpha x^{\alpha - 1} e^{x^{\alpha}}\, dx  \\
+    x^{\alpha} \rightarrow u \\
+    \alpha x^{\alpha - 1} \rightarrow du \\
+    \int^{\infty}_0 \rightarrow \int^{x}_0 \\
+    &= \int^x_0 e^-u\, du \\
+    &= -e^{-u} - 1 \\
+    &= 1 - e^{-u} \\
+  \end{align*}
+
+b) Derive the quantile function for the Weibuill $(\alpha)$ distribution
+  \begin{align*}
+    y &= 1 - e^{-u} \\
+    y - 1 &= -e^{-u} \\
+    1 - y &= e^{-u} \\
+    log(1 - y) &= -u \\
+    -log(1 - y) &= u
+  \end{align*}
+  
+  The inverse of y is:  $y = -log(1 - u)$
+
+#### 11) 2.5.24: Determine the distribution function for the LaPlace distribution in problem 5
+  \begin{align*}
+    f(x) = \frac{e^{-x}}{2} \\
+    \\
+    \int^{\infty}_0 \frac{e^{-x}}{2}\, dx &= \lim_{x \to \infty} \frac{-e^{-x}}{2} - \frac{1}{2} \\
+    &= \frac{1}{2} \\
+    \\
+    \int^{\infty}_0 \frac{e^{-|x|}}{2}\, dx &= \lim_{x \to -\infty} \frac{-e^{-|x|}}{2} - \frac{1}{2} \\
+    &= \frac{1}{2} \\
+    \\
+    \frac{1}{2} + \frac{1}{2} &= 1
+  \end{align*}
+
+#### 12) 2.6.1: Let X ~ Uniform[L, R]. Let $Y = cX + d$, where c > 0. Prove that Y ~ Uniform[cL + d, cR + d]. Look at 2.6.4
+  \begin{align*}
+    y = cX + d, y' = x, y^{-1} = \frac{y - d}{c} \\
+    \\
+    \frac{\frac{y - d}{c}}{x \frac{y - d}{c}} &= \frac{y - d}{c} \frac{x c}{x y - x d} \\
+    &= \frac{1}{x}
+    \\
+  \end{align*}
+
+#### 13) 2.6.5: Let X ~ Exponential($\lambda$). Let $Y = X^3$. Compute the density of $f_Y$ of Y.
+  \begin{align*}
+    Y = X^3, Y^{-1} = X^{\frac{1}{3}}, Y' = 3x^2 \\
+    \\
+    ExponentialFunction: \lambda e^{-\lambda x} \\
+    \\
+    \frac{fx(y^{-1})}{y'(y^{-1}(x))} = \frac{\lambda e^{-\lambda x^{1/3}}}{3x^2 x^{1/3} x^3} \\
+  \end{align*}
+
+#### 14) 2.6.9: Let X have the density function $f_Y(x) = \frac{x^3}{4}$ for $0 < x < 2$, otherwise $f_X(x) = 0$.
+a) Let $Y = X^2$. Computer the density function $f_Y(y)$ for Y.
+  \begin{align*}
+    Y = x^2, Y' = 2x, Y^{-1} = \sqrt{x} \\
+    \\
+    \frac{fx(\sqrt{x})}{2x \sqrt{x}} = \frac{x^3}{4 2x} = \frac{x^2}{8} = \frac{Y}{8} \\
+  \end{align*}
+
+b) Let $Z = \sqrt{X}$. Compute the density function $f_Z(z)$ for Z.
+  \begin{align*}
+    Z = \sqrt{x}, Z' = \frac{1}{\sqrt{x}},  Z^{-1} = x^2 \\
+    \\
+    \frac{fx(x^2)}{x^{\frac{-1}{2}} x^2} = \frac{x^3}{4 x^{\frac{-1}{2}}} = \frac{x^{3.5}}{4}
+  \end{align*}
+
+#### 15) 2.6.12: Let X have density function $f_X(x) = \frac{1}{x^2}$ for x > 1, otherwise $f_X(x) = 0$. Let $Y = X^\frac{1}{3}$. Compute the density function $f_Y(y)$ for Y.
+  \begin{align*}
+  Y = x^{\frac{1}{3}},  Y' = \frac{1}{3 x^{\frac{2}{3}}},  Y^{-1} = x^3 \\
+  \\
+  \frac{fx(x^3)}{\frac{1}{3 x^{\frac{2}{3}}} x^3} = \frac{3 x^{\frac{2}{3}}}{x^2} = \frac{3}{x^{1^\frac{1}{3}}}
+  \end{align*}
+
+#### 16) 2.6.18 (assume $\beta > 0$): Suppose that X ~ Weibull($\alpha$) (see problem 4), determine the distribution function of $Y = (1 + X)^\beta$.
+  \begin{align*}
+  Y = X^B,  Y' = Bx^{B - 1},  Y^{-1} = \frac{log(Y)}{log(B)} \\
+  \\
+  \frac{fx(\frac{log(Y)}{log(B)})}{Bx^{B - 1} \frac{log(Y)}{log(B)}} &= \\
+  &= \frac{\alpha(1 + x)^{\alpha - 1} e^{-x^{\alpha}}}{Bx^{B - 1}} \\
+  &= \frac{\alpha(1 + \frac{log(Y)}{log(B)})^{\alpha - 1} e^{-\frac{log(Y)}{log(B)}^{\alpha}}}{B\frac{log(Y)}{log(B)}^{B - 1}}
+  \end{align*}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

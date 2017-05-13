@@ -1,0 +1,140 @@
+---
+output: pdf_document
+mainfont: Bitstream Vera Sans Mono
+sansfont: Bitstream Vera Sans Mono
+geometry: margin=.5in
+---
+
+# STAT 626 HW05 BLUBAUGH
+
+
+### 3.27
+
+\begin{align*}
+  \bigtriangledown^k x_t = & x_t - x_{t-1} = y_t - (\beta_0 + \beta_1t + ... + \beta_qt^q) - y_{t-1} - (\beta_0 + \beta_1(t-1) + ... + \beta_q(t-1)^q) \\
+  = & \bigtriangledown^k x_t = \bigtriangledown y_t - 2 \beta_0 + \sum_{i=1}^q \beta_i^i \\
+  \\
+  \text{When k < q:  } \bigtriangledown^k y_t = & (\beta_0 + \beta_1t + ... + \beta_qt^q  + x_t) - (\beta_0 + \beta_1(t-1) + ... + \beta_q(t-1)^q + x_{t-1}) \\ 
+  = & \sum_{i=q-k}^q \beta_i^i + \bigtriangledown x_t = \sum_{i=q-k}^q \beta_i^i + \bigtriangledown y_t - 2 \beta_0 + \sum_{i=1}^q \beta_i^i \\
+  \text{When k >= q:  } \bigtriangledown^k y_t = & -\sum_{i=1}^q \beta_i^i + \bigtriangledown x_t = \bigtriangledown y_t - 2 \beta_0\\
+\end{align*}
+
+### 3.31
+
+The standardized residual time series plot show no patterns. There are some notable outliers observations in the 1950s and 1980s. The QQ plot shows that residuals are approximately normal, but depart from normality in the tails. There is no significant correlation in the lagged residuals. All of the Ljung-Box pvalues are greater than .05 indicating that the residuals are independent.
+
+```{r b, echo=FALSE, comment=FALSE, fig.height=5.5, fig.align='center', message=FALSE, warning=FALSE}
+library(astsa)
+
+mdl = sarima(xdata = diff(log(gnp)), p = 1, d = 0, q = 0, details = FALSE)
+
+```
+
+\newpage
+
+### 3.32
+
+Because of the rapid change of oil prices between 2008 and 2010, it is difficult to get a stationary time series. While I could achieve a stationary series by logging oil and taking the 2nd order difference, variance remains non-constant. The ACF/PACF plot suggest a starting arima model of (0,2,2) because the PACF plot trails off and the cutoff for the ACF plot is at lag 2. The standardized residual plots show a pattern between 2008 and 2010 during the period of rapid price change indicating the residuals are not independent. This is confirmed by the ACF plot and Ljung-Box plots. The distribution of the residuals is mostly normal, but has a heavy tail.
+
+```{r c, echo=FALSE, comment=FALSE, fig.height=4, fig.align='center', message=FALSE, warning=FALSE}
+oil.st = diff(log(oil), differences = 2)
+
+par(mfrow = c(2,2))
+plot.ts(oil, main = "Oil")
+plot.ts(diff(log(oil), differences = 2), main = "Oil log difference order 2")
+acf(oil.st, main = "ACF: Stationary Oil"); pacf(oil.st, main = "PACF: Stationary Oil")
+
+```
+
+```{r e, echo=FALSE, comment=FALSE, fig.height=5, fig.align='center', message=FALSE, warning=FALSE}
+mdl = sarima(xdata = log(oil), p = 0, d = 2, q = 2, details = FALSE)
+```
+
+### 3.35
+
+a) $ARIMA(p,d,q)*(P,D,Q)_s = ARIMA(0,0,0)*(0,0,1)_2$
+
+
+b)
+
+\begin{align*}
+  x_t = & w_t + \Theta w_{t-2} \\
+  \text{Find Roots: } \\
+  0 = & (1 + \Theta B^2) \\ 
+  -1 = & \Theta B^2 \\
+  \frac{-1}{\Theta} = & B^2 \\
+  \frac{i}{\Theta} = & B \text{,  When Theta < 1, roots are outside of the unit circle} \\
+  \\
+  var(x_t) = & (1 + \Theta^2)\sigma_w^2 \\
+  cov(x_{t-1}, x_t) = & 0 \\
+  cov(x_{t-2}, x_t) = & \Theta \sigma_w^2 \\
+  \rho (2) = & \frac{\gamma(2)}{\gamma(0)} = \frac{\Theta \sigma_w^2}{(1 + \Theta^2)\sigma_w^2} \\
+  \\
+  w_t = & \sum_{k=0}^\infty \frac{\Theta \sigma_w^2}{(1 + \Theta^2)\sigma_w^2} x_{t-k}\\
+\end{align*}
+
+c)
+
+\begin{align*}
+  x_{n+1}^n = \Theta(x_n - x_n^{n-2}) \sigma_w^2 / \rho_n^{n-2} \\
+\end{align*}
+
+
+### 3.36
+
+```{r f, echo=FALSE, comment=FALSE, fig.height=3, fig.align='center', message=FALSE, warning=FALSE}
+phi = c(rep(0, 11), .8)
+ACF = ARMAacf(ar = phi, ma = .5, 50)[-1]
+plot(ACF, type = "h", xlab = "lag", ylim = c(-.4, .8))
+abline(h = 0)
+```
+
+\newpage
+
+### 3.39 (skip the forecast part)
+
+Model: $ARIMA(2,0,0)*(1,1,0)_4$
+
+```{r g, echo=FALSE, comment=FALSE, fig.height=4, fig.align='center', message=FALSE, warning=FALSE}
+par(mfrow = c(2,2))
+plot.ts(log(jj), main = "JJ Quartlery Earnings (log)")
+plot.ts(diff(log(jj), lag = 4), main = "diff(log(jj), lag = 4)")
+acf(diff(log(jj), lag = 4), main = "ACF") 
+pacf(diff(log(jj), lag = 4), main = "PACF")
+```
+
+```{r h, echo=FALSE, comment=FALSE, fig.height=6, fig.align='center', message=FALSE, warning=FALSE}
+mdl = sarima(xdata = log(jj), p = 2, d = 0, q = 0, P = 1, D = 1, Q = 0, S = 4, details = FALSE)
+```
+
+\newpage
+
+### 4.10
+
+
+a)
+
+\begin{align*}
+  x_t = & \beta_1 cos(2 \pi w_k t) + \beta_2 sin(2 \pi w_k t) \\
+  \beta_1 = & \frac{2}{n} \sum_{t=1}^n x_t cos(2 \pi w_k t) = \frac{1}{\sqrt{n}} \frac{2}{\sqrt{n}} \sum_{t=1}^n x_t cos(2 \pi w_k t) \\
+  \beta_2 = & \frac{2}{n} \sum_{t=1}^n x_t sin(2 \pi w_k t) = \frac{1}{\sqrt{n}} \frac{2}{\sqrt{n}} \sum_{t=1}^n x_t sin(2 \pi w_k t) \\
+  d_c(w_k) = & \frac{1}{\sqrt{n}} \sum_{t=1}^n x_t cos(2 \pi w_k t) \\
+  d_s(w_k) = & \frac{1}{\sqrt{n}} \sum_{t=1}^n x_t sin(2 \pi w_k t) \\
+  \begin{bmatrix} \beta_1 \\ \beta_2 \\ \end{bmatrix} = & \frac{2}{\sqrt{n}} \begin{bmatrix} d_c (w_k) \\ d_s (w_k) \\ \end{bmatrix} \\
+\end{align*}
+
+
+b)
+
+\begin{align*}
+  SSE = & \sum_{t=1}^t (x_t - \hat{x_t})^2 \\
+  = & \sum_{t=1}^t x_t^2 - 2 \sum_{k=1}^n \hat{x_t} \\
+  I(w_k) = & d_c^2(w_k) + d_s^2(w_k) = \hat{x_t} \\
+  = & \sum_{k=1}^n x_t^2 - 2I_x(w_k) \\
+\end{align*}
+
+c) Since the F-Statistic is equivalent to the sum of explained variance divided by the sum of unexplained variance. The sum of squares for x is: $I(w_k) = d^2_c(w_k) + d^2_s(w_k) = SS_e$
+
+
+
+

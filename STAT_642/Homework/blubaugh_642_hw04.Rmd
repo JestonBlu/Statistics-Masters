@@ -1,0 +1,326 @@
+---
+output:
+  pdf_document:
+    fig_height: 4
+    highlight: pygments
+    latex_engine: xelatex
+mainfont: Calibri Light
+sansfont: Calibri Light
+fontsize: 12pt
+geometry: margin=1in
+---
+
+**Homework 04**  
+**Joseph Blubaugh**  
+jblubau1@tamu.edu  
+**STAT 642-720**  
+
+\newpage
+
+1.
+a) The data from all 4 temperatures appear to be from different distributions with different variances. Running the shapiro test on each temperature group separately we can conclude that the data are normal. The Brown-Forsythe-Levene test supports the statement that the data have different variances and the shapiro test run on all groups together support that the data are not normal.
+
+```{r q1, echo=FALSE, fig.height=4, comment=NA, warning=FALSE}
+
+suppressPackageStartupMessages(library(lawstat))
+suppressPackageStartupMessages(library(reshape2))
+suppressPackageStartupMessages(library(plyr))
+suppressPackageStartupMessages(library(car))
+suppressPackageStartupMessages(library(multcomp))
+suppressPackageStartupMessages(library(pgirmess))
+suppressPackageStartupMessages(library(MASS))
+suppressPackageStartupMessages(library(lme4))
+
+dt = data.frame(
+  C40 = c(1953, 2135, 2471, 4727, 6134, 6314),
+  C45 = c(1190, 1286, 1550, 2125, 2557, 2845),
+  C55 = c(651, 817, 848, 1038, 1361, 1543),
+  C70 = c(511, 651, 651, 652, 688, 729)
+)
+
+par(mfrow = c(2,2))
+qqnorm(dt$C40, main = "QQ Plot 40C"); qqline(dt$C40)
+qqnorm(dt$C45, main = "QQ Plot 45C"); qqline(dt$C45)
+qqnorm(dt$C55, main = "QQ Plot 55C"); qqline(dt$C55)
+qqnorm(dt$C70, main = "QQ Plot 70C"); qqline(dt$C70)
+
+dt.melt = melt(dt, id.vars = NULL)
+colnames(dt.melt) = c("temp", "failure")
+dt.melt$temp = gsub(pattern = "C", x = dt.melt$temp, replacement = "")
+dt.melt$temp = as.factor(dt.melt$temp)
+
+data.frame(row.names = "Shapiro Test p.value",
+           C40 = shapiro.test(dt$C40)$p.value,
+           C45 = shapiro.test(dt$C45)$p.value,
+           C55 = shapiro.test(dt$C55)$p.value,
+           C70 = shapiro.test(dt$C70)$p.value
+)
+
+leveneTest(y = dt.melt$failure, group = dt.melt$temp)
+shapiro.test(dt.melt$failure)
+
+par(mfrow = c(1,1))
+
+```
+
+b) Based on the regression model, an estimate for a power transformation is 3.459
+
+```{r q1b, comment=NA, warning=FALSE}
+
+(dt.sum = ddply(dt.melt, .(temp), summarize, 
+                S = var(failure), 
+                Y.bar = mean(failure)))
+(mdl = lm(log(S) ~ log(Y.bar), data = dt.sum))
+
+```
+
+c) The transformation estimate according to BoxCox is -.8
+
+```{r q1c, comment=NA, warning=FALSE, echo=FALSE}
+
+boxCox(lm(failure ~ temp, data = dt.melt))
+
+```
+
+d) It can be determined by the SW test that using the box cox transformation makes the data normal. The BFL test also shows that the variance is stablized by the transformation and is acceptable to use in AOV.
+
+```{r q1d, comment=NA, warning=FALSE, echo=FALSE}
+
+dt.melt$fail.trans = dt.melt$failure^-.8
+shapiro.test(dt.melt$fail.trans)
+leveneTest(lm(fail.trans ~ factor(dt.melt$temp), data = dt.melt))
+
+```
+
+e) The AOV on the original data has a much higher F Statistic and slightly higher pvalue than the AOV for the transformed data. Since the data has been transformed, SS for both models are on two different scales and cannot be compared.
+
+```{r q1e, comment=NA, warning=FALSE}
+
+summary(aov(failure ~ temp, data = dt.melt))
+summary(aov(fail.trans ~ temp, data = dt.melt))
+
+```
+
+
+f) All grouped pairs printed below are significant except for 45-40 which is not because the 95% confidence interval crosses 0.
+
+```{r q1f, comment=NA, warning=FALSE}
+
+TukeyHSD(aov(fail.trans ~ temp, data = dt.melt))
+
+```
+
+
+g) Based on the p-value it can be determined that only the linear trend is significant.
+
+```{r q1g, comment=NA, warning=FALSE}
+
+aovRes = aov(fail.trans ~ temp, data = dt.melt)
+cntrMat = t(contr.poly(4,scores=c(40,45,55,70)))
+summary(glht(aovRes, linfct=mcp(temp=cntrMat)))
+
+```
+
+
+2.
+
+a) Based on the Kruskal-Wallis test there are significant differences between the average failure time of the 4 temperatures
+
+```{r q2a, comment=NA, echo=FALSE}
+
+kruskal.test(failure ~ temp, data = dt.melt)
+
+```
+
+b) With the Dunn procedure there are significant differences between the following pairs (40-45), (40-70), (45-70)
+```{r q2b, comment=NA, echo=FALSE}
+
+kruskalmc(failure ~ temp, data = dt.melt)
+
+```
+
+c) AOV on the transformed data also detected a significant difference in the mean failure rates based on temperature, however the Tukey method for multiple comparison found more significant differences than the Dunn procedure.
+
+| Pairs |   Tukey (transformed) | Dunn (original) |
+|:-----:|:---------------------:|:---------------:|
+| 45-40 |                       |                 |
+| 55-40 |            ***        |        ***      |
+| 70-40 |            ***        |        ***      |
+| 55-45 |            ***        |                 |
+| 70-45 |            ***        |        ***      |
+| 70-55 |            ***        |                 |
+
+
+3.
+
+a) Poisson appears not to be a good distribution for these datasets after fitting a poisson model and plotting it against each data set.
+
+```{r 3a, comment=NA, echo=FALSE}
+
+dt = data.frame(
+  NS = 1:15,
+  USDA = c(448, 906, 28, 277, 634, 48, 369, 137, 29, 522, 319, 242, 261, 566, 734),
+  FIELD = c(211, 276, 415, 787, 18, 118, 1, 151, 0, 253, 61, 0, 275, 0, 153),
+  RESIST = c(0, 9, 143, 1, 26, 127, 161, 294, 0, 348, 0, 14, 21, 0, 218)
+)
+
+par(mfrow = c(1, 3))
+hist(dt$USDA, probability = TRUE, ylim = c(0, .02), main = "USDA: Hist vs Pois Fit", density = TRUE)
+lines(seq(0, 1000, 10), y = dpois(seq(0, 1000, 10), lambda = 368))
+
+hist(dt$FIELD, probability = TRUE, ylim = c(0, .03), main = "FIELD: Hist vs Pois Fit")
+lines(seq(0, 1000, 10), y = dpois(seq(0, 1000, 10), lambda = 181))
+
+hist(dt$RESIST, probability = TRUE, ylim = c(0, .04), main = "RESIST: Hist vs Pois Fit")
+lines(seq(0, 1000, 10), y = dpois(seq(0, 1000, 10), lambda = 90))
+
+par(mfrow = c(1,1))
+
+```
+
+
+b) Because the scaled deviance is so high, there is over dispersion and a transformation is needed.  A log transformation works well in this case.
+
+Criteria For Assessing Goodness Of Fit 
+
+| Criterion               | DF | Value | Value/DF | 
+|-------------------------|----|------:|---------:|
+| Deviance                | 42 | 8413  | 200.3    |
+| Scaled Deviance         | 42 | 42.71 | 1.01     | 
+| Pearson Chi-Square      | 42 | 8273  | 196.9    | 
+| Scaled Pearson X2       | 42 | 42    | 1        |
+| Log Likelihood          |    | 219.7 |          |   
+| Full Log Likelihood     |    |-4332  |          |   
+| AIC (smaller is better) |    |8671   |          |  
+| AICC (smaller is better)|    |8672   |          |
+| BIC (smaller is better) |    |8677   |          |
+
+
+Analysis Of Maximum Likelihood Parameter Estimates 
+
+| Parameter   | DF | Estimate | Standard Error | Wald 95% Confidence Limits | Wald Chi-Square | Pr > ChiSq | 
+|-------------|----|---------:|---------------:|:--------------------------:|----------------:|-----------:|
+| Intercept   | 1  | 5.9081   | 0.1889         | 5.5378 6.2783              | 978.16          |  <.0001    | 
+| type FIELD  | 1  | -0.7081  | 0.3288         |-1.3526 -0.0636             |4.64             |  0.0313    | 
+| type RESIST | 1  |-1.3994   | 0.4246         |-2.2317 -0.5672             | 10.86           |  0.0010    | 
+| type USDA   | 0  | 0.0000   | 0.0000         | 0.0000 0.0000              |                 |            | 
+| Scale       | 0  | 14.0350  | 0.0000         | 14.0350 14.0350            |                 |            | 
+
+
+
+c) Based on the Durbin-Watson test of Autocorrelation, there is no evidence of correlation in the residuals for either of the 3 datasets
+
+```{r 3c, comment=NA, echo=FALSE}
+
+durbinWatsonTest(lm(USDA ~ NS, data = dt))
+durbinWatsonTest(lm(FIELD ~ NS, data = dt))
+durbinWatsonTest(lm(RESIST ~ NS, data = dt))
+
+```
+
+
+4. 
+ a) Model: $Y_{ij} = \mu + a_i + e_{ij}$ $\mu$ is the mean of all samples and $a_i$ is the efect of $t_i$. $\mu + a_i$ is the mean of $treatment_i$. The expected mean squares are 1956.6 + 231.2 = 2187.8
+
+```{r 4q, comment=NA, echo=FALSE}
+
+dt = data.frame(
+  Lot.Number = c("3469-72", "3849-52", "3721-21", "3477-80", "3669-72", "3873-76", "3777-80", "3461-64"),
+  Samp1 = c(39, 56, 64, 29, 38, 11, 23, 10),
+  Samp2 = c(57, 13, 83, 55, 66, 49, 0, 11),
+  Samp3 = c(63, 25, 88, 21, 53, 34, 5, 23),
+  Samp4 = c(66, 31, 71, 51, 81, 10, 20, 37)
+)
+
+dt = melt(dt, id.vars = 'Lot.Number')
+colnames(dt) = c("Lot.Number", "Sample", "Aflatoxin")
+
+mdl = lmer(Aflatoxin ~ 1 + (1 | Lot.Number), data = dt)
+mdl.aov = aov(Aflatoxin ~ Lot.Number, data = dt)
+
+summary(mdl)
+summary(mdl.aov)
+
+```
+
+ 
+  b) Variance within lots is 431.1, variance within sample differences is 231.2
+  c) 431.1 + 231.2 = 662.3
+  d) Proportion of variance in lots: 431.1 / 662.3 = .65, Proportion of variance in samples: 231.2 / 662.3 = .349
+  e) sqrt(431.1) = 20.76
+  f) You could continue to measure the increase in variance from adding additional samples until variance stabalizes, then you would know that you have an adequate number of samples 
+
+5.
+  a) Yes because it is assumed that the treatments are independent.
+  b) 5 reps for each of the 8 samples would be required to reach the desired power of .9
+
+```{r q5b, comment=NA}
+t = 8; r = 2:10; alpha = .01; gamma = .9; tau = 2; u1 = t-1
+u2 = t*(r-1); lambda = sqrt(1 + (r*tau)); Fcr = qf(1-alpha, u1, u2) 
+C = (1/lambda)^2 * Fcr; power = 1 - pf(C, u1, u2)
+
+data.frame(t, r, alpha, gamma, tau, u1, u2, lambda, Fcr, C, power)
+
+```
+
+6. At minimum 5 treatments would be required to reach the desired power of .9
+
+```{r q6, comment=NA}
+t = 2:10; r = 5; alpha = .01; gamma = .9; tau = (2.1/2.0)^2; u1 = t-1
+u2 = t*(r-1); lambda = sqrt(1 + (r*tau)); Fcr = qf(1-alpha, u1, u2) 
+C = (1/lambda)^2 * Fcr; power = 1 - pf(C, u1, u2)
+
+data.frame(t, r, alpha, gamma, tau, u1, u2, lambda, Fcr, C, power)
+
+```
+
+7.
+  a) The assistant is not correct, positive correlation in the residuals will understate variance and lower the power of the F-test
+  b) Variance is different between the treatments, the data needs to be transformed to stablize variance. A box-cox transformation is suggested.
+  c) The Hsu procedure works by looking at the confidence intervals of an estimator, when you change the scale you no longer have a symmetrical confidence interval, it is likely right skewed.
+  d) The data must have small differences in variance. A log transformation should be applied to the data if the variation between treatments is large. The F test assumes normality, KW only does need normality, but does need stable variance
+  e) To control variation within each manufacturer, blocking should be done on manufacturer
+  f) The two treatments have different sample sizes and different degrees of freedom which are accounted for in the MS of each statistic so the ratio is correct.
+  g) Since the range of errors are all within the range of the MSE, I would not consider any of the residuals outliers
+  h) If you have equal sample sizes you are more likely to have the same variance if your samples comes from the same population.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,320 @@
+---
+output:
+  pdf_document:
+    latex_engine: xelatex
+    highlight: pygments
+mainfont: Calibri Light
+sansfont: Calibri Light
+fontsize: 11pt
+geometry: margin=1in
+---
+
+**Homework 08**  
+**Joseph Blubaugh**  
+jblubau1@tamu.edu  
+**STAT 659-700**  
+
+### 5.13
+
+AIC shows that the reduced model with verw removed is the better model because the AIC is lower. Verw is highly insiginificant and so removing it results in better overall performance than leaving it in. However the likelihood ratio test shows that the reduced model is not significantly better than the full model.
+
+### 5.9ad
+
+  a. This is a better test than the Chisquared Goodness of Fit test because for GOF you need each of the expected counts to be greater than 5 which will not happen in this case based on N and the number of levels.
+
+  d. `1 - pchisq(6.6, 6) = .359` The Hosmer-Lemeshow statistic follows a Chisquared distribution and in this case the model with the single term is insignificant and .359 would be the pvalue of the single term.
+
+
+### 5.10c
+
+A high pvalue indicates that weight is a good predictor of a female grab having satelite. If the pvalue were low (< .05) we would reject the null hypothesis that the model is a good fit. Since the pvalue is near one we conclude that the model is excellent fit.
+
+```{r a, comment=NA, warning=FALSE, message=FALSE}
+library(ResourceSelection)
+
+crabs = read.csv("crabs.csv")
+
+mdl = glm(y ~ weight, family = binomial(), data = crabs)
+
+hoslem.test(x = crabs$y, y = fitted(mdl), g = length(unique(crabs$group)))
+
+```
+
+\newpage
+
+### 5.14
+
+a)
+
+```{r b, warning=FALSE, message=FALSE, comment=NA}
+## Grouped
+(grouped = data.frame(x = c(0, 1, 2), n = rep(4, 3), s = c(1, 2, 4)))
+
+## Ungrouped
+(ungrouped = data.frame(x = c(rep(0, 4), rep(1, 4), rep(2, 4)),
+  s = c(0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1)
+))
+
+## Grouped Data Intercept Only
+(mdl.grouped.int = glm(cbind(s, n-s) ~ 1, family = binomial(), data = grouped))
+
+## Grouped Data with X
+(mdl.grouped.x = glm(cbind(s, n-s) ~ x, family = binomial(), data = grouped))
+
+## Individual Observations Intercept Only
+(mdl.ungrouped.int = glm(s ~ 1, family = binomial(), data = ungrouped))
+
+## Individual Observations with X
+(mdl.ungrouped.x = glm(s ~ x, family = binomial(), data = ungrouped))
+
+## Log Liklihood
+logLik(mdl.grouped.int); logLik(mdl.grouped.x)
+logLik(mdl.ungrouped.int); logLik(mdl.ungrouped.x)
+
+```
+
+b) The deviances are different because its based on the log likelihood which is different for all 4 models.
+
+```{r c, warning=FALSE, message=FALSE, comment=NA}
+## Deviance for grouped data
+anova(mdl.grouped.int, mdl.grouped.x)
+
+## Deviance for ungrouped data
+anova(mdl.ungrouped.int, mdl.ungrouped.x)
+```
+
+c) The difference in deviance is the same when comparing the 2 models in the different datasets even though the Log Likelihood is different for the 2 sets of models
+
+\newpage
+
+### 5.16
+
+Pvalue: `(1.8006e+02 - 1.9355e-04) = 180.06 > 5.99 = qchisq(.95, 2)`.  We conclude that the model is highly significant due to the difference between the null and residual deviance which is much larger than the critical value on 2 degrees of freedom.  
+
+```{r d, comment=NA, results='asis', echo=FALSE}
+library(pander)
+
+dta = data.frame(
+  Grad = c(498, 878, 54, 197),
+  No.Grad = c(796-498, 1625-878, 143-54, 660-197),
+  Race = c("White", "White", "Black", "Black"),
+  Gender = c("Female", "Male", "Female", "Male")
+)
+pandoc.table(dta, caption = "data.frame: dta")
+
+```
+
+```{r e, comment=NA}
+mdl = glm(cbind(dta$Grad, dta$No.Grad) ~ Race + Gender, family = binomial(), data = dta)
+summary(mdl)
+
+```
+
+\newpage
+
+### 5.18
+
+```{r f, comment=NA, results='asis', echo=FALSE}
+dta = data.frame(
+  city = c("c1", "c1", "c2", "c2", "c3", "c3", "c4", "c4", "c5", "c5", "c6", 
+           "c6", "c7", "c7", "c8", "c8"),
+  smoke = c("yes", "no", "yes", "no", "yes", "no", "yes", "no", "yes", "no", 
+            "yes", "no", "yes", "no", "yes", "no"),
+  yes = c(126, 35, 908, 497, 913, 336, 235, 58, 402, 121, 182, 72, 60, 11, 104, 21),
+  no = c(100, 61, 688, 807, 747, 598, 172, 121, 308, 215, 156, 98, 99, 43, 89, 36)
+)
+pandoc.table(dta, caption = "Smoking on Lung Cancer by City")
+
+```
+
+a. Smoking Effect: `exp(.777) = 2.17`. The odds of a smoker developing cancer are 2.17 times greater than a non-smoker.
+
+```{r g, comment=NA}
+mdl = glm(cbind(dta$yes, dta$no) ~ city + smoke, family = binomial(), data = dta)
+summary(mdl)
+```
+
+b. The Pearson Chisquared statistic is smaller than the Critical value so we would conclude that the model is a good fit of the data
+
+```{r h, comment=NA}
+(Pearson.Chisq = sum(residuals(mdl, type = "pearson")^2))
+(Critical.Chisq = qchisq(.95, 7))
+```
+
+c. The residual vs fitted and standardized residual plots both show no pattern in the residuals but the standardized residuals shows large deviance (> 3). The Normal QQ plot also shows large standardized residuals even though the plot is a relatively flat line. There are also a few observations which have high leverage and influence.. Removing points 7 and 11 may improve the model fit. We would conclude based on the diagnostic plots that the model is a not a good fit for the data.
+
+```{r i, comment=NA, echo=FALSE, fig.height=5}
+par(mfrow = c(2, 2))
+plot(mdl)
+```
+
+### 5.19
+
+```{r j, echo=FALSE, results='asis'}
+dta = data.frame(
+  department = sort(rep(1:6, 2)),
+  gender = rep(c("Male", "Female"), 6),
+  yes = c(512, 89, 353, 17, 120, 202, 138, 131, 53, 94, 22, 24),
+  no = c(313, 19, 207, 8, 205, 391, 279, 244, 138, 299, 351, 317)
+)
+
+pandoc.table(dta, caption = "Admissions to Berkley")
+```
+
+\newpage
+
+a. Model: $log(\frac{\pi(x)}{1 - \pi(x)}) = \mu + d_2 + d_3 + d_4 + d_5 + d_6 + e$
+
+```{r k, comment=NA}
+mdl = glm(cbind(dta$yes, dta$no) ~ factor(department), family = binomial(), data = dta)
+summary(mdl)
+```
+
+b. An informal test of fit is deviance/df = 3.6 which would indicate that the model does not fit the data very well. You want deviance/df to be close to 1.
+
+c. Department one is a clear outlier with standardized residuals greater than 4 meaning a lot more females were accepted than what was expected.
+
+d. `residuals(mdl)[1] = -1.4`. Less males than expected were accepted into department 1 by ~1.4 standard deviations. This makes sense because the female acceptance rate is so high and so it probably prevented more males from being accepted.
+
+e. There are many more men than woman in this data and the men overall have a higher overall acceptance rate when you average over department. In 4 of the 6 departments the acceptance rate is higher for females than it is for males which shows conditional on department, femalse have a higher chance of getting accepted.
+
+\newpage
+
+### 4
+
+```{r u, comment=NA, warning=FALSE, message=FALSE}
+
+icu = read.csv("icu.csv")
+icu = icu[, c("sta", "age", "can", "typ", "ph", "pco", "loc", "sys")]
+
+mdl = glm(sta ~ .+ .*., family = binomial(), data = icu)
+summary(mdl)
+
+mdl.01 = update(mdl   , ~ . - can:loc) ; itr.01 = mdl.01$aic # singularities 
+mdl.02 = update(mdl.01, ~ . - ph:loc)  ; itr.02 = mdl.02$aic # singularities
+mdl.03 = update(mdl.02, ~ . - typ:ph)  ; itr.03 = mdl.03$aic # pvalue = 1.0
+mdl.04 = update(mdl.03, ~ . - can:sys) ; itr.04 = mdl.04$aic # pvalue = .999
+mdl.05 = update(mdl.04, ~ . - can:pco) ; itr.05 = mdl.05$aic # pvalue = .999
+mdl.06 = update(mdl.05, ~ . - typ:sys) ; itr.06 = mdl.06$aic # pvalue = .998
+mdl.07 = update(mdl.06, ~ . - age:typ) ; itr.07 = mdl.07$aic # pvalue = .999
+mdl.08 = update(mdl.07, ~ . - typ:loc) ; itr.08 = mdl.08$aic # pvalue = .999
+mdl.09 = update(mdl.08, ~ . - can:ph)  ; itr.09 = mdl.09$aic # pvalue = .999
+mdl.10 = update(mdl.09, ~ . - age:loc) ; itr.10 = mdl.10$aic # pvalue = .995
+mdl.11 = update(mdl.10, ~ . - typ:pco) ; itr.11 = mdl.11$aic # pvalue = .996
+mdl.12 = update(mdl.11, ~ . - pco:loc) ; itr.12 = mdl.12$aic # pvalue = .980
+mdl.13 = update(mdl.12, ~ . - age:ph)  ; itr.13 = mdl.13$aic # pvalue = .897
+mdl.14 = update(mdl.13, ~ . - ph:sys)  ; itr.14 = mdl.14$aic # pvalue = .662
+mdl.15 = update(mdl.14, ~ . - can:typ) ; itr.15 = mdl.15$aic # pvalue = .562
+mdl.16 = update(mdl.15, ~ . - age:pco) ; itr.16 = mdl.16$aic # pvalue = .539
+mdl.17 = update(mdl.16, ~ . - age:can) ; itr.17 = mdl.17$aic # pvalue = .096
+mdl.18 = update(mdl.17, ~ . - pco:sys) ; itr.18 = mdl.18$aic # pvalue = .060
+mdl.19 = update(mdl.18, ~ . - ph:pco)  ; itr.19 = mdl.19$aic # pvalue = .232
+mdl.20 = update(mdl.19, ~ . - loc:sys) ; itr.20 = mdl.20$aic # pvalue = .219
+
+summary(mdl.20)
+```
+
+
+### 5
+
+The final model (mdl.20) has the highest residual deviance of all of the models because it has the fewest variables. It only has an AIC near the middle of the pack so it is not considered the best overall model compared to all combinations of main effects and 2 way interactions because it doesnt explain the maximum deviance, however it is the only model where all of the variables are statistically significant.  Most of the residual diagnostic plots are not useful when the response variable is 0/1, but you can use the cooks distance plot to assess if any observations have high leverage (far away from the average) and influence. Observations 151, 172, 18 have the highest leverage.  Marginal model plots (next page) are also used to assess the fit. Both Sys and Age approximate the data well by the close proximity between the model and data lines. Loc does not appear to model sta very well. The overall model fit (bottom right of marginal model plot) shows a well fitted model.
+
+```{r v, comment=NA}
+
+## AIC: Lowest is md.11 (137.9)
+c(itr.01, itr.02, itr.03, itr.04, itr.05, itr.06, itr.07, itr.08, itr.09, itr.10, 
+  itr.11, itr.12, itr.13, itr.14, itr.15, itr.16, itr.17, itr.18, itr.19, itr.20)
+
+## Cooks Distance
+cutoff = 4/((200 - length(mdl.20$coefficients)-2)) 
+plot(mdl.20, which=4, cook.levels=cutoff)
+
+```
+
+### 6
+
+```{r w, comment=NA, warning=FALSE, message=FALSE, echo=FALSE, fig.height=6, fig.width=7}
+library(car)
+
+icu = read.csv("icu.csv")
+icu = icu[, c("sta", "age", "can", "typ", "loc", "sys")]
+mdl = glm(sta ~ factor(can) + factor(typ) + loc + age + sys + age:sys, 
+          family = binomial(), data = icu)
+mdl
+mmps(mdl)
+
+```
+
+
+### 5.25
+
+```{r x, comment=NA, warning=FALSE, message=FALSE, echo=FALSE, results='asis'}
+dta = data.frame(
+  Lymphocytic.Infiltration = c(rep("High", 4), rep("Low", 4)),
+  Sex = rep(c("Female", "Female", "Male", "Male"), 2),
+  Osteoblastic.Pathology = rep(c("No", "Yes"), 4),
+  Disease.Free.Yes = c(3, 2, 4, 1, 5, 3, 5, 6),
+  Disease.Free.No = c(0, 0, 0, 0, 0, 2, 4, 11)
+)
+
+pandoc.table(dta, split.tables = Inf)
+
+```
+
+a.
+
+```{r x2, comment=NA, echo=FALSE}
+
+mdl.L = glm(cbind(dta$Disease.Free.Yes, dta$Disease.Free.No) ~ Lymphocytic.Infiltration, 
+            family = binomial(), data = dta)
+mdl.S = glm(cbind(dta$Disease.Free.Yes, dta$Disease.Free.No) ~ Sex, 
+            family = binomial(), data = dta)
+mdl.O = glm(cbind(dta$Disease.Free.Yes, dta$Disease.Free.No) ~ Osteoblastic.Pathology, 
+            family = binomial(), data = dta)
+
+summary(mdl.L); summary(mdl.S); summary(mdl.O)
+
+```
+
+
+b. Its infinite because the Lymphocytic Infiltration is high all of the counts are disease free.
+
+```{r x3, comment=NA, echo=FALSE}
+
+mdl = glm(cbind(dta$Disease.Free.Yes, dta$Disease.Free.No) ~ Lymphocytic.Infiltration + 
+            Sex + Osteoblastic.Pathology, 
+          family = binomial(), data = dta)
+
+summary(mdl)
+
+```
+
+c. $.002 < 1.96 = qnorm(.975), (1 - pnorm(.002))*2 = .998$
+
+d. 95% Confidence interval: (-Inf, 991.3)
+
+```{r x4, comment=NA, warning=FALSE, message=FALSE}
+confint(mdl)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

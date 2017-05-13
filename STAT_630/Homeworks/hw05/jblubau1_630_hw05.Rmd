@@ -1,0 +1,150 @@
+---
+title: ''
+output: pdf_document
+---
+
+
+**Joseph Blubaugh**  
+ jblubau1@tamu.edu  
+ **STAT 630-720**  
+ **HW 05**
+
+#### 1)  3.1.1
+  a) E(x) = -4(1/7) + 0(2/7) + 3(4/7) = 1.142
+  b) E(x) = 2x^-x-1 / log(2)
+
+#### 2) 3.1.2
+  a) 5(3/7) + 8(4/7)
+  b) 3(1/7) + 4(2/7)
+  c) E(3x + 7y) = 3(5(3/7) + 8(4/7)) + 7(3(1/7) + 4(2/7))
+  d) E(x^2) = 5^2(3/7) + 8^2(4/7)
+  f) (5 (3/7) + 8 (4/7)) * (3 (1/7) + 4 (2/7))
+  
+#### 3) 3.1.6
+E(Y ~ Binomial(100, .3)) = 30, E(Z ~ Poisson(7)) = 7, E(Y + Z) = 37
+
+#### 4) 3.1.7
+E(X ~ Binomial(80, 1/4)) = 20, E(Y ~ Poisson(3/2)) = 3/2, (EXY) = 20 * 3/2 = 30
+
+#### 5) 3.2.1
+  a) E(x) = 8, C = 1/4
+  b) E(x) = 512/3 + 18 = 188.6, C = 16
+
+#### 6) 3.2.2
+  a) 2
+  b) 1
+  d) 4
+  f) 1
+
+#### 7) 3.2.5
+E(x) = 5, E(y) = 1/9, E(-5x - 6y) = -25.666
+
+#### 8) 3.2.12
+  a) 11
+  b) 30
+  c) 270
+  d) 273
+
+#### 9) 3.2.18
+\begin{align*}
+E(x) &= \int x f(x) dx \\
+&= \int x ax^{(a - 1)} e^{(-x^a)} \\
+&= \frac{x^2}{2} e^{-x^a}
+\end{align*}
+
+#### 10) 3.2.22
+\begin{align*}
+E(x) &= \int x x^{a - 1} (1 - x)^{b - 1} \\
+&= \frac{x^2}{2} (a - 1) x^{a - 2} (b - 1) (1 - \frac{x^2}{2})^{(b-2)} \\
+&= \frac{a}{a + b}
+\end{align*}
+
+#### 11) 3.3.3
+  b) E(x) = 5(3/7) + 8(4/7) = 47/7, E(y) = 3(1/7) + 4(2/7) = 11/7, E((x - 47/7)(y - 11/7)) = -2.759
+  c) var(x) = (5 - 6.71)^2 3/7 + (8 - 6.71)^2 4/7 = 2.2, var(y) = (0 - 1.57)^2 4/7 + (3 - 1.57)^2 1/7 + (4 - 1.57)^2 2/7 = .57
+  d) corr(x,y) = -2.7/1.11
+
+#### 12) 3.3.7
+E(x) = 2/5, E(y) = 46/63, E(xy) = 34/21, cov(x,y) = 1.132, E(x,y) = .476, Cov(x,y) = -.010, var(x^2) = 19/30, var(y^2) = 7/12, var(x) = .188, var(y) = .118, corr(x,y) = -.010/.148 = -.06
+
+#### 13) 3.3.14
+var(z) = 17/36, var(w) = 1/36, E(z,w) = 5/36, cov(z,w) = .125, corr(z,w) = 1.09
+
+#### 14) 3.3.21
+\begin{align*}
+E(x) &= \int x ax^{a - 1} e^{-x^a} \\
+set(t) &= a x^a \\
+&= \frac{t^\frac{-1}{a}}{a} \\
+&= a^{\frac{-1}{1}} \int t^{\frac{1}{a}} e^{-t} \\
+E(x) &= a^{\frac{-1}{a}} \rho (1 + \frac{1}{a}) \\
+Var(x) &= E(x^2) - E(x)^2 \\
+&= a^{\frac{-1}{a}} \rho (1 + \frac{1}{a}) - (\rho (1 + \frac{1}{a})^2) \\
+\end{align*}
+
+#### 15) 3.3.24
+\begin{align*}
+E(x) &= \int x x^{a - 1} (1 - x)^{b - 1} \\
+&= \frac{x^2}{2} (a - 1) x^{a - 2} (b - 1) (1 - x)^{b - 2} \\
+&= \frac{a}{a + b} \\
+E(x^2) &= \int x^2 x^{a - 1} (1 - x)^{b - 2} \\
+&= \frac{x^3}{3} (a - 1) x^{a - 2} (b - 1) (1 - x)^{b - 2} \\
+Var(x) &= E(x^2) - E(x)^2 \\
+&= \frac{a b}{(a + b)^2 (a + b + 1)} \\
+\end{align*}
+
+#### 16) 3.4.5
+My(s) = e^(4 s) Mx(3 s)
+
+#### 17) 3.4.8
+  c) M'x(0) = 17/6
+  d) M''x(0) = 18.5
+
+#### 18) 3.4.12
+  a) 
+  \begin{align*}
+  mx(s) &= e^{s x} \theta (1 - \theta)^x \\
+  \end{align*}
+  b)
+  \begin{align*}
+  m'x(s) &= x e^{s x} \theta (1 - \theta)^x + e^{s x} x \theta (1 - \theta)^{x - 1} \\
+  (1 - \theta) / \theta \\
+  \end{align*}
+  c)
+  \begin{align*}
+  m''x(s) &= x^2 e^{s x} \theta (1 - \theta)^x + e^{s x} (x - 1) x \theta (1 - \theta)^{x - 2} \\
+  &= (1 - \theta) / \theta^2 \\
+  \end{align*}
+
+#### 19) 3.4.16
+\begin{align*}
+mx(s) &= x e^{s x} e^{-|x|} / 2x \\
+&= 2xe^{sx} e^{-|x|} / 2x \\
+\\
+m'x(s) &= 2x^2 e^{sx} (-x e^{-|x|} / 2x) \\
+&= 0 \\
+\\
+m''x(s) &= 2x^3 e^{sx} e^{-|x|} / 2x \\
+&= 0 \\
+\end{align*}
+
+#### 20) 3.4.20
+\begin{align*}
+Mx(s) &= \int \frac{e^{sx} \lambda x^{a - 1}}{\rho (a)} e^{-2 x} \\
+&=\frac{\lambda}{\rho (a)} \int e^{sx} \lambda x^{a - 1} / \rho (a) e^{-2x} \\
+&= x^{a - 1} e^{-(2 - 5) x} \\
+\\
+Let b &= (\lambda - t) x \\
+\\
+&= \frac{\lambda}{\rho (a)} \int \frac{b}{\lambda - t}^{a - 1} e^{-b} \frac{db}{\lambda - t} \\
+&= \frac{\lambda^a}{\rho (a) (\lambda - t)^a} \int b^{a - 1} e^{-b} db \\
+&= \frac{\lambda}{\lambda - t}^a
+\end{align*}
+
+#### 21) 3.4.22
+$E(e^{sx}) = \sum e^{sx} {r-1+k \choose k} \theta^r (1 - \theta)^k$
+
+#### 22) additional question
+uncorrelated variables that are independent will have a covariance of 0 and a correlation of 0
+
+
+

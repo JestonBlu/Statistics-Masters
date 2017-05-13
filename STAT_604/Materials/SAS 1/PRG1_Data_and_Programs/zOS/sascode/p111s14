@@ -1,0 +1,29 @@
+ods csvall file='.workshop.report(p111s14)' rs=none;
+proc print data=orion.customer_type;
+   title 'Customer Type Definitions';
+run;
+
+proc print data=orion.country;
+   title 'Country Definitions';
+run;
+ods csvall close;
+
+ods msoffice2k file='.workshop.report(p111s14)' rs=none style=Listing;
+proc print data=orion.customer_type;
+   title 'Customer Type Definitions';
+run;
+
+proc print data=orion.country;
+   title 'Country Definitions';
+run;
+ods msoffice2k close;
+
+ods tagsets.excelxp file='.workshop.report(p111s14)' rs=none style=Listing;
+proc print data=orion.customer_type;
+   title 'Customer Type Definitions';
+run;
+
+proc print data=orion.country;
+   title 'Country Definitions';
+run;
+ods tagsets.excelxp close;

@@ -1,0 +1,42 @@
+********** ODS CSVALL **********;
+ods csvall file='.workshop.report(mycsv)' rs=none;
+
+proc freq data=orion.sales;
+   tables Country;
+run;
+
+proc means data=orion.sales;
+   var Salary;
+run;
+
+ods csvall close;
+
+********** ODS MSOFFICE2K **********;
+ods msoffice2k file='.workshop.report(myhtml)' rs=none;
+
+proc freq data=orion.sales;
+   tables Country;
+run;
+
+proc means data=orion.sales;
+   var Salary;
+run;
+
+ods msoffice2k close;
+
+********** ODS EXCELXP **********;
+ods tagsets.excelxp file='.workshop.report(myxml)' rs=none;
+
+proc freq data=orion.sales;
+   tables Country;
+run;
+
+proc means data=orion.sales;
+   var Salary;
+run;
+
+ods tagsets.excelxp close;
+
+
+
+

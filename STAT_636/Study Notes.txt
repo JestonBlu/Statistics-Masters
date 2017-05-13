@@ -1,0 +1,49 @@
+Review for final
+-------------------------------------
+
+- Topic 6: Inferences about multiple means
+	- HW5:
+		- Recognize if data is paired or not. Be able to match the correct test with the data
+		-	Given test statistics, compute p-value or confidence interval
+	- Know the correct T2 test based on sample size, normality, and equal covariance
+	- MANOVA table (one factor)
+		-	Know we assume equal covariance
+		- Know the different components of manova
+			Treatment B (between), Residual W (within) (pooled covariance), B+W Total
+		-  Assumptions (Multivariate Normal, iid, constant covariance)
+	- Two way MANOVA (multiple factors)
+	 	- Know what it is
+		- What kind of a problem would you apply two way manova
+		- How is it different than one way
+		- Assumptions (Multivariate Normal, iid, constant covariance)
+
+
+- Topic 7: Principle Components
+	-	What is a principal component? (linear combination of the original variables)
+		-	Each principal component is uncorrelated with the others
+		- The first principal component represents the most variation in the data
+		- Variance of principal components = eigen values
+		- Make sure you understand what principal components is doing
+	- Slide 23: Interpret the results from a principal component table
+		- Weighted differences (+/-) Highlights individuals for which differences are extreme
+		- all signs +/- means its a weighted combination
+	- Scree Plot: How many components do you need and why?
+	- Scatterplot of the principle components
+
+
+- Topic 8: Clustering
+	- Hierarchical Clustering (slide 19)
+		- Dendrograms constructed by distance
+			- Interpret diagram
+			- Linkage: Single (closest), Complete (farthest), Avg
+		- Different types of distance computations
+	- KMeans: Talk through an example
+		- Be able to list the steps
+	- Multidimensional Scaling
+		- Reorders data to try to preserve the data in fewer dimensions
+	Biplot: Plot of principal components with annotations
+		- Errors show the contribution of each variables
+
+
+- Topic 9: Classification and Prediction
+	- Basic Test vs Training Sets

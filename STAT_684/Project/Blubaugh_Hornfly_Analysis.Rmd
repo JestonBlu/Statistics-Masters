@@ -1,0 +1,278 @@
+---
+title: "Hornfly Analysis"
+author: "Joseph Blubaugh"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  pdf_document:
+    latex_engine: xelatex
+    highlight: pygments
+mainfont: DejaVu Sans Mono
+sansfont: DejaVu Sans Mono
+fontsize: 11pt
+geometry: margin=.75in
+---
+
+
+## Problem Description
+
+Horn flies are destructive insects that reduce the productivity and health of livestock. They are a type of biting fly, approximately a quarter inch in length, and are most active during the summer months. Horn flies survive on the blood of their hosts which in cattle inhibits milk production, weight gain, and the overall health and comfort of the animal. They reproduce quickly and an untreated cow can have hundreds of flies living on them at one time.
+
+An experiment has been conducted to test the efficacy of ear tag pesticides on horn fly counts during the summer months. Research suggests that ear tags have been very successful in reducing the number of horn flies. The goal of this analysis is to determine which treatment is most effective at reducing the number of horn flies on cattle.
+
+
+
+## Data Description
+
+The experiment was conducted over a 26 week period between May and October in 15 Texas counties. The treatments consisted of 8 varieties of pesticides that were applied mostly using ear tags. Vetgun (injection) and Pythonstrips (pesticide strips attached to the ear tag) were the two treatments with an application method different from the rest of the treatments. In each county there were a minimum of two herds. One herd in each county served as the control and received no pesticide. All other herds in the county that were participating in the experiment received a randomly selected pesticide. Each week a sample of 10 cows were randomly selected and manually observed from one side. The number of flies observed on each cow were recorded. The observed number of flies was an approximation and not the actual count. The observations were also recorded between 7am-11am or after 5pm to avoid counting during the hottest part of the day when the flies may be on the underside of the cow.
+
+|                   |                                                                                                                 |
+|:------------------|:----------------------------------------------------------------------------------------------------------------|
+| Pesticides:       | Gardstar, Magnum, Optimizer, Python, PythonStrips Vetgun, Warrior, XP820                                        |
+| Texas Counties:   | Anderson, Bowie, Camp, Cherokee, Ellis, Falls, Fannin, Houston, Palopinto, Panola, Polk, Shelby, Smith, Trinity |
+
+
+## Exploratory Analysis
+
+Since the experiment was originally conducted across several counties in Texas, it makes sense to observe the data stratified by county and note any differences. It is immediately obvious that there is a lot of variation between the counties. Focussing on the control herds for a momemnt, it is interesting to note that although there is a variety of control count patterns ocurring over the season, there is not a single county that displays a completely unique pattern. Some counties have smooth weekly averages that steadily increase, some of which have large uptick towards the end of the season. Other counties have larger swings, but still trend upwards. A few coutnies stay relatively constant all season, and some counties exibit a season pattern where they peak around the middle of the season. These similar patters suggests that some counties may share similar environments that influence horn fly counts in different ways, therefore it will be important to retain the association between each herd and county.
+
+
+```{r a, echo=FALSE, fig.width=9, fig.height=6, message=FALSE, warning=FALSE}
+
+rm(list = ls())
+
+library(ggplot2)
+library(plyr)
+library(reshape2)
+library(Hmisc)
+library(multcomp)
+library(nlme)
+library(pander)
+library(lsmeans)
+library(forecast)
+
+flies = read.csv("hornflydata.csv")
+flies$trt = factor(capitalize(as.character(flies$trt)))
+flies$cty = factor(capitalize(as.character(flies$cty)))
+
+ggplot(flies, aes(x = week, y = flies, color = trt)) +
+  stat_summary(fun.y = "mean", geom = "point") +
+  stat_summary(fun.y = "mean", geom = "line") +
+  scale_x_continuous("Week") +
+  scale_y_continuous("Fly Count") +
+  scale_color_discrete("Treatment") +
+  ggtitle("Horn Fly Count by Treatment and County") +
+  facet_wrap(~cty) +
+  theme(plot.title = element_text(hjust = .5))
+
+flies$trt = factor(capitalize(as.character(flies$trt)))
+flies$cty = factor(capitalize(as.character(flies$cty)))
+flies$week = flies$week + 2
+flies$flies = flies$flies + 1
+
+## Ensure all of the treatments have been applied
+flies = subset(flies, week > 6 & week < 21)
+
+## Create weekly average by county, treatment, week
+avg = ddply(flies, .(cty, trt, week), summarise, flies = mean(flies))
+avg$trt = relevel(avg$trt, ref = 'Control')
+
+## Split control from the treatments
+control = subset(avg, trt == 'Control')
+colnames(control)[4] = 'ctrl_cnt'
+control = control[, -2]
+avg = subset(avg, trt != 'Control')
+
+## Join control value back as a separate column
+avg = join(x = avg, y = control, type = 'inner')
+avg = na.omit(avg)
+avg$diff = with(avg, ctrl_cnt - flies)
+
+
+## Remove Suspicious Data
+modeling = subset(avg, !cty %in% c('Anderson', 'Camp') & !trt %in% c('Vetgun', 'Pythonstrips'))
+
+modeling$cty = factor(modeling$cty)
+modeling$trt = factor(modeling$trt, levels = c('Magnum', 'Warrior', 'Python', 'Gardstar', 'Xp820', 'Optimizer'))
+row.names(modeling) = 1:nrow(modeling)
+
+```
+
+One of the most interesting things about the treatments is that some perform very well against horn flies in some counties and in others, are no better than the control. Most of the treatments show a fairly small changes in horn fly counts from week to week with the exception of Vetgun which is the only treatment in the experiment which was not administered from an ear tag. In some of the counties, the treatment counts have a very similar pattern to the control counts, in other counties they are completely different. This suggests that the effectiveness of the treatments may be dependent on the surrounding environment.
+
+## Restricting Observations
+
+County plays a significant role in this analysis and has been treated conservatively. Anderson county is confirmed to have not had a control herd and has been removed. Camp county has not been confirmed, but the difference between the reported control herd and the treatment herds are suspicious enough that it has been removed from this analysis as well. Vetgun has also been removed given that the treatment method was different then the rest of the treatments. Pythonstrips was removed for a few reasons: It has a slightly different treatment method (strips are applied to the tag manually), it only appears as a treatment in one county with no other treatments, and contrasts show that pythonstrips a python are not significantly different. Python is used in several counties so there is no need to combine to pythonstrips into the python treatment. 
+
+An additional filter was applied to weeks so that only data between weeks 5 through 18 were used. The reason for starting at week 5 was to ensure that treatment observations that were recorded before the tag was applied were removed. Since the overall goal of the analysis is to determine the best or most effective pesticide, observations beyond week 18 were removed because some treatments appeared to be losing the effectiveness.
+
+Before building a model the difference in average fly count between the control herd and treatment herds were computed. Any treatment observations that did not have a corresponding control observation were removed.
+
+
+```{r b, echo=FALSE, fig.width=9, fig.height=6, message=FALSE, warning=FALSE}
+x = modeling
+colnames(x) = c("County", "Treatment", "Week", "Treatment Count", "Control Count", "Difference")
+pander(head(x), caption = "Sample of Final Dataset")
+```
+
+The following tables are computed from the final dataset. All remaining treatments are used in at least 3 counties. Optimizer has the highest mean difference vs the control. Magnum has the lowest average difference and Warrior is slightly higher.
+
+
+```{r a2, echo=FALSE, fig.width=9, fig.height=6, message=FALSE, warning=FALSE}
+x = ddply(modeling, .(trt), summarise, mean = mean(diff), cty = length(unique(cty)))
+colnames(x) = c("Treatment", "Mean", "Counties")
+x = arrange(x, desc(Mean))
+pander(x, caption = "Mean Difference in Count vs Control")
+
+x = ddply(modeling, .(trt, cty), summarise, mean = round(mean(diff), 1))
+colnames(x) = c("Treatment", "County", "Mean")
+x = dcast(x, County ~ Treatment, fill = '')
+pander(x, caption = "Mean Difference in Count by Treatment and County")
+
+```
+
+\newpage
+
+## Statistical Method
+
+The response variable is the difference in average fly count between the control herds and the treatment herds. In early modeling attempts there were issues with non-constant variance in the residuals so in the final model a transformation of log(difference + 150) has been used. The +150 is added to ensure that none of the response observations have a negative value when applying the log transformation.
+
+The original experiment was a repeated measures design and as a result the observations are correlated. The following plot illustrates the weekly change in average fly count by county and treatment. Six of the twelve remaining counties have multiple treatments applied. 
+
+```{r c, echo=FALSE, fig.width=9, fig.height=5, message=FALSE, warning=FALSE}
+
+ggplot(modeling, aes(x = week, y = diff, color = trt)) + 
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  scale_x_continuous("Week") +
+  scale_y_continuous("Mean Difference") +
+  scale_color_discrete("Treatment") +
+  facet_wrap(~cty) +
+  ggtitle("Mean Difference in Control vs Treatment Count") +
+  theme(plot.title = element_text(hjust = .5))
+
+```
+
+Simple regression lines indicate that the intercept and slopes within county do not look very different, however they look quite different across counties. This could be an indication of each counties overall influence on the effectiveness of the treatments over time. One way to approach modeling this situation is with a random coefficient model. 
+
+Treatments are the primary interest and will be used as fixed effects. County will be the random effect since we want to use inference to make statements on the effectiveness of treatments in general. Since the slopes across counties appear to be different, week will be used to model the rate of change within each county. Finally, to account for the correlation among observations we will use an AR(1) correlation structure for the residuals.
+
+\newpage
+
+## Model Results
+
+```{r d, echo=FALSE, fig.width=9, fig.height=4, message=FALSE, warning=FALSE, comment=NA}
+
+## Modeling
+mdl = lme(log(diff + 150) ~ trt, random = list(~week|cty), 
+          correlation = corAR1(), data = modeling)
+
+## Anova since diff is transformed
+cat("ANOVA Summary\n")
+anova(mdl)
+cat("--------------------------------------------------------\n")
+cat("\n\n")
+cat("Random Coefficient Model Estimates\n")
+summary(mdl)
+
+```
+
+\newpage
+
+```{r d99, echo=FALSE, fig.width=9, fig.height=3.5, message=FALSE, warning=FALSE, comment=NA}
+
+## LS Means
+x = lsmeans(mdl, specs = "trt")
+plot(x, main = "LSMeans Transformed Scale", xlab = "LSMean", ylab = "Treatment")
+
+cat("Multiple Comparisons of Means\n")
+pairs(x, reverse = TRUE)
+plot(pairs(x), main = "Multiple Comparison of Means: Tukey Contrasts", ylab = "", xlab = "Estimated Difference in Treatments")
+
+```
+
+\newpage
+
+## Statistical Summary
+
+**ANOVA Results**
+
+* Treatment has a significant effect on fly count vs the control (pvalue: .021).
+
+**Random Coefficient Model Summary**
+
+* Week is highly correlated within county ($\rho$:-.825).
+* County accounts for most of the variance: County:87.9%, Week(County):.2%, Residual:11.9%.
+* The error structure AR($\phi = .618$), indicates the correlation between observations at lag = 1. 
+* Optimizer has the highest estimated mean difference in fly count vs. the base treatment Magnum.
+
+**LSMeans and Tukey Contrasts**
+
+* The LSMeans plot indicates that the treatments with the highest mean difference in fly count are Optimizer (159.2), Xp820 (149.5), and Gardstar (148.9) *(Backtransformed)*.
+* The LSMeans 95% Confidence Interval for treatments are all greater than 0 indicating that all treatments are effective against repelling horn flies vs the control (no treatment).
+* Tukey's test of multiple comparisons indicates that none of the treatments are significantly different (pvalue >.05).
+
+## Model Diagnostics
+
+* Nice spread of residuals, but not exactly centered on 0 (median = .06).
+* Predicted vs Actuals look okay, Warrior and Xp820 do not have great fits
+* Box Plots of residuals by treatment show some notable outliers
+* ACF plots of residuals by county show some slightly significant correlation at lag = 1, but no other significant correlation for the other lags 
+
+## Conclusion
+
+In this experiment, county appears to have an influence on the effectiveness of the pesticides. Many of the treatments had a large range in fly counts when compared across counties. Only six of the twelve counties were able to compare multiple treatments directly. As a result, many of the treatments were never tested against each other within the same county. It would be beneficial to do a follow up study with a balanced experimental design so see if one of the treatments with a higher predicted effectiveness proves to be statistically different than the other treatments.
+
+The six pesticides used in the final model all had a significant effect on horn fly counts, meaning they were all more effective than the herds that received no pesticides. However, a multiple comparison test showed that the treatments are not stastically different enough to declare any single treatment the best or most effective. 
+
+## Model Diagnostic Plots
+
+```{r ee1, echo=FALSE, fig.width=8, fig.height=5, message=FALSE, warning=FALSE, comment=NA}
+plot(mdl, main = "Fitted Values vs Residuals", xlab = "Fitted Values", ylab = "Residuals",
+     col = "gray50")
+
+qqnorm(residuals(mdl), main = "Normal Q-Q Plot of Residuals", col = "gray50"); qqline(residuals(mdl))
+
+plot(mdl, log(diff + 150) ~ fitted(.) | trt, abline = c(0,1), main = "Fitted Values vs Actual Values",
+     xlab = "Fitted", ylab = "Actual", col = "gray50")
+
+plot(mdl, trt ~ resid(.), ylab = "Treatment", main = "Box Plot of Residuals by Treatment", col = "gray50")
+
+```
+
+```{r ee12, echo=FALSE, fig.width=8, fig.height=9, message=FALSE, warning=FALSE, comment=NA}
+
+modeling$pred = exp(predict(mdl, modeling)) - 150
+modeling$error = with(modeling, pred - diff)
+
+agg = ddply(modeling, .(cty, week), summarise, error = mean(error))
+
+par(mfrow = c(4,3), oma=c(0,0,4,0))
+Acf(x = as.numeric(subset(agg, cty == 'Bowie')$error), main = "Bowie")
+Acf(x = as.numeric(subset(agg, cty == 'Cherokee')$error), main = "Cherokee")
+Acf(x = as.numeric(subset(agg, cty == 'Ellis')$error), main = "Ellis")
+Acf(x = as.numeric(subset(agg, cty == 'Falls')$error), main = "Falls")
+Acf(x = as.numeric(subset(agg, cty == 'Fannin')$error), main = "Fannin")
+Acf(x = as.numeric(subset(agg, cty == 'Houston')$error), main = "Houston")
+Acf(x = as.numeric(subset(agg, cty == 'Palopinto')$error), main = "Palopinto")
+Acf(x = as.numeric(subset(agg, cty == 'Panola')$error), main = "Panola")
+Acf(x = as.numeric(subset(agg, cty == 'Polk')$error), main = "Polk")
+Acf(x = as.numeric(subset(agg, cty == 'Shelby')$error), main = "Shelby")
+Acf(x = as.numeric(subset(agg, cty == 'Smith')$error), main = "Smith")
+Acf(x = as.numeric(subset(agg, cty == 'Trinity')$error), main = "Trinity")
+title("ACF Plot of Residuals by County", outer = TRUE)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,42 @@
+---
+title: "Data Extraction"
+author: "Joseph Blubaugh"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  pdf_document:
+    latex_engine: xelatex
+    highlight: pygments
+mainfont: DejaVu Sans Mono
+sansfont: DejaVu Sans Mono
+fontsize: 11pt
+geometry: margin=.5in
+---
+
+Since the data is not really big, rather than writing a full program to deal with the different formatting of the various sheets I instead did a little prep work on each sheet to make it a little easier to read into R. I created columns for County, Treatment, and Setup Day then I transposed the Week, Date, and Count data so that the week indicators was in a single column. This helped to flatten the data a bit.
+
+```{r a, comment=NA, message=FALSE, warning=FALSE}
+library(xlsx)
+library(reshape2)
+library(knitr)
+
+dta = read.xlsx(file = "../FlyData.xlsx", 
+                startRow = 1, endRow = 49, 
+                colIndex = 1:15, 
+                sheetName = "Anderson", 
+                header = TRUE)
+
+kable(head(dta))
+
+```
+
+In the R package **reshape2** there is a function called **melt** which can easily be used to collapse the data further into something more usable.
+
+```{r b, comment=NA, message=FALSE, warning=FALSE}
+
+dta = melt(data = dta, id.vars = c("County", "Treatment", "Setup", "Week", "Date"), 
+           variable.name = "Measurement", 
+           value.name = "Count")
+
+kable(head(dta))
+```
+

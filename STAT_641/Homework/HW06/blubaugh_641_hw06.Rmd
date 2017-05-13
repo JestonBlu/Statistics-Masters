@@ -1,0 +1,193 @@
+---
+output:
+  pdf_document:
+    latex_engine: xelatex
+    highlight: pygments
+mainfont: Calibri Light
+sansfont: Calibri Light
+fontsize: 11pt
+geometry: margin=1in
+---
+
+**Homework 06**  
+**Joseph Blubaugh**  
+jblubau1@tamu.edu  
+**STAT 641-720**  
+
+\newpage
+
+I.
+1) a) $PDF:  \frac{e^{-\frac{x}{5}}}{5}$ b) mean = $\frac{1}{5}$, sd = $\frac{1}{5}$  
+
+2) Using two different test for testing normality, both tests have low p-values so the normal distribution is not a good fit.
+
+```{r q1_2, echo=FALSE, comment=NA}
+library(MASS)
+
+results = as.numeric()
+
+for (i in 1:1000) {
+dt = rexp(25, rate = .2)
+results = c(results, mean(dt))
+}
+
+x = fitdistr(x = results, densfun = "normal")
+
+ks.test(dt, "pnorm", mean = x$estimate[[1]], sd = x$estimate[[2]])
+shapiro.test(x = dt)
+
+```
+
+3)
+
+a) `r pexp(4.8, .2) + 1 - pexp(5.2, .2)`
+b) `r -(1/25) * sqrt(25) * (.2 - 1/.2)`
+c) `r (length(results[results < 4.8]) + length(results[results > 5.2]))/1000`
+
+4) The exact distribution is the most accurate followedb by the central limit theorem and the simulated values are the least accurate.
+
+
+
+
+
+II.
+1) The bootstrap standard error is much lower than the sample error because of the sample size difference.
+
+```{r q2_1, echo=FALSE, comment=NA}
+
+dt = c(0.6, 0.7, 1.1, 1.3, 1.8, 2.0, 2.3, 2.7, 2.9, 3.1,
+       3.9, 4.3, 4.4, 4.9, 5.2, 5.4, 6.1, 6.8, 7.1, 8.0,
+       9.4, 10.3, 12.9, 15.9, 16.0, 22.0, 22.2, 22.5, 23.0, 23.1,
+       23.9, 26.5, 26.7, 28.4, 28.5, 32.2, 40.2, 42.5, 47.2, 48.3,
+       55.8, 57.0, 57.2, 64.9, 67.6, 71.3, 79.5, 114.5, 128.6, 293.5)
+
+dt = log(dt)
+
+returns = data.frame()
+
+for (i in 1:5000) {
+
+samp.r = sample(dt, 10, replace = TRUE)
+
+result = data.frame(
+  mean.r = mean(samp.r),
+  sd.r = sd(samp.r),
+  median.r = median(samp.r)
+)
+
+returns = rbind(returns, result)
+
+}
+cat("Sample Data Std Error:", sd(dt)/sqrt(50))
+cat("Bootstrap Std Err:", sd(returns$mean.r)/sqrt(5000))
+
+```
+2)
+
+```{r q2_2, echo=FALSE, comment=NA}
+cat("Sample Median: ", mean(returns$median.r))
+cat("Sample Std Dev: ", mean(returns$sd.r))
+cat("MAD: ", mad(returns$mean.r))
+```
+
+3) Overall the bootstrap sample results for mean and median are pretty close to the historically modeled version. In the boostrap simulation the mean and standard deviation are noticeably lower than the theoretical model.
+
+
+
+
+III.
+1) This is a binomial(n = 100, p = .2) distribution.  
+ a) Mean = 20, Sd = 4
+ b) Mean = .2, Sd = .04
+ c) exact probability `r 1 - pbinom(q = 20, 100, .2)`, normal approximation `r 1-.7324`
+
+2)
+ a)
+
+```{r q3_2a, echo=FALSE, comment=NA}
+results = as.numeric()
+
+for (i in 1:1000) {
+  dt = rnorm(10, 20, 5)
+  results = c(results, ((10 - 1) * var(dt)) / 25)
+}
+
+cat("Sample Quantiles: ", quantile(results, c(.1, .25, .5, .9, .95, .99)),
+    "\nChi Squared Quantiles: ", qchisq(c(.1, .25, .5, .9, .95, .99), df = 9))
+
+```
+
+ b)
+ 
+ ```{r q3_2b, echo=FALSE, comment=NA}
+results = as.numeric()
+
+for (i in 1:1000) {
+  dt = 18.4 + 15.8 * rgamma(n = 10, .1, 1)
+  results = c(results, ((10 - 1) * var(dt)) / 25)
+}
+
+cat("Gamma Sample Quantiles: ", quantile(results, c(.1, .25, .5, .9, .95, .99)),
+    "\nChi Squared Quantiles: ", qchisq(c(.1, .25, .5, .9, .95, .99), df = 9))
+
+ ```
+
+ c)
+ ```{r q3_2c, echo=FALSE, comment=NA}
+results = as.numeric()
+
+for (i in 1:1000) {
+  dt = 20 + 2.9 * rt(n = 10, 3)
+  results = c(results, ((10 - 1) * var(dt)) / 25)
+}
+
+cat("T Distibution Sample Quantiles: ", quantile(results, c(.1, .25, .5, .9, .95, .99)),
+    "\nChi Squared Quantiles: ", qchisq(c(.1, .25, .5, .9, .95, .99), df = 9))
+
+ ```
+
+d) The skewness and heavy tails impacts the variance by stretching out the distribution.
+
+3)
+ a)
+ \begin{align*}
+    P(Yes) &= P(Yes \cap Q_1 \cup Yes \cap Q_2)         \\
+           &= P(Yes \cap Q_2) + P(Yes \cap Q_2)         \\
+           &= P(Yes | Q_1) P(Q_1) + P(Yes | Q_2) P(Q_2) \\
+           &= p \theta + (1 - p) (1 - \theta)           \\
+ \end{align*}
+
+b)
+\begin{align*}
+     \pi &= p \theta + (1 - \theta) (1 - p)               \\
+         &= p \theta - p(1 - \theta) + (1 - \theta)       \\
+         &= p (2 \theta - 1) + (1 - \theta)               \\
+       p &= \frac{\pi - (1 - \theta)}{(2 \theta - 1)}     \\
+ \hat{p} &= \frac{\hat{\pi} - (1 - \theta)}{2 \theta - 1} \\ 
+\end{align*}
+ 
+c)
+\begin{align*}
+         \hat{p} &= \frac{\hat{\pi} - (1 - \theta)}{2 \theta - 1}                             \\
+    Var(\hat{p}) &= Var(\frac{\hat{\pi}}{2 \theta - 1} - \frac{(1 - \theta)}{(2 \theta - 1)}) \\
+                 &= Var(\frac{\hat{\pi}}{2 \theta - 1}                                        \\
+                 &= \frac{1}{(2 \theta - 1)^2} Var(\hat{\pi})                                 \\
+                 &= \frac{1}{(2 \theta - 1)^2} \frac{\pi (1 - \pi)}{n}                        \\
+\end{align*}
+
+d) As $\theta$ goes to 0 or 1 from 1/2 $Var(\hat{p})$ approaches 0.
+
+
+
+
+
+
+IV.
+1) C, the best estimator is always the one with the smallest error  
+2) B, bootstrapping is really good at approximating distributions when the sample is small  
+3) A, both of these conditions are better than one or the other individually  
+4) C, for a symmetrical distribution mean is superior to median  
+5) E, none of these choices are correct  
+6) D, the estimator with the smallest mse will be the closest value to the true mean  
+7) B, since the sample is not small, using the sample distribution is best  
+8) D, bias is the difference between the actual parameter value and the sample parameter value  

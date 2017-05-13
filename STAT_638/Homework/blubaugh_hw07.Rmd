@@ -1,0 +1,223 @@
+---
+output:
+  pdf_document:
+    latex_engine: xelatex
+    highlight: pygments
+mainfont: DejaVu Sans Mono
+sansfont: DejaVu Sans Mono
+fontsize: 11pt
+geometry: margin=1in
+---
+  
+Homework 07  
+Joseph Blubaugh      
+jblubau1@tamu.edu    
+
+
+## 8.1)
+
+a) I would expect $Var[Y_{i,j} | \theta_i, \sigma^2]$ to be less than $Var[Y_{i,j} | \mu, \tau^2]$ because the former can be considered a sub grouping of the latter and should have less spread than the overall data set.
+
+b) I would expect $Cov[Y_{i1,j}, Y_{i2,j} | \theta_j, \sigma^2]$ to be positive meaning that the samples within the group are not independent when the mean is known. Likewise $Cov[Y_{i1,j}, Y_{i2,j} | \mu, \tau^2]$ would be zero because the mean is unknown and the samples are assumed independent.
+
+c)
+
+\begin{align*}
+  var[y_{i,j} | \theta, \sigma^2] = & var[y_{i,j}] + var[E(y_{i,j} | \theta, \sigma^2)] \\
+   = & \tilde\sigma^2 + var[\theta] \\
+  var[y_{i,j} | \mu, \tau^2] = & var[y_{i,j}] + var[E(y_{i,j} | \mu, \tau^2)] \\
+   = & \tilde\sigma^2 + \sigma^2 \\
+  var[\hat y_{.,j} | \theta, \sigma^2] = & var[\hat y_{.,j}] + var[E(\hat y_{.,j} | \theta, \sigma^2)] \\
+  = & \tilde\sigma^2 + var[\theta]/n \\
+  var[\hat y_{.,j} | \mu, \tau^2] = & var[\hat y_{.,j}] + var[E(\hat y_{.,j} | \mu, \tau^2)] \\
+  = & \tilde\sigma^2 + \sigma^2/n \\
+  cov[y_{i,j} | \theta, \sigma^2] = & var[y_{1i,j}] + var[y_{2i,j}] - var[E(y_{i,j}, y_{2i,j} | \theta, \sigma^2)] \\
+  = & var[\theta] + var[\mu] - \sigma^2 \\
+  cov[y_{i,j} | \mu, \tau^2] = & var[y_{1i,j}] + var[y_{2i,j}] - var[E(y_{i,j}, y_{2i,j} | \mu, \tau^2)] \\
+  = & var[\theta] + var[\mu] - \tau^2 \\
+\end{align*}
+
+
+d)
+
+\begin{align*}
+  p(\mu | \theta_1 ... \theta_m, \sigma^2, \tau^2, y) & \\
+  \propto & p(\mu, \theta_1 ... \theta_m, \sigma^2, \tau^2 | y) \\
+  = & \tau^{-m} exp[- \frac{1}{2 \tau^2} \sum_{j=1}^m (\theta_j - \mu)^2] exp[\frac{1}{2 \gamma_0^2} (\mu - \mu_0)^2] \\
+\end{align*}
+
+\newpage
+
+## 8.3)
+
+```{r a0, echo=FALSE}
+
+normal.hierarchy.suff=function(Y,nreps,mu0,gamma0,eta0,tau0,nu0,sigma0){
+  #
+  #
+  # This function provides Gibbs samples from the posterior of the
+  # normal hierarchical model on pp. 184-186 of the notes.  The priors are
+  # the same as in the notes.  The input Y is a list with m components.
+  # Each component is a three-vector containing sufficient statistics for
+  # one group: the sample size, the sample mean and the sample variance
+  # (in that order).  It is assumed that the sample variance uses n-1 in 
+  # the denominator.  
+  #
+  #  
+  m=length(Y)  
+  theta=matrix(0,nreps+1,m)  
+  sigma2=1:(nreps+1)  
+  mu=1:(nreps+1)  
+  tau2=1:(nreps+1)  
+  n=1:m  
+  ybar=1:m  
+  s2=0  
+  for(j in 1:m){    
+    n[j]=Y[[j]][1]    
+    theta[1,j]=Y[[j]][2]    
+    ybar[j]=theta[1,j]    
+    s2=s2+(n[j]-1)*Y[[j]][3]  
+  }  
+  N=sum(n)  
+  sigma2[1]=s2/N  
+  mu[1]=sum(n*ybar)/N  
+  tau2[1]=s2/mean(n)  
+  for(i in 2:(nreps+1)){    
+    par=s2+sum(n*(ybar-theta[i-1,])^2)    
+    par=(par+nu0*sigma0^2)/2    
+    sigma2[i]=1/rgamma(1,(N+nu0)/2,rate=par)    
+    par=(sum((theta[i-1,]-mu[i-1])^2)+eta0*tau0^2)/2    
+    tau2[i]=1/rgamma(1,(m+eta0)/2,rate=par)    
+    mutilde=sum(theta[i-1,])/tau2[i]+mu0/gamma0^2    
+    mutilde=mutilde/(m/tau2[i]+1/gamma0^2)    
+    sigmatilde=(m/tau2[i]+1/gamma0^2)^(-1/2)    
+    mu[i]=rnorm(1,mutilde,sigmatilde)    
+    vecmean=(n*ybar/sigma2[i]+mu[i]/tau2[i])/(n/sigma2[i]+1/tau2[i])    
+    vecsd=sqrt(1/(n/sigma2[i]+1/tau2[i]))    
+    theta[i,]=rnorm(m,vecmean,vecsd)  
+  }  
+  list(theta[2:(nreps+1),],sigma2[2:(nreps+1)],mu[2:(nreps+1)],tau2[2:(nreps+1)])
+}
+
+```
+
+```{r a, echo=TRUE, fig.height=6, comment=NA}
+school1 = read.table("../Data/school1.dat", col.names = "S1")[,1]
+school2 = read.table("../Data/school2.dat", col.names = "S2")[,1]
+school3 = read.table("../Data/school3.dat", col.names = "S3")[,1]
+school4 = read.table("../Data/school4.dat", col.names = "S4")[,1]
+school5 = read.table("../Data/school5.dat", col.names = "S5")[,1]
+school6 = read.table("../Data/school6.dat", col.names = "S6")[,1]
+school7 = read.table("../Data/school7.dat", col.names = "S7")[,1]
+school8 = read.table("../Data/school8.dat", col.names = "S8")[,1]
+
+dta = list(s1 = c(length(school1), mean(school1), var(school1)),
+           s2 = c(length(school2), mean(school2), var(school2)),
+           s3 = c(length(school3), mean(school3), var(school3)),
+           s4 = c(length(school4), mean(school4), var(school4)),
+           s5 = c(length(school5), mean(school5), var(school5)),
+           s6 = c(length(school6), mean(school6), var(school6)),
+           s7 = c(length(school7), mean(school7), var(school7)),
+           s8 = c(length(school8), mean(school8), var(school8)))
+           
+gibbs = normal.hierarchy.suff(Y = dta, nreps = 100000, mu0 = 7, gamma0 = 5, 
+                              eta0 = 2, tau0 = 10, nu0 = 2, sigma0 = 15)
+
+
+#####
+##### A)
+#####
+
+## Mean Estimate of Thetas
+colMeans(gibbs[[1]])
+
+## Effective Sample Size for Sigma
+var(gibbs[[2]]) / apply(X = gibbs[[1]], MARGIN = 2, FUN = var)
+
+## Effective Sample Size for Mu
+var(gibbs[[3]]) / apply(X = gibbs[[1]], MARGIN = 2, FUN = var)
+
+## Effective Sample Size for Tau
+var(gibbs[[4]]) / apply(X = gibbs[[1]], MARGIN = 2, FUN = var)
+
+
+
+#####
+##### B)
+#####
+
+## Posterior Mean and 95% Confidence for Sigma
+mean(gibbs[[2]]); quantile(gibbs[[2]], c(.025, .975))
+
+## Posterior Mean and 95% Confidence for Mu
+mean(gibbs[[3]]); quantile(gibbs[[3]], c(.025, .975))
+
+## Posterior Mean and 95% Confidence for Tau
+mean(gibbs[[4]]); quantile(gibbs[[4]], c(.025, .975))
+
+## 
+##
+
+#####
+##### C)
+#####
+
+plot(density(gibbs[[4]] / (gibbs[[2]] + gibbs[[4]])), main = "R")
+abline(v = .4, lty = 2)
+
+## There is noticeable change in variance between Tau and Sigma which indicates that 
+## there are differences between the schools. Variance has also increased vs the prior estimate
+
+
+#####
+##### D)
+#####
+
+## Probability that Theta.7 is less than theta.8
+length(which(gibbs[[1]][,7] < gibbs[[1]][,8])) / 100000
+
+## Probability that Theta.7 is the smallest value
+length(which(gibbs[[1]][,7] < gibbs[[1]][,8] & gibbs[[1]][,7] < gibbs[[1]][,6] &
+               gibbs[[1]][,7] < gibbs[[1]][,5] & gibbs[[1]][,7] < gibbs[[1]][,4] &
+               gibbs[[1]][,7] < gibbs[[1]][,3] & gibbs[[1]][,7] < gibbs[[1]][,2] &
+               gibbs[[1]][,7] < gibbs[[1]][,1])) / 100000
+
+#####
+##### E)
+#####
+
+par(mfrow = c(4, 2))
+plot(density(gibbs[[1]][,1])); abline(v = mean(school1), lty = 2)
+plot(density(gibbs[[1]][,2])); abline(v = mean(school2), lty = 2)
+plot(density(gibbs[[1]][,3])); abline(v = mean(school3), lty = 2)
+plot(density(gibbs[[1]][,4])); abline(v = mean(school4), lty = 2)
+plot(density(gibbs[[1]][,5])); abline(v = mean(school5), lty = 2)
+plot(density(gibbs[[1]][,6])); abline(v = mean(school6), lty = 2)
+plot(density(gibbs[[1]][,7])); abline(v = mean(school7), lty = 2)
+plot(density(gibbs[[1]][,8])); abline(v = mean(school8), lty = 2)
+
+## All of the sample means are close to the peak of the posterior distributions
+## The posterior mu of 7.55 is close to the original prior mu of 7
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

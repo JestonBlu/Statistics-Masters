@@ -1,0 +1,332 @@
+---
+output:
+  pdf_document:
+    latex_engine: xelatex
+    highlight: pygments
+mainfont: Calibri Light
+sansfont: Calibri Light
+fontsize: 11pt
+geometry: margin=1in
+---
+
+**Homework 09**  
+**Joseph Blubaugh**  
+jblubau1@tamu.edu  
+**STAT 641-720**  
+
+\newpage
+
+1)
+    a) matched pairs
+    b) independent samples
+    c) independent samples
+    d) matched pairs
+
+
+2)
+  a) There is not enough evidence to conclude that the thickness of eggs from owls exposed to the chemical is less than owl whos eggs have not been exposed to the chemical.  
+      
+```{r q2a, echo=FALSE, comment=NA, warning=FALSE}
+dt = data.frame(
+    exposed = c(3.6, 3.2, 3.8, 3.6, 4.1, 3.8, 4.2, 3.4, 3.7, 3.8),
+    not_exposed = c(4.3, 4.4, 3.6, 3.5, 4.4, 3.5, 3.4, 3.6, 4.1, 4.3))
+
+t.test(x = dt$exposed, y = dt$not_exposed, alternative = "less")
+```  
+
+  b) Probability of a Type II error
+
+```{r q2b, echo=FALSE, comment=NA}
+S = (var(dt$exposed) + var(dt$not_exposed))/2
+T = qt(1 - .05, 18) ## T
+v  = c(0, -.5, -1, -1.5, -2) * S 
+d = (v) / sqrt(S * (1/10 + 1/10)) ## delta
+1-pt(T, 18, d)
+```  
+  c) n = 11, so m = 33
+
+```{r q2c, echo=FALSE, comment=NA, warning=FALSE}
+library(pwr)
+pwr.t.test(d = .3/sqrt(S), power = .8, type = "one", alternative = "greater")
+```  
+    
+  d) There is not sufficient evidence to suggest that owl eggs from owls exposed to the chemical are less than owl eggs from owls who have not been exposed to the chemeical.
+
+```{r q2d, echo=FALSE, comment=NA, warning=FALSE}
+wilcox.test(x = dt$exposed, y = dt$not_exposed, alternative = "less")
+```  
+  e) There is not significant evidence to suggest that the variability of exposed eggs is greater than the variability of unexposed eggs.
+
+```{r q2e, echo=FALSE, comment=NA, warning=FALSE}
+x = var(dt$exposed)
+y = var(dt$not_exposed)
+TS = (9 * x) / y
+cat('p-value:', 1 - pchisq(4.449438, 9))
+```  
+  f) data collected from the non exposed group does not bass the shapiro test of normality so wilcox will be a better test.
+
+```{r q2f, comment=NA, warning=FALSE}
+shapiro.test(dt$exposed)
+shapiro.test(dt$not_exposed)
+```  
+
+3) With a significance level of .05, both tests fail to reject the null hypothesis that the vitaminB group is larger than the placebo group. The t-test is more reliable in this case because both samples pass the shapiro test of normality.
+
+```{r q3, echo=FALSE, comment=NA, warning=FALSE}
+dt = 
+  data.frame(vitaminB = c(14, 26, 2, 4, -5, 14, 3, -1, 1, 6, 3, 4),
+             placebo = c(8, 18, -7, -1, 2, 9, 0, -4, 13, 3, 3, 3))
+
+t.test(x = dt$vitaminB, y = dt$placebo, paired = TRUE, alternative = "greater")
+wilcox.test(x = dt$vitaminB, y = dt$placebo, paired = TRUE, alternative = "greater")
+```  
+
+4) 
+  a) $H_o: p_1 = p_2$, $H_1: p_1 \ne p_2$, where $p_1$ and $p_2$ are the probabilities of normal and diabetic patients having low excretions.
+  b) There is substantial evidience to suggest that the two probabilities are not the same so we reject $H_o$
+
+```{r q4b, comment=NA, warning=FALSE}
+cat('p-value:', phyper(4, 12, 12, 14))
+````  
+
+5) 
+  a) $H_o: p_1 = p_2$, $H_1: p_1 \ne p_2$, where $p_1$ and $p_2$ are the probabilities of Drug 1 and Drug 2 successfully anesthetizing membranes.
+  b) There is sufficient evidence to conclude that the probabilities of the 2 drugs are different.
+
+```{r q5b, comment=NA, warning=FALSE}
+cat('p-value:', phyper(18, 45, 45, 46))
+```  
+
+
+6) There is not substantial evidence to conclude that the phenotypes follow the proportion 9:3:3:1.
+
+```{r q6, echo=FALSE, comment=NA, warning=FALSE}
+dt = data.frame(
+  Oi = c(926, 293, 288, 104),
+  Ei = c(906.1875, 302.0625, 302.0625, 100.6875)
+)
+dt$TS = with(dt, (Oi - Ei)^2 / Ei)
+dt
+cat('p-value:', pchisq(sum(dt$TS), df = 3))
+```  
+
+7)
+  a) Based on the Shapiro Wilks test of normality the data from Lab2 appears normal, while the data from Lab1 does not.
+
+```{r 7a, echo=FALSE, comment=NA, warning=FALSE}
+dt = data.frame(
+  Lab.1 = c(4.13, 4.07, 4.04, 4.07, 4.05, 4.04, 4.02, 4.06, 4.10, 3.86,
+            3.85, 4.08, 4.11, 4.08, 4.01, 4.02, 4.04, 3.97, 4.00, 4.04),
+  Lab.2 = c(3.88, 4.02, 4.01, 4.01, 4.04, 3.99, 4.03, 3.97, 3.98, 4.02,
+            3.88, 3.91, 3.95, 3.92, 3.97, 3.92, 3.90, 3.89, 3.97, 3.95)
+)
+shapiro.test(dt$Lab.1)
+shapiro.test(dt$Lab.2)
+```  
+
+  b) Based on the F test, the two variances appear to be different
+
+```{r 7b, echo=FALSE, comment=NA, warning=FALSE}
+var.test(x = dt$Lab.1, y = dt$Lab.2)
+```  
+  
+  c) There is no significant correlation between day to tests, all correlation are within the acceptable "noise" range.
+
+```{r 7c, echo=FALSE, comment=NA, warning=FALSE}
+par(mfrow = c(1,2))
+acf(dt$Lab.1, main = "Autocorrelation Plot Lab 1")
+acf(dt$Lab.2, main = "Autocorrelation Plot Lab 2")
+par(mfrow = c(1,1))
+```  
+  
+  d) Based on wilcox test, the two averages appear to be different. The wilcox test is a better approximation than the t test because one of the labs data appears not to be from a normal distribution.
+  
+```{r 7d, echo=FALSE, comment=NA, warning=FALSE}
+wilcox.test(x = dt$Lab.1, y = dt$Lab.2)
+```  
+
+  e) 
+
+```{r q7e, echo=FALSE, comment=NA, warning=FALSE}
+ cat('Lab.1 95% Confidence Interval:', mean(dt$Lab.1) - (1.96 * sd(dt$Lab.1)), mean(dt$Lab.1) + (1.96 * sd(dt$Lab.1))) 
+ cat('Lab.1 95% Confidence Interval:', mean(dt$Lab.1) - (1.96 * sd(dt$Lab.2)), mean(dt$Lab.1) + (1.96 * sd(dt$Lab.2)))
+ ```  
+
+8)  There is substantial evidence that the relationship between carrier status and size are not independent. Futhermore, measures of assocation show that they have very little association.
+
+```{r q8, echo=FALSE, comment=NA, warning=FALSE}
+
+cat('Oi')
+(Oi = data.frame(
+  Carrier = c(19, 29, 24),
+  NonCarrier = c(497, 560, 269),
+  row.names = c("Norm", "Large", "V. Large")
+))
+
+N = 1398
+pi1 = 72/1398; pi2 = 1326/1398
+pj1 = 516/1398; pj2 = 589/1398; pj3 = 293/1398
+
+cat('Ei')
+(Ei = data.frame(
+  Carrier = c(N*pi1*pj1, N*pi1*pj2, N*pi1*pj3),
+  NonCarrier = c(N*pi2*pj1, N*pi2*pj2, N*pi2*pj3),
+  row.names = c("Norm", "Large", "V. Large")
+))
+
+cat('TS')
+(TS = data.frame((Oi - Ei)^2 / Ei))
+
+cat('p-value:', 1 - pchisq(sum(TS), 2))
+
+(Association = data.frame(
+  Association = c(sqrt(sum(TS)/N), 
+                  sqrt(sum(TS)/(N + sum(TS))), 
+                  sqrt(sum(TS)/(N + 1))),
+  row.names = c("Phi", "Contingency", "Cramer's V")
+))
+
+```  
+
+
+9)
+  a)  Although the p-value is very close to .05, there is not substantial evidence to conclude that the proportions of white and black death penatly proportions are different.
+
+```{r 9a, echo=FALSE, comment=NA, warning=FALSE}
+cat('Oi')
+(Oi = data.frame(
+  DP = c(19+11, 6),
+  No.DP = c(132+52, 9+97),
+  row.names = c("White", "Black")
+))
+
+N = 326
+pi1 = 36/N; pi2 = 290/N
+pj1 = 214/N; pj2 = 112/N
+
+cat('Ei')
+(Ei = data.frame(
+  DP = c(N*pi1*pj1, N*pi1*pj2),
+  No.DP = c(N*pi2*pj1, N*pi2*pj2),
+  row.names = c("White", "Black")
+))
+
+cat('TS')
+(TS = data.frame((Oi - Ei)^2 / Ei))
+
+cat('p-value:', 1 - pchisq(sum(TS), 2))
+
+(Association = data.frame(
+  Association = c(sqrt(sum(TS)/N), 
+                  sqrt(sum(TS)/(N + sum(TS))), 
+                  sqrt(sum(TS)/(N + 1))),
+  row.names = c("Phi", "Contingency", "Cramer's V")
+))
+
+```  
+
+  b) There is not enough evidence to conclude that there is a difference between white and black death sentence proportions.
+
+```{r 9b, echo=FALSE, comment=NA, warning=FALSE}
+cat('Oi')
+(Oi = data.frame(
+  DP = c(19, 11+6),
+  No.DP = c(132+9, 52+97),
+  row.names = c("White", "Black")
+))
+
+N = 326
+pi1 = 36/N; pi2 = 290/N
+pj1 = 160/N; pj2 = 166/N
+
+cat('Ei')
+(Ei = data.frame(
+  DP = c(N*pi1*pj1, N*pi1*pj2),
+  No.DP = c(N*pi2*pj1, N*pi2*pj2),
+  row.names = c("White", "Black")
+))
+
+cat('TS')
+(TS = data.frame((Oi - Ei)^2 / Ei))
+
+cat('p-value:', 1 - pchisq(sum(TS), 2))
+
+(Association = data.frame(
+  Association = c(sqrt(sum(TS)/N), 
+                  sqrt(sum(TS)/(N + sum(TS))), 
+                  sqrt(sum(TS)/(N + 1))),
+  row.names = c("Phi", "Contingency", "Cramer's V")
+))
+```  
+
+  c) There is not evidence to support that the ratio of dealth penalty sentences for whites and blacks are any different.
+
+```{r q9c, echo=FALSE, comment=NA, warning=FALSE}
+breslowday.test = function(x, OR=NA, printORi.s=TRUE){
+  ## function to compute the Breslow Day test of homogeneity
+  ## for a 2 by 2 by k table
+  ## x is a three dim array, 2x2xk
+  ## tests to see if all strata have the same OR
+  ## if OR is not given, the Mantel-Haenszel estimate is used.
+  if(is.na(OR)) {
+    OR = mantelhaen.test(x)$estimate
+    names(OR) = ""
+  } 
+  OR.i <- apply(x, 3,  function(x) x[1,1] * x[2,2] / x[1,2] /x[2,1])
+  k = dim(x)[3]
+  n11k = x[1,1,]
+  n21k = x[2,1,]
+  n12k = x[1,2,]
+  n22k = x[2,2,]
+  row1sums = n11k + n12k
+  row2sums = n21k + n22k
+  col1sums = n11k + n21k
+  Amax = apply(cbind(row1sums,col1sums),1,min)
+  ## Astar must be no more than col1sums and no more than row1sums
+  bb = row2sums +row1sums * OR - col1sums*(1-OR)
+  determ = sqrt(bb^2 + 4 * (1-OR) *  OR * row1sums * col1sums)
+  Astar = (-bb + cbind( -determ, determ))/ (2 -2*OR)
+  Astar = ifelse(Astar[,1] <= Amax & Astar[,1] >= 0, Astar[,1], Astar[,2])
+  ## print(Astar)
+  Bstar = row1sums - Astar
+  Cstar = col1sums - Astar
+  Dstar = row2sums - col1sums + Astar
+  Var = apply(1 / (.5+cbind(Astar,Bstar,Cstar,Dstar)), 1, sum)^(-1)
+  ## print(Var)
+  X2 = sum( (x[1,1,] - Astar)^2/Var )
+  pvalue = 1 - pchisq(X2,k-1)
+  if(printORi.s) {
+    out <- rbind(log(OR.i), 1/Var)
+    dimnames(out)[[1]] <- c("log OR","Weight")
+    print(out)
+  }
+  return(unlist(list(OR = OR, Stat = X2, df = k-1, pvalue = pvalue)))
+}
+## Useage:
+##  biomassTB.Salary = array(c(38,12,102,141,12,9,136,383),dim=c(2,2,2),dimnames=list(exposure=c("exposed","not"), disease=c("case","control"),salary=c("<1000",">=1000")))
+##  ORconfInterval( biomassTB.Salary)
+##Data:  biomassTB.Salary 
+##method               lower common odds ratio    upper confidence
+##  Woolf           2.351913          4.028269 6.899469       0.95
+##  Mantel-Haenszel 2.401977          4.158475 7.199451       0.95
+##  breslowday.test( biomassTB.Salary, 4.02)
+##           <1000    >=1000
+##log OR 1.4764666 1.3230622
+##Weight 0.1190846 0.1969553
+##        OR       Stat         df     pvalue 
+##4.15000000 0.07150466 1.00000000 0.78915846 
+
+dt = array(c(19,11,132,52,0,6,9,97), 
+           dim = c(2,2,2), 
+           dimnames = list(
+             race = c("white", "black"), 
+             penalty = c("DP", "NDP"), 
+             victims = c("White Victim", "Black Victim")))
+
+breslowday.test(dt)
+```
+
+  d)  All 3 tests were unable to support the evidence that the proportions and ratios between white and black death penalty sentences were any different, although when testing victims race only it was very close to meeting the alpha conditions and with more data it might prove to be significant.
+
+  
+

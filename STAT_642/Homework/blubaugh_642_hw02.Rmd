@@ -1,0 +1,244 @@
+---
+output:
+  pdf_document:
+    latex_engine: xelatex
+    highlight: pygments
+mainfont: Calibri Light
+sansfont: Calibri Light
+fontsize: 11pt
+geometry: margin=1in
+---
+
+**Homework 02**  
+**Joseph Blubaugh**  
+jblubau1@tamu.edu  
+**STAT 642-720**  
+
+\newpage
+
+1)
+  a)
+    1) Factor(s) 
+      - Fixture, Layout, Operator
+      
+    2) Factor Levels 
+      - Fixture: (F1, F2, F3), Fixed, crossed with Layout and Operator
+      - Layout: (L1, L2) Fixed
+      - Operator: (O1-O24) Random, nested with Layout
+      
+    3) Treatments
+      - 24:  L1-F1-O1, L1-F1-O2, L1-F1-O3, L1-F1-O4,    
+      L1-F2-O5, L1-F2-O6, L1-F2-O7, L1-F2-O8,     
+      L1-F3-O9, L1-F3-O10, L1-F3-O11, L1-F3-O12,     
+      L2-F1-O13, L2-F1-O14, L2-F1-O15, L2-F1-O16,     
+      L2-F2-O17, L2-F2-O18, L2-F2-O19, L2-F2-O20,     
+      L2-F3-O21, L2-F3-O21, L2-F3-O23, L2-F3-O24    
+      
+    4) Response
+      - Assembly time in seconds
+      
+    5) Experimental Units 
+      - Circuit Board
+      
+    6) Measurement Units 
+      - Circuit Board
+      
+    7) Replications 
+      - 2 per treatment
+      
+    8) Subsampling
+      - None
+      
+    9) Covariates 
+      - None
+      
+    10) Blocking 
+      - Layout
+      
+    11) Confounding
+      - Operator is Confounding with Layout, because no operators are shared accross the 2 layouts so you cant really tell if either layout is better because you cant account for the differences in the operators.
+      
+  b)
+    1) Method of Randomization:
+      - Balanced Incomplete Block Design: This experiment is a block design because of the limitation of using using the same operators at both layouts. It is incomplete because not all treatments appear in both blocks. It is balanced because the order the same number of treatments appear in each block, the same number of times.
+    2) Treatment Structure
+      - Nested Treatment Structure: Operator is nested in Layout since the operators are unique to the layout. Fixture is crossed with Operator because all Operators and Layouts interact with each fixture. Both Fixture and Layout are fixed and Operators are random
+    3) Measurement Structure
+      - Y = Assembly time in seconds, repeated measures, no covariates
+
+
+2)
+  a)
+    1) Factor(s)
+      - Infestation
+      - Weed Treatment
+      - Clipping
+    2) Factor Levels 
+      - Infestation (I1, I2, I3, I4)
+      - Weed Treatmene (W1, W2, W3)
+      - Clipping (C1, C2)
+    3) Treatments 
+      - 24 Treatments: I1-W1-C1, I1-W1-C2, I1-W2-C1, I1-W2-C2, I1-W3-C1, I1-W3-C2    
+      I2-W1-C1, I2-W1-C2, I2-W2-C1, I2-W2-C2, I2-W3-C1, I2-W3-C2     
+      I3-W1-C1, I3-W1-C2, I3-W2-C1, I3-W2-C2, I3-W3-C1, I3-W3-C2   
+      I4-W1-C1, I4-W1-C2, I4-W2-C1, I4-W2-C2, I4-W3-C1, I4-W3-C2   
+     
+    4) Response
+      - Cotton yield per sub plot 
+    
+    5) Experimental Units 
+      - Individual sub plot on a field
+    
+    6) Measurement Units 
+      - Cotton plants
+    
+    7) Replications 
+      - 2 Replications
+    
+    8) Subsampling
+      - None
+    
+    9) Covariates 
+      - There are no covariates specifically listed but a potential covariate is weather/climate differences
+    
+    10) Blocking 
+      - Plots are blocked by fields, and subplots are blocked by plots
+    
+    11) Confounding
+      - None
+    
+  b)
+    1) Method of Randomization
+      - Strip Plot Design: This is a strip plot design because it is not possible for every field to receive every treatment randomly. Possibly because of expense or the ability change or control factors is why the experiment is laid out this way so that each field is designated a fixed infestation level and then sub plots receive differing levels of weed treatment and clipping.  
+    2) Treatment Structure
+      - Factorial Treatment Structure: The 3 factors are all crossed with each other and none are nested. There are 24 total treatments
+    3) Measurement Structure
+      - Y = average yield per subplot of 200 cotton plants
+
+
+
+3.
+  a)
+    1) Factor(s) 
+      - Sweeteners
+      - Levening Agent
+      
+    2) Factor Levels 
+      - Sweeteners: (S1, S2, S3), crossed with L
+      - Levening Agent: (L1, L2), crossed with S
+      
+    3) Treatments 
+      - 6:  
+      S1-L1, S1-L2, S2-L1,   
+      S2-L2, S3-L1, S3-L2
+      
+    4) Response
+      - Taste Rating
+     
+    5) Experimental Units 
+      - Cakes
+     
+    6) Measurement Units 
+      - Cakes
+     
+    7) Replications 
+      - None
+     
+    8) Subsampling
+      - None
+     
+    9) Covariates 
+      - None
+     
+    10) Blocking 
+      - Day
+     
+    11) Confounding
+      - None
+    
+  b)
+    1) Method of Randomization
+      - Latin Square Design: This experiment uses the same Tasters and cake recipes and replicates the experiment 3 times on different day which are blocked. The order of cake is also randomized for each taster each day.
+    2) Treatment Structure
+      - Factorial Treatment Structure where Sweeteners and Levening are fully crossed and assigned randomly
+    3) Measurement Structure
+      - Y = individual taste rating by each Taster from a total of 108 observations, 36 per block
+
+
+
+4.
+  a)
+    1) Factor(s) 
+      - Method, fixed
+      - Section, fixed
+    
+    2) Factor Levels
+      - Method (M1, M2, M3)
+      - Section (S1, S2, S3, S4)
+    
+    3) Treatments 
+      - 12:  
+      S1-M1, S1-M2, S1-M3,  
+      S2-M1, S2-M2, S2-M3,  
+      S3-M1, S3-M2, S3-M3,
+      S4-M1, S4-M2, S4-M3  
+      
+    4) Response
+    - Average score for each test per section
+    
+    5) Experimental Units 
+    - Student
+    
+    6) Measurement Units 
+    - Student Test Score
+    
+    7) Replications 
+    - 2 per treatment: In each Period two students should get the same test method from each section
+    
+    8) Subsampling
+    - None
+    
+    9) Covariates 
+    - None listed, but the ability of the students could be an impact
+    
+    10) Blocking 
+    - Section
+    - Period
+    
+    11) Confounding
+    - Section is confounding with method. Some instructors may have teaching styles that prepare students to do better with certain methods of exams and so there is no way to tell whethere the test method or the teacher has the impact on the students performance.
+    
+  b)
+    1) Method of Randomization
+      - Split Plot Design: It is not possible or is impractical to completely randomize all treatments so the testing methods are randomly assigned each period on each fixed section
+      
+    2) Treatment Structure
+      - Factorial Treatment Structure where both factors are fixed. Method and Section are fully crossed.
+    
+    3) Measurement Structure
+      - Y = average test score per student per method from 72 observations
+
+5. Salt water animals can be very sensitive to temperature and salinity In both designs the aquarium must be a block because the temperature and salinity factors, while fixed, are ultimately approximate and cant be measured exactly. The number of reps  will therefore be equal to the number of shrimp for each treatment per block since the treatments will be unique per block.  
+The advantage of going with the first setup where the tanks are partioned is that you will get exactly the same temperature and salinity in the tank which will account for the variability of temp and salt in other tanks. You can ensure that small changes in salt and temperature in each tank will affect all shrimp in each tank.  The other advantage to using the partition design is that you get to observe more observations. A negative of the partition design is that you may not be able to account for the amount of food in each partition since the water is cycled through the entire tank.  
+The advantage of using seperate tanks is that you eliminate the possible covariate of differing amounts of food going to the two densities of shrimp. On the other hand you can ensure that the differing tanks have the exact same temperature and salinity. On top of that, since you cant partition the tank you only have half of observations per treatment.  
+Considering all of those factors, I would go with the design with split tanks on the next page vs the independent tank design.
+
+
+![]("design.png")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

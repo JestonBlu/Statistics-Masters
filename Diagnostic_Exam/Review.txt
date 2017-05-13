@@ -1,0 +1,123 @@
+2015 JAN
+----------------------------------------------
+  1)  - Anova table, EMS, DF
+      - Construct Linear Model
+      - Hypothesis Test from MS
+      - Proportional Variance
+      - Standard Error from estimates
+      - Standard Error from difference in estimates
+  2)  - Presented with Data and distribution plots
+      - Provide 95% Confidence Interval
+      - Explain using simulation to determine the sampling distribution
+      - Provide CI from pivot results
+      - Determine significance based on previous study
+  3)  - Linear Regression: Write interpretations of coefficients
+      - Derive expressions for mean response
+      - Hypothesis of test for equal slopes
+      - Effects: Simple, Main, Interaction
+
+2014 AUG
+----------------------------------------------
+  1)  - Experiment Description: Provide Structure Components
+      - Complete Anova table for DF and EMS
+      - Write a statistics model from the data
+      - Match situations to correct test
+  2)  - Linear Regression
+      - Use matrix calculations to compute β, σ, SE(βᵢ)
+      - Compute CI and PI for a predicted value
+  3)  - Binomial probability for proportion comparison
+      - Hypothesis test for true proportion
+      - Mid P-value test
+      - 95% confidence interval
+  4)  - Regression Output
+      - Diagnose issues with model
+      - Suggest improvements
+
+2014 JAN
+----------------------------------------------
+  1)  - Experiment Description: Provide Structure Components
+      - Match situations to correct test
+  2)  - Linear Regression: Interpret Parameters
+      - Hypothesis test of overall model
+      - Examine diagnostic plots
+      - Assumptions for a linear model
+  3)  - Identify distribution of random variables
+      - Derive constants associated with variables to for specific distribution
+      - **Fractional constants**
+  4)  - Explain linear in linear regression
+      - Define least squares properties
+      - Assumptions for biased estimators
+      - Assumptions for LSE
+      - Assumptions for valid F test
+
+2013 AUG
+----------------------------------------------
+  1)  - Categorical - Chi Squared Test
+      - Odds Ratio Test
+      - Conditional Dependence Test
+      - Simpsons Paradox
+  2)  - Logistic Regression
+      - Write Likelihood function
+      - Calculate maximum likelihood
+      - Likelihood ratio test
+      - Calculate probability for logistic regression output
+      - Calculate CI for the odds ratio
+  3)  - Linear Regression: Interpret equation
+      - Validity of models based on output and plots
+  4)  - Write equation based on description
+      - Conditions for testing hypothesis: Normality, Equal σ^2 , Independence
+      - Construct Anova table, DF, EMS
+      - Compute p value from MS
+      - Group factor levels together based on significant interactions
+      - Calculated Standard Error of estimates from EMS
+      - Provide Confidence around mean
+
+2013 JAN
+----------------------------------------------
+  1)  - Linear Model: Interpret model parameters
+      - Construct CI for difference in coefficients
+  2)  - Poisson Distribution CI
+      - Chi-squared goodness of fit interpretation, df
+      - Linear model output, interpret plots
+  3)  - Dummy variable regression, design effects model
+      - Interpret log coefficients in models
+  4)  - Conditions for testing hypothesis: Normality, Equal σ^2 , Independence
+      - Write equation and conditional parameters
+      - Significant effects
+      - Calculate standard error of estimates, SAS and manual
+      - Group not significantly different
+
+2012 AUG
+----------------------------------------------
+  1)  - Linear Model, interpret coefficients
+      - Model assumptions
+      - Confidence Interval calculation, CI of mean differences
+  2)  - Derive Least Squares, formula and words
+      - Derive Least Squares for intercept model
+  3)  - Validity of a model based on plots
+      - Logistic Regression
+      - Calculated Odds, odds ratio
+      - Test for model reduction
+  4)  - Conditions for testing hypothesis
+      - Test of equal variance
+      - Construct linear model equation
+      - Effects main and interaction significance
+      - Compute standard error difference in mean
+      - Group insignificant differences
+      - Confidence interval for specific levels
+
+2012 JAN
+----------------------------------------------
+  1)  - Weibull model, reference plot
+      - Goodness of Fit Anderson Darling
+      - Maximum Likelihood from SAS output
+      - Distribution Free
+  2)  - Model assumptions
+      - Which effects are significant
+      - Group insignificant variables
+      - Provide CI for specific levels
+      - Identify sums of squares
+  3)  - Identify distributions from standard normal variables
+      - Identify constants to fit certain distributions
+  4)  - Linear regression
+      - Derive expectation and variance of β fro

@@ -1,0 +1,117 @@
+---
+output:
+  pdf_document:
+    latex_engine: xelatex
+    highlight: pygments
+mainfont: Calibri Light
+sansfont: Calibri Light
+fontsize: 11pt
+geometry: margin=1in
+---
+
+**Homework 01**  
+**Joseph Blubaugh**  
+jblubau1@tamu.edu  
+**STAT 641-720**  
+
+\newpage
+
+1. Two major problems of the initial o-ring analysis were:
+    - The engineers only displayed data from launch failures instead of data from all launches and therefore left out relevant data related to oring failues and temperature
+    - The second problem is that there were no data for launches where the launch time temperature were below 51 degrees. An extrapolation would be required outside of the range of observations which is dangerous.
+
+2. One of the most frequent misinterpretations of statistical findings is when 2 variables are found to have a statisticalyl significant relationship and it is concluded that the explanatory variables causes the change in the response variable.
+
+3.   
+    Study 1: Evaluating the risk of myocardial infarction and/or death from coronary heart disease after discontinuation of low dose aspirin  
+         1. Observational Study  
+         2. Description Study  
+
+    Study 2: Assess the best method for collection money for a fund raising campaign  
+         1. Observational Study  
+         2. Comparative Study  
+         3. The explanatory variable is the method of contact, either by phone or in person, the response variable is the money raised from each person
+
+    Study 3: Researcher randomly selects deer and determines the proportion of deer with ticks  
+         1. Observational Study  
+         2. Description Study  
+
+    Study 4: Conducts a survey to see if students are marijuana smokers, records whether the student is academically successful or not  
+         1. Observational Study  
+         2. Comparative Study  
+         3. The explanatory variable is whether the student smokes marijuana or not, the response variable is whether the student is academically successful or not
+
+4.  
+    a)  Systematic Random Sampling
+    b)  Simple Random Sample
+    c)  Stratified Random Sample
+    d)  Multistage Cluster Sample 
+
+5.  
+    a)  We want to be sure that every stratum is represented because different job categories may tend to connect with different types of devices. A Stratified Random Sample would be appropriate.
+    b)  Systematic Random Sampling would be appropriate because it would ensure that all data are not collected from patients entering the emergency room for the same incident.
+    c)  Since some ethnic groups may have similar last nights, Systematic Random Sampling would be appropriate if the list were in alphabetical order that way it would increase the chances of all ethnic groups being represented.
+    d)  A Multistage Cluster Sample would be appropriate since each school is a cluster of students. A random sample of clusters can be chosen, and for each cluster/school chosen, a random sample of students can be chosen in which to survey.
+
+6.  
+    - The largest source of variation appears to be in the specimen within the operation, S(O)
+    - The smallest source of variation appears to be A(R,S,O)
+
+```{r chem, fig.height=4, echo = F}
+###########################################################
+##  R Code                                               ##
+###########################################################
+
+run = seq(1,18)
+Res = c(137.75, 138.75, 137.50, 147.75, 147.25, 147.50,
+    148.25, 149.75, 147.50, 137.75, 138.55, 139.20,
+    167.50, 159.25, 163.75, 123.75, 125.75, 119.50)
+spec =  seq(1,6)
+
+plot(run, Res, type = "p", xlab = "Specimen", ylab = "Chemical Level",
+    main = "Variation Due Only to S(O)", cex=.99,
+    ylim = c(100,200), xaxt = "n")
+
+segments(0.75,136.6,3.25,136.6); segments(0.75,140,3.25,140)
+segments(0.75,136.6,0.75,140); segments(3.25,136.6,3.25,140)
+segments(3.75,142.5,6.25,142.5); segments(3.75,150,6.25,150)
+segments(3.75,142.5,3.75,150); segments(6.25,142.5,6.25,150)
+segments(6.75,145,9.25,145); segments(6.75,152,9.25,152)
+segments(6.75,145,6.75,152); segments(9.25,145,9.25,152)
+segments(9.75,135,12.25,135); segments(9.75,145,12.25,145)
+segments(9.75,135,9.75,145); segments(12.25,135,12.25,145)
+segments(12.75,155,15.25,155); segments(12.75,170,15.25,170)
+segments(12.75,155,12.75,170); segments(15.25,155,15.25,170)
+segments(15.75,115,18.25,115); segments(15.75,130,18.25,130)
+segments(15.75,115,15.75,130); segments(18.25,115,18.25,130)
+
+axis(side=1,at=c(2,5,8,11,14,17),labels=c(1,2,3,4,5,6))
+segments(0,147.8,19,147.8)
+
+```
+
+7.  D. Stratified Simple Random Sample
+8.  E. Multistage Cluster Random Sample
+9.  A. Stratified Cluster Random Sample
+10.  D. Stratified Cluster Random Sample 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

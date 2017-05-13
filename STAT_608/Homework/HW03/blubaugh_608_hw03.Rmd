@@ -1,0 +1,203 @@
+---
+output:
+  pdf_document:
+    latex_engine: xelatex
+    highlight: pygments
+mainfont: Calibri Light
+sansfont: Calibri Light
+fontsize: 11pt
+geometry: margin=1in
+---
+
+**Homework 03**  
+**Joseph Blubaugh**  
+jblubau1@tamu.edu  
+**STAT 608-720**  
+
+\newpage
+
+
+1.  The sum of the errors would be equal to 0 because the design matrix is not full rank. 
+
+2. 
+\begin{displaymath}
+\begin{bmatrix}
+ y_1 \\
+ y_2 \\
+ y_3 \\
+ y_4 \\
+\end{bmatrix}
+\mathbf{=} 
+\begin{bmatrix}
+ 1 & 0 & 0 \\
+ 1 & 1 & 1 \\
+ 1 & 1 & 0 \\
+ 1 & 0 & 1 \\
+\end{bmatrix}
+\mathbf{+}
+\begin{bmatrix}
+ B_0 \\
+ B_a \\
+ B_b \\
+\end{bmatrix}
+\mathbf{+}
+\begin{bmatrix}
+ e_1 \\
+ e_2 \\
+ e_3 \\
+ e_4 \\
+\end{bmatrix}
+\end{displaymath}
+
+3.  
+    a)  $y_i = a_1 x_1 + a_2 x_2 + e_i$, $x_1$ and $x_2$ are dummy variables where their values are limited to 1 or 0.  Also when $x_1 = 1$, $x_2 = 2$ and when $x_1 = 0$, $x_2 = 1$. The linear model is set up as:
+\begin{displaymath}
+\begin{bmatrix}
+ y_1 \\
+ y_2 \\
+ y_3 \\
+ y_4 \\
+ y_n \\
+\end{bmatrix}
+\mathbf{=}
+\begin{bmatrix}
+ 1_1 & 0_1         \\
+ 1_2 & 0_2         \\
+ 1_m & 0_m         \\
+ 0_{m+1} & 1_{m+1} \\
+ 0_{n} & 1_{n}   \\
+\end{bmatrix}
+\mathbf{+}
+\begin{bmatrix}
+ a_1 \\
+ a_2 \\
+\end{bmatrix}
+\mathbf{+}
+\begin{bmatrix}
+ e_1 \\
+ e_2 \\
+ e_3 \\
+ e_4 \\
+ e_n \\
+\end{bmatrix}
+\end{displaymath}
+
+    b)  
+
+\begin{displaymath}
+x'x =
+\begin{bmatrix}
+ \sum_{i=1}^{m} 1_i & 0   \\
+ 0 & \sum_{i=m+1}^{n} 1_i \\
+\end{bmatrix}
+(x'x)^{-1} =
+\begin{bmatrix}
+ \frac{1}{\sum_{i=1}^{m} 1_i} & 0   \\
+ 0 & \frac{1}{\sum_{i=m+1}^{n} 1_i} \\
+\end{bmatrix}
+\end{displaymath}
+
+\begin{displaymath}
+ x'y =
+\begin{bmatrix}
+ 1_1 & 1_2 & 1_m & 0_{m+1} & 0_{n} \\
+ 0_1 & 0_2 & 0_m & 1_{m+1} & 1_{n} \\
+\end{bmatrix}
+\begin{bmatrix}
+ y_1 \\
+ y_2 \\
+ y_3 \\
+ y_4 \\
+ y_n \\
+\end{bmatrix}
+=
+\begin{bmatrix}
+ \sum_{i=1}^{m} 1_i   \\
+ \sum_{i=m+1}^{n} 1_i \\
+\end{bmatrix}
+\end{displaymath}
+
+\begin{displaymath}
+(X'X)^{-1} X'Y =
+\begin{bmatrix}
+ a_1 \\
+ a_2 \\
+\end{bmatrix}
+\end{displaymath}
+
+\begin{align*}
+    a_1 &= \frac{1}{\sum_{i=1}^{m} 1_i} \big ( \sum_{i=1}^n y_i - \sum_{i=m+1}^{n-m} y_i \big ) = \bar{y} \\
+    a_2 &= \frac{1}{\sum_{i=m+1}^{n} 1_i} \big ( \sum_{i=1}^n y_i - \sum_{i=1}^{m} y_i \big ) = \bar{y}   \\
+\end{align*}
+
+
+4.  
+    a)
+\begin{displaymath}
+\begin{bmatrix}
+ y_1 \\
+ y_2 \\
+ y_3 \\
+ y_4 \\
+\end{bmatrix}
+\mathbf{=}
+\begin{bmatrix}
+ 1 & 0 \\
+ 0 & 1 \\
+ 1 & 1 \\
+ 1 & 1 \\
+\end{bmatrix}
+\mathbf{+}
+\begin{bmatrix}
+ B_1 \\
+ B_2 \\
+\end{bmatrix}
+\mathbf{+}
+\begin{bmatrix}
+ e_1 \\
+ e_2 \\
+ e_3 \\
+ e_4 \\
+\end{bmatrix}
+\end{displaymath}
+
+\begin{align*}
+        \hat{B} &= (X'X)^{-1} X'Y \\
+                              \\
+            X'X &= \begin{bmatrix} 3 & 2 \\ 2 & 3 \end{bmatrix} \\
+     (X'X)^{-1} &= \begin{bmatrix} \frac{3}{5} & \frac{-2}{5} \\ \frac{-2}{5} & \frac{3}{5} \end{bmatrix} \\
+            X'Y &= \begin{bmatrix} y_1 + y_3 + y_4 \\ y_2 + y_3 + y_4 \end{bmatrix} \\
+ (X'X)^{-1} X'Y &= \begin{bmatrix} \frac{3}{5} & \frac{-2}{5} \\ \frac{-2}{5} & \frac{3}{5} \end{bmatrix} \begin{bmatrix} y_1 + y_3 + y_4 \\ y_2 + y_3 + y_4 \end{bmatrix} \\
+        \hat{B} &= \begin{bmatrix} \frac{3y_1 - 2y_2 + y_3 + y_4}{5} \\ \frac{2y_1 + 3y_2 + y_3 + y_4}{5} \end{bmatrix} \\
+\end{align*}
+
+    b)  This makes some sense because for $B_1$, coin 1 is not on the scale for observation $y_2$ so the weight should be less for that specific parameter.  For $B_2$, coin 2 is not on the scale for $y_1$ so the weight should be less than $B_1$.  For obserations $y_3$ and $y_4$, both coins are on the scale and the weights should be even.  The denominator of 5 makes sense because it is the outcome of taking the inverse of X'X. 
+
+5.  (d).  SSReg is the value of variance in y that can be explained by a model while the RSS is the value of the variance in the model errors and is difference between total variance and explained variance. The first graph which is the tighter looking model will have a larger SSReg and a lower RSS than the second model because of the distance between the regression line and the individual points.
+
+6.  
+    a)  For $(y_i - \hat{y}) = (y_i - \bar{y}) - \hat{\beta_1}(x_i - \bar{x})$, 
+\begin{align*}
+    \hat{\beta_1} &= \frac{(x_i - \bar{x}) (y_i - \bar{y})}{(x_i - \bar{x})^{2}} \\
+    (y_i - \hat{y}) &= (y_i - \bar{y}) - \frac{(x_i - \bar{x}) (y_i - \bar{y})}{(x_i - \bar{x})^{2}} (x_i - \bar{x})\\
+\end{align*}
+
+    b) For $(\hat{y_i} - \bar{y}) = \hat{\beta_1} (x_i - \bar{x})$
+\begin{align*}
+    \hat{\beta_1} &= \frac{(x_i - \bar{x}) (y_i - \bar{y})}{(x_i - \bar{x})^{2}} \\
+    (\hat{y_i} - \bar{y}) &= \frac{(x_i - \bar{x}) (y_i - \bar{y})}{(x_i - \bar{x})^{2}} (x_i - \bar{x}) \\
+    (\hat{y_i} - \bar{y}) &= (y_i - \bar{y}) \\
+\end{align*}
+
+7.
+    a)  The t-statistic will have a normal distribution if the assumption that the errors are normally distributed with a mean of 0 is true.  The t distribution has a normal curve and is centered at 0 so there also must be an equal variance of errors. Erros must also be independent or the t-statistic may not be accurate.  
+
+    b)  As the sample size gets larger the t distribution coverges on the normal distribution and error independence becomes less important.
+
+8.
+\begin{align*}
+      \sum &= E \Big [ (x - \mu)(x - \mu)^{T} \Big ] = 0    \\
+         0 &= E[x] E[x]' - E[x] \mu' - \mu E[x]' + \mu \mu' \\
+  \mu \mu' &= E[x] E[x]'                                    \\
+  \mu \mu' &= E[xx']
+\end{align*}

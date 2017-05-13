@@ -1,0 +1,51 @@
+---
+output:
+  pdf_document:
+    latex_engine: xelatex
+    highlight: pygments
+mainfont: Calibri Light
+sansfont: Calibri Light
+fontsize: 11pt
+geometry: margin=1in
+---
+
+**Homework 09**  
+**Joseph Blubaugh**  
+jblubau1@tamu.edu  
+**STAT 608-720**  
+
+\newpage
+
+1)
+
+a)
+\begin{align*}
+    log(\frac{\theta(x)}{1 - \theta(x)}) &= \beta_0 + \beta_1 x         \\
+    (\frac{\theta(x)}{1 - \theta(x)}) &= exp(\beta_0 + \beta_1 x )      \\
+    \theta(x) &= \frac{exp(\beta_0 + \beta_1 x)}{1 + exp(\beta_0 + \beta_1 x)} \\
+\end{align*}
+
+b)
+\begin{align*}
+    \theta(x) &= \frac{exp(\beta_0 + \beta_1 x)}{1 + exp(\beta_0 + \beta_1 x)} \\
+    \theta(x) &= \frac{1}{1 + exp(-(\beta_0 + \beta_1 x))} \\
+\end{align*}
+
+
+
+2) We might be interested in tranforming the predictor variables in a logistic regression in order get a linear relationship between the predictor variables and log(odds). using log on the predictor variables would enable the interpretation of percent changes.
+
+
+
+3) 
+
+a) & b)
+\begin{align*}
+    Z = Bin(n, p) = P(Z = z) &= {n \choose z} p^z (1 - p)^{n - z}   \\
+    n = 1: P(Z = z) &= p^z (1 - p)^{n - z}                          \\
+    z = 0: P(Z = 0) &= (1 - p)                                      \\
+    z = 1: P(Z = 1) &= p (1 - p)^{1 - z}                            \\
+                                                                    \\
+    log(\frac{\theta(x)}{1 - \theta(x)}) &= log(\frac{P(Y=1)}{P(Y=0)}) + log(\frac{P(X=x | Y=1)}{P(X=x | Y=0)}) \\ &= log(\frac{p_1}{p_0}) + log(\frac{p_1 (1 - p_1)^{1-z}}{(1 - p_0)}) \\
+    &= \beta_0 + \beta_1 x \\
+\end{align*}

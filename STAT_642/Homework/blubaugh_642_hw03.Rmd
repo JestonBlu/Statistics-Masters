@@ -1,0 +1,365 @@
+---
+output:
+  pdf_document:
+    fig_height: 4
+    highlight: pygments
+    latex_engine: xelatex
+mainfont: Calibri Light
+sansfont: Calibri Light
+fontsize: 12pt
+geometry: margin=1in
+---
+
+**Homework 03**  
+**Joseph Blubaugh**  
+jblubau1@tamu.edu  
+**STAT 642-720**  
+
+\newpage
+
+1)
+  a)
+    i) Designed Experiment: create a random permutation of the experimental units and assign it to the treatments so that each treatment has the same number of experimental units
+    ii) Observational Experiment: you cannot randomly assign treatments to experimental units in this case so either treatment groups or charateristic group have to be formed where each unit as an equal chance of being selected. The randomization will hold true only within in individual groups.  
+  b)
+    i) $\mu_i$ is the mean response for the ith treatment
+    ii) $\beta$ is the Best Linear Unbiased Estimator
+  c) $e_ij$ are iid random variables with a normal distribution
+  d) You can do an F-Test to test of the Reduced Model vs. the Full Model
+
+2) 
+  a) The power of the test is 0.946295
+```{r q2a, comment=NA}
+mu_hat = 1/21 * (90*4 + 100*5 + 120*3 + 110*5 + 80*4)
+lambda = (4*(90 - mu_hat)^2 + 
+            5*(100 - mu_hat)^2 + 
+            3*(120 - mu_hat)^2 + 
+            5*(110 - mu_hat)^2 + 
+            4*(80 - mu_hat)^2) / 150
+F_stat = qf(.95, 4, 16)
+1 - pf(F_stat, 4, 16, lambda)
+
+
+```
+
+  b) We would need at least 17 chickens per treatment to detect the difference
+```{r q2b, comment=NA, echo=TRUE}
+
+r = 2:20; t = 5; u1 = t - 1; u2 = t * (r - 1); S = 150; D = 20 
+L = (r * D^2) / (2 * S); phi = sqrt(L/t)
+
+data.frame(
+  Treaments = t,
+  Reps = r,
+  DF.1 = u1,
+  DF.2 = u2,
+  Lambda = round(L, 3),
+  Phi = round(phi, 3) ,
+  Power = round(1 - pf(qf(.99, u1, u2), u1, u2, L), 3)
+)
+
+```
+
+
+3)
+  a)  
+
+```{r q3a, echo=FALSE, comment=NA}
+library(ggplot2)
+
+treatments = 3
+reps = 5
+variance = 12
+df = treatments * (reps - 1)
+D = seq(0, 15, 1)
+Lambda = (D^2 * reps * treatments) / variance^2
+Power = 1 - pf(qf(.95, treatments - 1, df), treatments - 1, df, Lambda)
+qplot(Lambda, Power, geom = 'line', main = 'Power Curve', xlab = "Lambda", ylab = "Power")
+
+```
+
+  b) The engineer would need 26 intersections
+
+```{r q3b, comment=NA}
+reps = 10:27
+treatments = 3
+alpha = .05
+variance = 12
+u1 = 16
+u2 = 17
+u3 = 19
+mean_u = (u1 + u2 + u3) / treatments
+Lambda = reps * ( (u1 - mean_u)^2 + (u2 - mean_u)^2 + (u3 - mean_u)^2 ) / variance
+df.1 = treatments - 1
+df.2 = treatments * (reps - 1)
+F.stat = qf(1 - alpha, df.1, df.2)
+Power = 1 - pf(F.stat, df.1, df.2, Lambda)
+
+data.frame(
+  reps = reps,
+  df.1 = df.1,
+  df.2 = df.2,
+  F.stat = F.stat,
+  Lambda = Lambda,
+  Power = Power
+)
+
+```
+
+4) 
+  a) Cell Means Model: $Y_{ij} = u_i + e_{ij};  i = {1, 2, 3}; j = 1, ..., n; n = \sum_{i=1}^t n_i$
+
+\begin{displaymath}
+Y = 
+\begin{bmatrix}
+y_{1,1}  \\
+y_{1,2}  \\
+...      \\
+y_{1,12} \\
+y_{2,1}  \\
+y_{2,2}  \\
+...      \\
+y_{2,14} \\
+y_{3,1}  \\
+y_{3,2}  \\
+...      \\
+y_{3,11} \\
+\end{bmatrix}
+X = 
+\begin{bmatrix}
+1 & 0 & 0 \\
+1 & 0 & 0 \\
+. & . & . \\
+1 & 0 & 0 \\
+0 & 1 & 0 \\
+0 & 1 & 0 \\
+. & . & . \\
+0 & 1 & 0 \\
+0 & 0 & 1 \\
+0 & 0 & 1 \\
+. & . & . \\
+0 & 0 & 1 \\
+\end{bmatrix}
+\beta = 
+\begin{bmatrix}
+25.2 \\
+32.6 \\
+28.1 \\
+\end{bmatrix}
+e = 
+\begin{bmatrix}
+e_{1,1}  \\
+e_{1,2}  \\
+...      \\
+e_{1,12} \\
+e_{2,1}  \\
+e_{2,2}  \\
+...      \\
+e_{2,14} \\
+e_{3,1}  \\
+e_{3,2}  \\
+...      \\
+e_{3,11} \\
+\end{bmatrix}
+\end{displaymath}
+
+  b) We can conclude that there is not a significant difference in the means
+
+```{r q4b, comment=NA}
+
+u1 = 25.2; u2 = 32.6; u3 = 28.1
+n1 = 12; n2 = 14; n3 = 11
+s1 = 3.6; s2 = 4.8; s3 = 5.3
+
+mu = ( 1 / (n1 + n2 + n3)) * (n1*u1 + n2*u2 + n3*u3)
+se = ( 1 / (n1 + n2 + n3)) * (n1*s1^2 + n2*s2^2 + n3*s3^2)
+
+lambda = ( n1*(u1-mu)^2 + n2*(u2-mu)^2 + n3*(u3-mu)^2 ) / se 
+
+1 - pf(qf(.99, 2, 34), 2, 34, lambda)
+
+```
+
+5)
+  a) $\tau_4 = -\frac{1}{3} \sum_{i=1}^{t-1} n_i \tau_i = -\frac{1}{3} (6(-2.3) + 3(-1.7) + 5(1.8)) = 3.3$
+  b) Randomizing the mice to the treatments will minimize any bias that might occur from differences in the mice
+  c) There is only one sample of paint from each manufacturer and each manufacturer might have provided only their best paint so the experiment can only measure the effectiveness of the single batch instead of the effectiveness of several paint samples
+  d) Answer: (c) $\tau_1$ is the difference between the model mean and the mean of P5 because in SAS, by default the last treatment has a coefficient of 0, meaning the model $\mu$ is its coefficient, so Pl is 2.3 less than P5.
+  e) At least 6 samples per treatment are required
+
+```{r q5e, comment=NA}
+
+r = 2:6; t = 5; u1 = t - 1; u2 = t * (r - 1); S = 2; D = 5.1 
+L = (r * D^2) / (2 * S); phi = sqrt(L/t)
+
+data.frame(
+Treaments = t,
+Reps = r,
+DF.1 = u1,
+DF.2 = u2,
+Lambda = round(L, 3),
+Phi = round(phi, 3) ,
+Power = round(1 - pf(qf(.99, u1, u2), u1, u2, L), 3)
+)
+
+
+```
+
+```{r q67, echo=FALSE, comment=NA}
+
+data = data.frame(
+  T10 = c(7.2, 7.8, 7.1, 7.9, 8.1, 8.8, 8.3, 8.9, 9.3, 9.8),
+  T15 = c(8.1, 8.1, 8.0, 8.9, 8.2, 8.9, 8.1, 8.8, 9.2, 9.9),
+  T20 = c(9.0, 9.9, 9.2, 9.8, 10.0, 10.8, 10.2, 10.7, 9.9, 9.0),
+  T25 = c(9.2, 9.8, 9.1, 9.9, 10.1, 10.8, 10.3, 10.9, 9.3, 9.8),
+  T30 = c(10.2, 10.8, 10.1, 10.9, 11.1, 11.8, 11.3, 11.9, 9.3, 9.9))
+
+
+####################################################
+library(reshape2)
+reg.data = melt(data)
+
+colnames(reg.data) = c("Temp", "E.Coli")
+reg.data$Temp = gsub(pattern = "T", replacement = "", x = reg.data$Temp)
+
+poly = contr.poly(n = 5)
+mu = colMeans(data)
+contrasts = poly * mu
+colSums(contrasts)
+
+mdl = lm(E.Coli ~ 0 + Temp, data = reg.data, contrasts = contr.poly(n = 5, scores = c(10, 15, 20, 25, 30), contrasts = TRUE))
+
+a = aov(mdl)
+
+
+mat = matrix(c(1/5, 1/5, 1/5, 1/5, 1/5), ncol = 1)
+
+mat = cbind(mat, poly)
+
+solve(t(mat))
+
+```
+
+6)
+  a) C1 is not mutually orthogonal with the other constrasts. At most there can be t-1 mutually othogonal contrasts, but C1 is specific and we have to weight T30 against the other Temps so we really have t=4 and the 3 available mutually othgonal contrasts can be applied to C2, C3, and C4.
+  b)
+  
+| Parameter   | Estimate |Standard Error | t Value | Pval  | 
+|-------------|----------|---------------|---------|-------|
+|T30 vs Other | 6.21     |1.034          | 6.00    | <.0001| 
+|Linear       |6.12      |0.731          |8.37     |<.0001 |
+|Quadratic    |-0.14     |0.865          |-0.16    |0.8722 |
+|Cubic        | -0.19    |0.731          |-0.26    |0.7962 |
+
+
+  c) We have evidence to support all of the contrasts are not equal to 0
+  
+```{r q6c}
+library(knitr)
+
+Con = data.frame(
+  C1 = c(-1, -1, -1, -1, 4),
+  C2 = c(-2, -1, 0, 1, 2),
+  C3 = c(2, -1, -2, -1, 2),
+  C4 = c(-1, 2, 0, -2, 1)
+)
+
+n = 10; t = 5
+Dh = data.frame(Dh = colSums(Con^2 / n))
+Sh = (1.141542*sqrt((t - 1)* qf(.95, 4, 45))) * Dh
+colnames(Sh) = "Sh"
+Ch = data.frame( Ch = abs(colSums(c(6.21, 6.12, -.14, -.19) * Con)))
+Con.t = t(Con)
+colnames(Con.t) = c(1,2,3,4,5)
+
+Scheffe = cbind(Con.t, Dh, Sh, Ch)
+
+kable(Scheffe)
+
+```
+  
+  d) For Bonferroni we have to divide the significance level by M = 4 so the actual alpha we are looking for is $\alpha = .0125$. From the table in 6a, both the T30 vs Other and Linear Contrasts are still significant.
+  
+  e) There is not significant evidence that the 3 contrasts are not equal to 0
+  
+```{r q6e, echo=FALSE, comment=NA}
+library(MASS)
+
+H = matrix(c(-1, -1, -1, -1, 4, 
+             -2, -1, 0, 1, 2, 
+             2, -1, -2, -1, 2, 
+             -1, 2, 0, -2, 1),
+           nrow = 4, byrow = TRUE)
+
+muhat = matrix(c(8.32, 8.62, 9.85, 9.92, 10.73 ), nrow = 5)
+h = matrix(c(0,0,0,0), nrow = 4)
+x = rep(4,5)
+D = diag(x, 5, 5)
+A = H %*% muhat - h
+Dinv = solve(D)
+Cinv = solve(H %*% Dinv %*% t(H))
+SSH = t(A) %*% Cinv %*% A
+MSE = 9.9447
+
+
+1 - pf((SSH/4) / MSE, df1 = 4, df2 = 45)
+
+```
+  
+  f) There is a clear linear trend between Temperature and the detected E-Coli levels. A measure of correlation returns .76 which is a strong trend. The trend is easily detected with a simple plot.
+  
+```{r q6f, echo=FALSE, comment=NA}
+library(ggplot2)
+qplot(x = as.numeric(reg.data$Temp), y = as.numeric(reg.data$E.Coli),
+      main = "Temperature vs. E-Coli Levels") +
+  geom_smooth(method = "lm")
+```
+  
+7)
+  
+  a) Temperate at 10 degrees has the lowest Ecoli Concentration
+  
+|Temp   | Est  | LSMEAN 95% Confidence Limits |
+|-------|------|:----------------------------:|
+|T10    | 8.32 |7.85, 8.78                    |
+|T15    | 8.62 |8.15, 9.08                    |
+|T20    | 9.85 |9.38, 10.31                   |
+|T25    | 9.92 |9.45, 10.38                   |
+|T30    | 10.73| 10.26, 11.19                 |  
+
+  b) All of the temperature levels have a mean E-Coli concentration below the mean of the E-coli concentration at 30 degrees
+  
+  c) Different Pairs using the Tukey method: (1 & 3), (1 & 4), (1 & 5) (2 & 3), (2 & 4), (2 & 5)
+
+Least Squares Means for effect Temp Pr > |t| for H0: LSMean(i)=LSMean(j)
+
+|   |   1   |    2   |    3   |    4   |   5    |
+|---|-------|--------|--------|--------|--------|
+| 1 |       | 0.8888 | 0.0002 | 0.0001 | <.0001 | 
+| 2 |0.8888 |        | 0.0042 | 0.0022 | <.0001 | 
+| 3 |0.0002 | 0.0042 |        | 0.9995 | 0.0713 | 
+| 4 |0.0001 | 0.0022 | 0.9995 |        | 0.1143 | 
+| 5 |<.0001 | <.0001 | 0.0713 | 0.1143 |        | 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

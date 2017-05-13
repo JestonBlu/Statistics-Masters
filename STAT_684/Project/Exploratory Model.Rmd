@@ -1,0 +1,202 @@
+---
+title: "Hornfly Analysis Exploratory Model"
+author: "Joseph Blubaugh"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  pdf_document:
+    latex_engine: xelatex
+    highlight: pygments
+mainfont: DejaVu Sans Mono
+sansfont: DejaVu Sans Mono
+fontsize: 9pt
+geometry: margin=.75in
+---
+
+## Overview
+
+My approach was to calculate the difference between the overall average of the control group vs the overall average of each treatment group in a given week. Any treatment observations that did not have a corresponding control group were dropped. Early models displayed non-constant variance in the residuals. To counter this, I am applied a transformation of $log(\text{diff} + 150)$ on the response variable.
+
+**Additional Filters**  
+  
+* Restricted Week range > 4 to eliminate observations that started before treatments were applied.
+* Restricted Week range < 21. Many of the tags seemed to wear off towards the end of the season.
+* Removed Anderson County due to the control herd actually being a treatment herd.
+* Removed Camp and Palapinto Counties. Questionable that the control herds did not receive a treatment.
+* Initially kept Pythonstrips and Vetgun.
+
+
+```{r a, echo=FALSE, warning=FALSE, message=FALSE, fig.height=4}
+options(width = 120)
+
+library(ggplot2)
+library(plyr)
+library(reshape2)
+library(Hmisc)
+library(multcomp)
+library(lsmeans)
+library(lmerTest)
+library(lme4)
+library(pander)
+
+rm(list = ls())
+
+###################################################
+## Data Prep
+
+## Read in Data
+flies = read.csv("hornflydata.csv")
+flies$trt = factor(capitalize(as.character(flies$trt)))
+flies$cty = factor(capitalize(as.character(flies$cty)))
+flies$week = flies$week + 2
+flies$flies = flies$flies + 1
+
+## Ensure all of the treatments have been applied
+flies = subset(flies, week > 6 & week < 21)
+
+## Create weekly average by county, treatment, week
+avg = ddply(flies, .(cty, trt, week), summarise, flies = mean(flies))
+avg$trt = relevel(avg$trt, ref = 'Control')
+
+## Split control from the treatments
+control = subset(avg, trt == 'Control')
+colnames(control)[4] = 'ctrl_cnt'
+control = control[, -2]
+avg = subset(avg, trt != 'Control')
+
+## Join control value back as a separate column
+avg = join(x = avg, y = control, type = 'inner')
+avg = na.omit(avg)
+avg$diff = with(avg, ctrl_cnt - flies)
+
+
+## Remove Suspicious Data
+modeling = subset(avg, ! cty %in% c('Anderson', 'Camp', 'Palapinto'))
+
+modeling$cty = factor(modeling$cty)
+modeling$trt = factor(modeling$trt)
+modeling$trt = relevel(modeling$trt, ref = "Vetgun")
+row.names(modeling) = 1:nrow(modeling)
+
+pander(head(modeling), caption = "Sample of Dataset")
+
+ggplot(modeling) + 
+  geom_dotplot(aes(x = diff), binwidth = 15) +
+  geom_vline(xintercept = 0, lty = 2) +
+  scale_x_continuous("Control - Treatment") +
+  scale_y_continuous("Density") +
+  facet_wrap(~trt) +
+  ggtitle("Dotplot of Treatment vs Control") +
+  theme(plot.title = element_text(hjust = .5))
+
+```
+
+\newpage
+
+## Exploratory Model
+
+In this first model I am primarily interested in looking at the overall fit and testing some contrasts to determine if Pythonstrips and Vetgun should be removed from the analysis.
+
+**Proposed Model**: $y_{ijk} = \mu + \beta_1 (week) + \alpha_{(treatment)} + c_{(county)} + e_{ijk}$
+
+
+```{r b, echo=FALSE, comment=NA, warning=FALSE, message=FALSE, fig.height=3}
+## Modeling
+my.tran = make.tran(type = "genlog", 150)
+mdl = with(my.tran, lmer(linkfun(diff) ~ week + trt + (1|cty), data = modeling))
+
+## Anova since diff is transformed
+anova(mdl)
+
+## Plot --> good looking residuals
+plot(mdl, main = "Fitted Values vs Residuals", xlab = "Fitted Values", ylab = "Residuals")
+
+```
+
+The ANOVA table shows that both week and treatment are significant overall. The non-constant variance issue seems to be fixed by the transformation, but there are some notable outliers near the bottom right of the residuals. These are actually 3 Vetgun observations indicating weeks where the pesticide had worn off and was reapplied.
+
+```{r b2, echo=FALSE, comment=NA, warning=FALSE, message=FALSE, fig.height=3}
+print(mdl, ranef.comp = 'Variance')
+```
+
+The variance component County makes up approximately 55% of variance.
+
+\newpage
+
+The treatment with the highest estimated mean count in hornfly reduction is the Python strips treatment. It is notable that Pythonstrips only shows up in one county. Pythonstrips also has the largest confidence interval of all of the treatments.
+
+```{r c, echo=FALSE, comment=NA, warning=FALSE, message=FALSE, fig.height=3}
+
+## LS Means --> back transformed
+x = lsmeans::lsmeans(mdl, specs = "trt", type = "response")
+cat("LSMeans for Treatments (Back Transformed)")
+summary(x)
+plot(x, main = "LSMeans for Treatment")
+
+```
+
+Since Vetgun has a different type of treatment application it is worth looking at a contrast to assess if Vetgun is different from the overall average of all other treatments. The following Vetgun contrast excludes Pythonstrips. Pythonstrips and Python are the same pesticide, but are applied differently. Since Pythonstrips is only tested in one county it is worth testing a contract against Python.
+
+```{r d, echo=FALSE, comment=NA, warning=FALSE, message=FALSE}
+
+## Contrasts
+contr = rbind("Vetgun vs All Tags" = c(-6, 1, 1, 1, 1, 0, 1, 1),
+              "Python vs Pythonstrips" = c(0, 0, 0, 0, -1, 1, 0, 0))
+
+## Hypthesis Testing
+hp1 = glht(model = mdl, linfct = mcp(trt = contr))
+summary(hp1)
+
+```
+
+\newpage
+
+## Refined Model
+
+* Pythonstrips have been removed because it is not significantly different than Python and it is only used in one county.
+* Vetgun have been removed because its a different treatment method that needs to be reapplied. Observations where the pesticide had worn off were outliers in the original model.
+
+```{r e, echo=FALSE, comment=NA, warning=FALSE, message=FALSE, fig.height=3.25}
+## Redo model after elminating some data
+modeling = subset(avg, ! cty %in% c('Anderson', 'Camp', 'Palapinto') & !trt %in% c('Vetgun', 'Pythonstrips'))
+
+modeling$cty = factor(modeling$cty)
+modeling$trt = factor(modeling$trt)
+modeling$trt = relevel(modeling$trt, ref = "Magnum")
+
+## Modeling
+my.tran = make.tran(type = "genlog", 150)
+mdl2 = with(my.tran, lmer(linkfun(diff) ~ week + trt + (1|cty), data = modeling))
+
+## Anova since diff is transformed
+anova(mdl2)
+
+## Summary of Fixed Effects (transformed)
+print(summary(mdl2), corr = FALSE)
+
+## Plot --> good looking residuals
+plot(mdl2, main = "Fitted Values vs Residuals", xlab = "Fitted Values", ylab = "Residuals")
+```
+
+
+In the refined model, both week and treatment are still significant. The variance component County now makes up approximately 70% of the variance in the model. The model residuals have improved as well with the removal of the Vetgun treatment. The model summary shows the output in the transformed scale. All but one treatment appears to be significantly different than the base treatment, Magnum. The negative week estimate indicates that the effect of the pesticides are wearing off as the season progresses. A future model will test the interaction between treatment and week to see if some treatments wear off at different rates.
+
+
+
+```{r e2, echo=FALSE, comment=NA, warning=FALSE, message=FALSE, fig.height=3.25}
+## LS Means --> back transformed
+x = lsmeans::lsmeans(mdl2, specs = "trt", type = "response")
+cat("LSMeans for Treatments (Back Transformed)")
+summary(x)
+plot(x, main = "LSMeans for Treatment")
+```
+
+\newpage
+
+Tukey's test for multiple comparisons shows significant differences between Xp820 and Magnum, and Optimizer and Magnum. Xp820 and Warrior are borderline different.
+
+```{r e3, echo=FALSE, comment=NA, warning=FALSE, message=FALSE, fig.height=4}
+hp1 = glht(model = mdl2, linfct = mcp(trt = "Tukey"))
+summary(hp1)
+
+```
+

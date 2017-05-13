@@ -1,0 +1,470 @@
+---
+output:
+  pdf_document:
+    latex_engine: xelatex
+    highlight: pygments
+mainfont: Calibri Light
+sansfont: Calibri Light
+fontsize: 11pt
+geometry: margin=1in
+---
+
+**Homework 05**  
+**Joseph Blubaugh**  
+jblubau1@tamu.edu  
+**STAT 659-700**  
+
+
+#### 3.11
+
+a) 
+
+```{r a, comment=NA}
+
+A = c(8, 7, 6, 6, 3, 4, 7, 2, 3, 4); B = c(9, 9, 8, 14, 8, 13, 11, 5, 7, 6)
+
+# a)
+log(mean(B)) - log(mean(A)); round(exp(0.5877867), 1) == (mean(B)/mean(A))
+
+```
+
+b) Equation: $1.6094 + .5878x$ $\beta$ has a multiplicative effect so the expected increase in defects from treatment B is $exp(.587) = 1.8$
+
+```{r a2, comment=NA}
+dta = data.frame(
+  Y = c(A, B),
+  X = c(rep("A", 10), rep("B", 10))
+)
+
+(mdl = glm(Y ~ X, family = poisson(link = "log"), data = dta))
+```
+
+c) With a small pvalue we reject the null hypothesis that the treatments are the same
+
+```{r a3, comment=NA}
+x = 27.86 - 16.27; 1 - pchisq(x, 1)
+
+```
+
+d) $.5878 \pm 1.96 (.1764) = (.242, .993)$, $exp(.242, .993) = (1.27, 2.54)$
+
+\newpage
+
+#### 3.12 
+
+ The likelihood ratio test using the deviance $16.26 - 14.435 = 1.832, 1 - pchisq(1.832, 1) = .175$ show that the coating thickness effect is insignificant. A 95% confidence interval for the coating parameter is $exp(-.2296 + c(-1, 1) * 1.96 * .1701) = (.569, 1.10)$.
+
+```{r b, comment=NA}
+
+dta$X2 = c(rep(0, 5), rep(1, 5), rep(0, 5), rep(1, 5))
+
+mdl2 = glm(Y ~ X + X2, family = poisson(link = "log"), data = dta)
+summary(mdl2)
+
+```
+
+\newpage
+
+#### 3.13 
+
+a) The prediction equation is: $-.4284 + .5893(weight)$
+
+```{r c, comment=NA}
+crabs = read.csv("crabs.csv")
+mdl = glm(satell ~ weight, family = poisson(link = "log"), data = crabs)
+summary(mdl)
+```
+
+b) $exp(-.4284 + .5893 * 2.44) = 2.74$
+
+c) $exp(.5893 + \pm 1.96 * .06542) = exp(.461, .716) = (1.58, 2.04)$ We expect a 1 kg increase in crab weight to increase the number of satelites by 1.8
+
+d) The Wald test concludes that weight has a significant effect on the number of satellites
+
+```{r d, comment=NA}
+library(aod); wald.test(b = coef(mdl), Sigma = vcov(mdl), Terms = 2)
+```
+
+e) The likelihood ratio test also concludes that weight has a significant effect on the number of satellites. $1 - pchisq(623.79 - 560.87, 1) = < .001$
+
+\newpage
+
+#### 3.14 
+
+a) The prediction equation is: $-.8647 + .7603 (weight)$ The negative binomial model has a lower AIC score than the poisson model so there is evidence that the negative binomial model fits the data better. The poisson model also has a large deviance to df ratio indicating that the model does not fit the data very well.
+
+```{r e, comment=NA, message=FALSE, warning=FALSE}
+library(MASS)
+
+mdl.nb = glm.nb(satell ~ weight, data = crabs)
+summary(mdl.nb)
+
+```
+
+b) $exp(.7603 + c(-1, 1) * 1.96 * .1578) = (1.57, 2.91)$. The negative binomial model has variance equal to the variance of the poisson model plus the dispersion factor which affects the range of the the interval estimates. The negative binomial model will always produce wider intervals than the poisson model when the dispersion paramter is > 0.
+
+\newpage
+
+#### 3.15 
+
+a)
+```{r f, comment=NA}
+exp(-2.38 + 1.733); exp(-2.38)
+```
+
+b)
+
+```{r f2, comment=NA}
+exp(1.733 + c(-1, 1) * 1.96 * .147)
+```
+
+c) The negative binomial models confidence intervals are more believable because the variance for blacks and whites is much larger than the sample means so the poisson model is not really appropriate.
+
+d) The negative binomial model has a large dispersion parameter indicating that the variance is much larger than the mean probably due to the fact that the data set has a lot of 0s, much more more than would be expected under the poisson distribution.
+
+#### 3.17 
+
+Model: $log(\mu) = \alpha$  
+$\mu$ Estimate: $log(\mu) = .495/38.7 = .0127$   
+Standard Error: $\sqrt{.0127} = .1126$  
+  
+Model with offset: $log(\mu) = .0127 + log(38.7) = 3.67$  
+95% CI: $3.67 \pm 1.96 * .1126 = (3.44, 3.89) \rightarrow exp(3.44, 3.89) = (31.5, 48.9)$  
+
+The 95% confidence interval for the expected rate of injuries per 1000 driving years is 31.5 - 48.9  
+
+\newpage
+
+#### 3.18 
+
+a) The number of arrests is correlated with the number of attendees so it might be reasonable to assume that the number of attendees times an overall rate would approximate the number of arrests.
+
+\begin{align*}
+  E(Y) = & \mu (Attendence) \\
+  log(E(Y) / Attendence) = & log(\mu) + log(Attendence) \\
+\end{align*}
+
+
+b) $\mu$ is the intercept: 3.64, the expected number of arrests are $exp(3.64) = 38.1$
+
+```{r g, comment=NA, message=FALSE, warning=FALSE}
+dta = data.frame(
+  Attendence = c(404,286,443,169,222,150,321,189,258,223,211,215,108,
+                 210,224,211,168,185,158,429,226,150,148 ),
+  Arrests = c(308,197,184,149,132,126,110,101,99,81,79,78,68,67,60,
+              57,55,44,38,35,29,20,19)
+)
+
+(mdl = glm(Arrests ~ 0 + Attendence, family = poisson(link = "log"),
+           data = dta))
+
+```
+
+c) There are many records that would be considered extreme, however the most extreme are 1, 2, 3, 20, 22, 23
+
+```{r g2, comment=NA, fig.height=3}
+library(ggplot2)
+
+dta$Prediction = exp(predict(mdl, dta))
+
+## Pearson Residuals
+dta$rP = with(dta, 
+              (Arrests - mean(Arrests)) / 
+                (sqrt(mean(Arrests) * ( 1 - hatvalues(mdl))))
+)
+
+dta
+
+ggplot(dta) +
+  geom_point(aes(x = Attendence, y = Arrests), color = "black") +
+  geom_point(aes(x = Attendence, y = Prediction), color = "red") +
+  ggtitle("Attendence vs. Arrests")
+
+```
+
+\newpage
+
+d) The dispersion parameter is very high which would indicate that the poisson model is not a good fit. Furthermore the deviance/df measure is very high as well also supporting that the poisson model method is inappropriate.
+
+```{r g3, comment=NA, warning=FALSE, message=FALSE}
+mdl = glm.nb((Arrests/Attendence) ~ 1, data = dta)
+summary(mdl)
+```
+
+\newpage
+
+#### 3.19 
+
+a) the deviance to df ratio for the intercept only model is low so the poisson model does a pretty good job fitting to the data, however when compared to the model with year as a predictor variable the ratio is even lower indicating that time plays a part in the number of train collisions and so the rate does not remain constant over time.
+
+```{r h, echo=FALSE, comment=NA, warning=FALSE, message=FALSE}
+
+dta = data.frame(
+  year = 1975:2003,
+  km = c(436, 426, 425, 430, 426, 430, 417, 372, 401, 389, 418, 414, 397, 443,
+         436, 431, 439, 430, 425, 415, 423, 437, 463, 487, 505, 503, 508, 516, 518),
+  train.collisions = c(5, 2, 1, 2, 3, 2, 2, 2, 2, 5, 0, 2, 1, 2, 
+                       4, 1, 2, 1, 0, 2, 1, 2, 1, 0, 1, 1, 0, 1, 0),
+  train.road.collisions = c(2, 12, 8, 4, 3, 2, 2, 3, 7, 3, 5, 13, 6, 4, 
+                            4, 2, 6, 4, 4, 4, 2, 2, 1, 4, 2, 3, 4, 3, 3)
+)
+
+dta$collisions = with(dta, train.collisions + train.road.collisions)
+
+head(dta)
+
+```
+
+```{r h2, comment=NA}
+
+(mdl.1 = glm(collisions ~ 1, family = poisson(link = "log"), data = dta))
+(mdl.2 = glm(collisions ~ year, family = poisson(link = "log"), data = dta))
+
+```
+
+
+b) `(-.0337)^2 / (.013^2) = 6.72` which is larger than the critical value of 3.84 so we conclude that $\beta \ne 0$
+
+c) `1 - exp(c(-.06, -.08)) = (.058, .076)`, each year, the number of train collisions is expected to decrease between 5.8-7.6%.
+
+\newpage
+
+#### 3.20
+
+a) For all age groups except the oldest group, the ratio of smokers dieing from coronary issues is higher than non smokers.  The highest rate difference is for the youngest group and it steadily declines from there.
+
+```{r i, echo=FALSE, results='asis'}
+dta = data.frame(
+  Age = c("35-44", "45-54", "55-64", "65-74", "75-84"),
+  Non.Smoker.Yrs = c(18793, 10673, 5710, 2585, 1462),
+  Smoker.Yrs = c(52407, 43248, 28612, 12663, 5317),
+  Death.Non.Smoker = c(2, 12, 28, 28, 31),
+  Death.Smoker = c(32, 104, 206, 186, 102)
+)
+
+dta$Non.Smoker.ratio = with(dta, Death.Non.Smoker / Non.Smoker.Yrs)
+dta$Smoker.ratio = with(dta, Death.Smoker / Smoker.Yrs)
+dta$ratio = with(dta, Smoker.ratio / Non.Smoker.ratio)
+
+library(pander)
+
+pandoc.table(dta)
+
+dta = data.frame(
+  Age = c("35-44", "35-44", "45-54", "45-54", "55-64", "55-64", "65-74", "65-74", "75-84", "75-84"),
+  Smoker = c("no", "yes", "no", "yes", "no", "yes", "no", "yes", "no", "yes"),
+  Total = c(18793, 52407, 10673, 43248, 5710, 28612, 2585, 12663, 1462, 5317),
+  Death = c(2, 32, 12, 104, 28, 206, 28, 186, 31, 102)
+)
+
+dta$logTotal = with(dta, log(Total))
+dta$Rate = with(dta, Death * 1000 / Total)  
+
+```
+
+b) Model: $y_{ijk} = \mu + \alpha_i + \beta_j + e_{ikk}$, where $\alpha$ are the levels of the age groups and $\beta$ is an indicator for smoking. $\alpha_1 = \beta_1 = 0$ where $\mu$ is mean response of the 35-44 age group of non-smokers. The model assumes constant rates by age because there is no interaction term specified in the model.
+
+c) The oldest group indicates that smokers are less likely to die of coronary death than non-smokers. Model: $y_{ijk} = \mu + \alpha_i + \beta_j + (\alpha_i \beta_j) + e_{ikk}$
+
+\begin{align*}
+  y_{20} = & \mu + \alpha_2 + \beta_0 + (\alpha_2 \beta_0) \\
+  = & \mu + (\text{35-44}) + 0 + ((\text{35-44}) 0) \\
+  = & \mu + (\text{35-44}) \\
+  \\
+  y_{21} = & \mu + \alpha_2 + \beta_1 + (\alpha_2 \beta_1) \\
+  = & \mu + (\text{35-44}) + \beta_1 + ((\text{35-44}) \beta_1) \\
+\end{align*}
+
+\newpage
+
+d) There are not enough degrees of freedom to fit an interaction term so the first model is better. The deviance/df ratio of the first model is low ~ .39, but the deviance in the second model is 0 because there is no error due to not having anymore degrees of freedom.  Age appears to be the primary contributor on the count of coronary cases. The smoking variable appears to be insignificant. If we had more observations we could test the interaction and maybe see a different result.
+
+```{r i2, comment=NA, warning=FALSE, message=FALSE}
+
+(mdl.1 = glm(Rate ~ Age + Smoker, family = poisson(link = "log"), data = dta))
+(mdl.2 = glm(Rate ~ Age*Smoker, family = poisson(link = "log"), data = dta))
+
+```
+
+\newpage
+
+#### Additional 1
+
+The color and weight model had the lowest AIC of all of the models. All of the models had a deviance/df ratio over 3 indicating that the poisson regression model may not be appropriate.
+
+```{r j, comment=NA, warning=FALSE, message=FALSE, echo=FALSE, results='asis'}
+
+dta = data.frame(
+  Criterion = c("Deviance", "Scaled Deviance", "AIC"),
+  DF = c(168, 168, 0),
+  Value = c(551.8, 551.8, 917.1),
+  Value.DF = c(3.28, 3.28, 0)
+)
+
+pandoc.table(dta, caption = "Partial SAS Output for color-weight model")
+
+```
+
+
+
+#### Additional 2
+
+The negative binomial model with weight as the parameter is the best model because its AICc is the lowest.
+
+```{r k, echo=FALSE, results='asis'}
+
+dta = data.frame(
+  Model = c("Poisson Weight", "Poisson Intercept Only", "Negative Binom Weight", "Negative Binom Intercept Only"),
+  AICc = c(762.1, 767.2, 740.3, 744.8)
+)
+
+pandoc.table(dta, caption = "SAS Output of Model Comparison")
+
+```
+
+Code for Additional 2
+
+```sas
+proc genmod data=sasuser.crab; 
+model satell = weight / dist=zip link=log;
+zeromodel;
+title 'poisson weight';
+run;
+
+proc genmod data=sasuser.crab; 
+model satell = / dist=zip link=log;
+zeromodel;
+title 'poisson intercept only';
+run;
+
+proc genmod data=sasuser.crab; 
+model satell = weight / dist=zinb link=log;
+zeromodel;
+title 'negative binom weight';
+run;
+
+proc genmod data=sasuser.crab; 
+model satell = / dist=zinb link=log;
+zeromodel;
+title 'negative binom intercept only';
+run;
+```
+
+
+
+Code for Additional 1
+
+```sas
+proc genmod data=sasuser.crab; 
+ods select Modelfit;
+class color spine;
+model satell = / dist=poi link=log;
+title 'intercept only';
+run;
+
+proc genmod data=sasuser.crab; 
+ods select Modelfit;
+class color spine;
+model satell = color / dist=poi link=log;
+title 'color';
+run;
+
+proc genmod data=sasuser.crab; 
+ods select Modelfit;
+class color spine;
+model satell = spine / dist=poi link=log;
+title 'spine';
+run;
+
+proc genmod data=sasuser.crab; 
+ods select Modelfit;
+class color spine;
+model satell = width / dist=poi link=log;
+title 'width';
+run;
+
+proc genmod data=sasuser.crab; 
+ods select Modelfit;
+class color spine;
+model satell = weight / dist=poi link=log;
+title 'weight';
+run;
+
+proc genmod data=sasuser.crab; 
+ods select Modelfit;
+class color spine;
+model satell = color spine / dist=poi link=log;
+title 'color spine';
+run;
+
+
+proc genmod data=sasuser.crab; 
+ods select Modelfit;
+class color spine;
+model satell = color width / dist=poi link=log;
+title 'color width';
+run;
+
+proc genmod data=sasuser.crab; 
+ods select Modelfit;
+class color spine;
+model satell = color weight / dist=poi link=log;
+title 'color weight';
+run;
+
+proc genmod data=sasuser.crab; 
+ods select Modelfit;
+class color spine;
+model satell = spine width / dist=poi link=log;
+title 'spine width';
+run;
+
+proc genmod data=sasuser.crab; 
+ods select Modelfit;
+class color spine;
+model satell = spine weight / dist=poi link=log;
+title 'spine weight';
+run;
+
+proc genmod data=sasuser.crab; 
+ods select Modelfit;
+class color spine;
+model satell = width weight / dist=poi link=log;
+title 'width weight';
+run;
+
+proc genmod data=sasuser.crab; 
+ods select Modelfit;
+class color spine;
+model satell = color spine width / dist=poi link=log;
+title 'color spine width';
+run;
+
+proc genmod data=sasuser.crab; 
+ods select Modelfit;
+class color spine;
+model satell = color spine weight / dist=poi link=log;
+title 'color spine weight';
+run;
+
+proc genmod data=sasuser.crab; 
+ods select Modelfit;
+class color spine;
+model satell = color width weight / dist=poi link=log;
+title 'color width weight';
+run;
+
+proc genmod data=sasuser.crab; 
+ods select Modelfit;
+class color spine;
+model satell = spine width weight / dist=poi link=log;
+title 'spine width weight';
+run;
+
+proc genmod data=sasuser.crab; 
+ods select Modelfit;
+class color spine;
+model satell = color spine width weight / dist=poi link=log;
+title 'color spine width weight';
+run;
+```

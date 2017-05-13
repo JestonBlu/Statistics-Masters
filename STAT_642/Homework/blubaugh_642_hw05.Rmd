@@ -1,0 +1,448 @@
+---
+output:
+  pdf_document:
+    fig_height: 4
+    highlight: pygments
+    latex_engine: xelatex
+mainfont: Calibri Light
+sansfont: Calibri Light
+fontsize: 12pt
+geometry: margin=1in
+---
+
+**Homework 05**  
+**Joseph Blubaugh**  
+jblubau1@tamu.edu  
+**STAT 642-720**  
+
+\newpage
+
+
+1.
+  a) Interactions are comparing all levels from both A and B and so the degrees of freedom must be -1 for each parameter to avoid being over parameterized.
+  
+  \begin{align*}
+    DF_{A*B} =& ab - N_{H_0}                          \\
+             =& ab - [b + (a - 1)]                    \\
+             =& (a - 1)(b - 1)                        \\
+                                                      \\
+   \mu_{a,j} =& B                                     \\
+   \mu_{a,j} - \mu_{a-1,j} =& A                       \\
+     N_{H_0} =& \mu_{a,j} + (\mu_{a,j} - \mu_{a-1,j}) \\
+             =& B + A                                 \\
+  \end{align*}
+
+  b) In the main effect, A is measured over all of the levels of B so there must be -1 + A to avoid being over parameterized 
+  
+  \begin{align*}
+    DF_{A} =& ab - N_{H_0}                            \\
+             =& ab - [b(a - 1) + 1]                   \\
+             =& a - 1                                 \\
+                                                      \\
+           c =& \frac{1}{b} \sum_{j=1}^b \mu_{i,j}    \\
+     N_{H_0} =& a(b - 1) + c                          \\
+  \end{align*}
+
+---
+
+2. if this, no interaction
+  a) $y_{i,j,k} = \mu + \tau_{i} + \beta_{j} + (\tau \beta)_{i,j} + e_{i,j,k}$ where ...   
+    $\mu$ is the overall mean  
+    $\tau$ is soil type  
+    $\beta$ is field  
+    $e_{i,j,k}$ are the errors associated with each $k$  
+    $i = 1,...,3$  
+    $j = 1,...,30$  
+    $k = 1,...,44$  
+
+```{r q2, echo=FALSE, comment=NA, warning=FALSE}
+
+suppressPackageStartupMessages(library(scales))
+suppressPackageStartupMessages(library(car))
+suppressPackageStartupMessages(library(lme4))
+suppressPackageStartupMessages(library(multcomp))
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(plyr))
+suppressPackageStartupMessages(library(lsmeans))
+suppressPackageStartupMessages(library(contrast))
+suppressPackageStartupMessages(library(ggplot2))
+
+dt = data.frame(
+  Soil = c("C","C","C","C","C","C","C","C","C","C","C","C","C","C","C","L",
+           "L","L","L","L","L","L","L","L","L","L","L","L","L","S","S","S",
+           "S","S","S","S","S","S","S","S","S","S","S","S"),
+  Field = c("1", "1", "2", "2", "3", "3", "4", "5", "6", "7", "7", "8", "9", 
+            "9", "10", "11", "11", "12", "12", "13", "14", "15", "16", "16", 
+            "17", "18", "18", "19", "20", "21", "21", "22", "22", "23", "24", 
+            "24", "25", "26", "27", "27", "28", "29", "29", "30"),
+  Porosity = c(3.846, 5.212, 5.129, 4.521, 4.587, 5.137, 4.621, 4.411, 3.357, 
+               4.491, 3.721, 3.766, 3.177, 4.357, 3.333, 5.355, 5.592, 3.940, 
+               4.410, 4.983, 4.396, 5.603, 3.683, 4.339, 5.942, 5.014, 4.728, 
+               5.143, 4.061, 7.635, 6.964, 6.784, 5.398, 6.193, 6.725, 7.352, 
+               5.074, 5.483, 6.867, 6.289, 6.212, 5.547, 6.428, 6.730)
+)
+
+```
+  
+  b)  Fitting a mixed model with Soil as the fixed variable and Field as the random variable
+```{r q2b, comment=NA, echo=FALSE}
+
+mdl = lmer(Porosity ~ Soil + (1 | Field), data = dt)
+summary(mdl)
+anova(mdl)
+
+```
+
+  c)  
+```{r q2c, comment=NA, echo=TRUE}
+
+cat("Soil:", percent(9.5295 / (9.5295 + 0.1779996 + 0.3136)))
+cat("Field:", percent(0.1779996 / (36.67 + 0.1779996 + 0.3136)))
+
+```
+  
+  d) Both Sandy-Clay and Sandy-Loam can be grouped based TukeyHSD.
+```{r q2d, comment=NA, echo=FALSE}
+
+summary(glht(mdl, linfct=mcp(Soil="Tukey")))
+
+```
+  
+  
+  e) Using the covariance parameter estimates we can reject the null and say there is sufficient evidence to show that the variance of field is greater than 0.
+Covariance Parameter Estimates  
+  
+    | Cov      | Param Estimate |  Alpha | Lower   |  Upper  |   
+    |:--------:|:--------------:|:------:|:-------:|:-------:|  
+    | Field    | 0.1780         |  0.05  | 0.06018 |  1.9121 |   
+    | Residual | 0.3244         |  0.05  | 0.1771  |  0.7761 |   
+    
+    
+\begin{align*}
+  H_0: \sigma = 0, & H_a: \sigma > 0        \\
+  F* =& \frac{MS_{TRT}}{MSE}                \\
+     =& \frac{0.178}{.3244}                 \\
+     =& .5487053                            \\
+     pf(.5487053, 29, 14) =&  0.083         \\
+\end{align*}
+
+
+```{r q3, echo=FALSE, comment=NA}
+
+crops = data.frame(
+  Nitrogen = factor(c(0 , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 50 , 50 , 50 , 
+               50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 50 , 
+               100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 
+               100, 100, 100)),
+  Crop = c("Alfalfa", "Alfalfa", "Alfalfa", "Alfalfa", "Soybean", "Soybean", 
+           "Soybean", "Soybean", "Guar", "Guar", "Guar", "Guar", "Mungbean", 
+           "Mungbean", "Mungbean", "Mungbean", "Alfalfa", "Alfalfa", "Alfalfa", 
+           "Alfalfa", "Soybean", "Soybean", "Soybean", "Soybean", "Guar", 
+           "Guar", "Guar", "Guar", "Mungbean", "Mungbean", "Mungbean", "Mungbean", 
+           "Alfalfa", "Alfalfa", "Alfalfa", "Alfalfa", "Soybean", "Soybean", 
+           "Soybean", "Soybean", "Guar", "Guar", "Guar", "Guar", "Mungbean", 
+           "Mungbean", "Mungbean", "Mungbean"),
+  Reduction = c(2.6, 1.1, 0.9, 1.2, 6.5, 2.6, 3.9, 4.3, 0.5, 0.9, 0.7, 0.7, 
+                0.8, 0.9, 2.2, 1.2, 1.5, 1.8, 0.7, 2.2, 0.6, 0.6, 0.3, 0.8, 
+                0.3, 0.5, 0.4, 0.4, 0.7, 0.7, 0.5, 0.6, 0.6, 1.3, 1.9, 2.6, 
+                0.5, 0.1, 0.1, 0.3, 0.2, 0.1, 0.1, 0.2, 0.3, 0.4, 0.2, 0.2)
+)
+
+```
+
+---
+
+3. 
+  a) $y_{i,j,k} = \mu + \tau_{i} + \beta_{j} + (\tau \beta)_{i,j} + e_{i,j,k}$ where ...   
+    $\mu$ is the overall mean in Reduction  
+    $\tau$ is Nitrogen Level    
+    $\beta$ is Crop Type  
+    $(\tau \beta)$ is the interaction between Nitrogen and Crop Type
+    $e_{i,j,k}$ are the errors associated with each $k$  
+    $i = 1,...,3$ 3 different levels of Nitrogen  
+    $j = 1,...,4$ 4 different levels of Crops  
+    $k = 1,...,48$ 48 different combinations of Nitrogen, Crops, and Tanks  
+  b) Conditions:
+    * Homogeneity of variance: Variance is not stable, consider a transformation
+    ```{r q3a, echo=FALSE, comment=NA}
+    leveneTest(Reduction ~ Nitrogen:Crop, data = crops)
+    ```
+    
+    * Data are normally distributed: Data are not normally distributed, consider a transformation
+    ```{r q3b, echo=FALSE, comment=NA}
+    shapiro.test(crops$Reduction)
+    ```
+    
+    * Completely Randomized Data: Based on the description of the experiment Each EU was randomly assigned to a level of treatment and this condition is satisfied
+    
+  c)
+  
+```{r q3c, comment=NA}
+
+mdl = lm(Reduction ~ Nitrogen*Crop, data = crops)
+anova(mdl)
+
+```
+  
+  
+  d) Based on an alpha of .05, the following Contrasts are measured to be significant:
+    * Linear Trend in Nitrogen
+    * Quadratic Trend in Nitrogen
+    * Quadratic Trend in Crop
+    * Interactions 1,2,4
+    * Main effect of Nitrogen
+    * Main effect of Crop
+    * Overall Interaction of Nitrogen and Crop
+
+**ANALYSIS OF FACTORIAL TREATMENT STRUCTURE (SAS OUTPUT)**
+
+|Source          | DF |Sum of Squares | Mean Square | F Value | Pr > F |
+|----            |----|------         | -----       |----     |----    |
+|Model           | 11 | 57.85229167   | 5.25929924  | 12.86   | <.0001 |
+|Error           | 36 | 14.71750000   | 0.40881944  |         |        |
+|Corrected Total | 47 |   72.56979167 |             |         |        |
+
+
+
+|R-Square | Coeff Var | Root MSE | Reduction Mean |
+|---------|----- |----- |
+|0.797195 | 58.23665 | 0.639390 | 1.097917 |
+
+
+
+| Source        | DF | Type III SS |  Mean Square | F Value | Pr > F |  
+|---------------|----|-------------|--------------|---------|--------|  
+| Nitrogen      | 2  | 17.30041667 | 8.65020833   | 21.16   | <.0001 |  
+| Crop          | 3  | 14.10729167 | 4.70243056   | 11.50   | <.0001 |  
+| Nitrogen:Crop | 6  | 26.44458333 | 4.40743056   | 10.78   | <.0001 |    
+
+
+
+
+| Contrast                 | DF | Contrast SS | Mean Square | F Value | Pr > F |
+|:-------------------------|:---|:------------|:------------|:--------|:-------|
+| Linear Trend in Nitrogen | 1  | 10.58000000 | 10.58000000 | 25.88   | <.0001 |
+| Quad Trend in Nitrogen   | 1  | 6.72041667  | 6.72041667  | 16.44   | 0.0003 |
+| Linear Trend in Crop     | 1  | 0.44204167  | 0.44204167  | 1.08    | 0.3053 |
+| Quad Trend in Crop       | 1  | 13.33520833 | 13.33520833 | 32.62   | <.0001 |
+| Cubin Trend in Crop      | 1  | 0.33004167  | 0.33004167  | 0.81    | 0.3749 |
+| INTER1                   | 1  | 14.16100000 | 14.16100000 | 34.64   | <.0001 |
+| INTER2                   | 1  | 3.64500000  | 3.64500000  | 8.92    | 0.0051 |
+| INTER3                   | 1  | 0.78400000  | 0.78400000  | 1.92    | 0.1746 |
+| INTER4                   | 1  | 6.86408333  | 6.86408333  | 16.79   | 0.0002 |
+| INTER5                   | 1  | 0.70041667  | 0.70041667  | 1.71    | 0.1989 |
+| INTER6                   | 1  | 0.29008333  | 0.29008333  | 0.71    | 0.4052 |
+| MAIN OF Nitrogen         | 2  | 17.30041667 | 8.65020833  | 21.16   | <.0001 |
+| Main of Crop             | 3  | 14.10729167 | 4.70243056  | 11.50   | <.0001 |
+| INTERACTION              | 6  | 26.44458333 | 4.40743056  | 10.78   | <.0001 |
+
+
+
+  e)  There is a clear interaction between Nitrogen and Crop which are visible in the plot through non-constant distinace between lines and lines that cross.  
+    
+![]("C:/Users/Joseph/Projects/learning/Statistics/STAT_642/Homework/IntPlot6.png")
+
+  f) Group 1: (Alfalfa, Soybean), Group 2: (Guar, Mungbean)
+
+**The GLM Procedure**  
+Least Squares Means  
+Adjustment for Multiple Comparisons: Tukey  
+
+| Crop Reduction | LSMEAN     | Standard Error | Pr > t | LSMEAN Number |
+|:---------------|:-----------|:---------------|:-------|:--------------|
+| Alfalfa        | 1.53333333 | 0.18457597     | <.0001 | 1             |
+| Guar           | 0.41666667 | 0.18457597     | 0.0301 | 2             |
+| Mungbean       | 0.72500000 | 0.18457597     | 0.0004 | 3             |
+| Soybean        | 1.71666667 | 0.18457597     | <.0001 | 4             |
+
+
+
+**Least Squares Means for effect Crop**  
+ Pr > |t| for H0: LSMean(i)=LSMean(j)  
+ Dependent Variable: Reduction
+
+| i/j | 1      | 2      | 3      | 4      |
+|:----|:-------|:-------|:-------|:-------|
+| 1   |        | 0.0007 | 0.0189 | 0.8955 |
+| 2   | 0.0007 |        | 0.6424 | <.0001 |
+| 3   | 0.0189 | 0.6424 |        | 0.0029 |
+| 4   | 0.8955 | <.0001 | 0.0029 |        |
+
+
+---
+
+4.
+
+**LS Means for Effects Model**
+
+| Nitrogen | Reduction LSMEAN | Standard Error | Pr > t | LSMEAN Number |
+|:---------|:-----------------|:---------------|:-------|:--------------|
+| 0        | 1.93750000       | 0.15984748     | <.0001 | 1             |
+| 100      | 0.56875000       | 0.15984748     | 0.0011 | 2             |
+| 50       | 0.78750000       | 0.15984748     | <.0001 | 3             |
+
+| Crop     | Reduction LSMEAN | Standard Error | Pr > t | LSMEAN Number |
+|:---------|:-----------------|:---------------|:-------|:--------------|
+| Alfalfa  | 1.53333333       | 0.18457597     | <.0001 | 1             |
+| Guar     | 0.41666667       | 0.18457597     | 0.0301 | 2             |
+| Mungbean | 0.72500000       | 0.18457597     | 0.0004 | 3             |
+| Soybean  | 1.71666667       | 0.18457597     | <.0001 | 4             |
+
+| Nitrogen | Crop     | Reduction LSMEAN | Standard Error | Pr > t | LSMEAN Number |
+|:---------|:---------|:-----------------|:---------------|:-------|:--------------|
+| 0        | Alfalfa  | 1.45000000       | 0.31969495     | <.0001 | 1             |
+| 0        | Guar     | 0.70000000       | 0.31969495     | 0.0351 | 2             |
+| 0        | Mungbean | 1.27500000       | 0.31969495     | 0.0003 | 3             |
+| 0        | Soybean  | 4.32500000       | 0.31969495     | <.0001 | 4             |
+| 100      | Alfalfa  | 1.60000000       | 0.31969495     | <.0001 | 5             |
+| 100      | Guar     | 0.15000000       | 0.31969495     | 0.6418 | 6             |
+| 100      | Mungbean | 0.27500000       | 0.31969495     | 0.3954 | 7             |
+| 100      | Soybean  | 0.25000000       | 0.31969495     | 0.4393 | 8             |
+| 50       | Alfalfa  | 1.55000000       | 0.31969495     | <.0001 | 9             |
+| 50       | Guar     | 0.40000000       | 0.31969495     | 0.2189 | 10            |
+| 50       | Mungbean | 0.62500000       | 0.31969495     | 0.0584 | 11            |
+| 50       | Soybean  | 0.57500000       | 0.31969495     | 0.0805 | 12            |
+
+```{r q4, echo=FALSE, comment=NA}
+mdl.cell.means = lm(Reduction ~ 0 + Nitrogen + Crop, data = crops)
+summary(mdl.cell.means)
+```
+
+  a) Cell Means Model: $y_{i,j,k} = \mu_{i,j} + e_{i,j,k}$  
+  $y_{i,j,k}$: Mean Reduction response for Nitrogen and Crop treatements  
+  $\mu_{i,j}$: mean of Reduction for each combination of treatments 
+  $e_{i,j,k}$: error between the mean response and the overall mean for each treatment  
+  $i_{1,...,3}$: 3 levels of Nitrogen  
+  $j_{1,...,4}$: 4 levels of Crop  
+  $k_{1,...,48}$: 48 individual observations (3\*4\*4)  
+  
+  b) Effects Model: $y_{i,j,k} = \mu + \tau_i + \beta_j + (\tau \beta)_{i,j} + e_{i,j,k}$
+  $y_{i,j,k}$: Mean Reduction response for Nitrogen and Crop treatements  
+  $\mu$: the overall mean  
+  $\tau_i$: effect of Nitrogen  
+  $\beta_j$: effect of Crop  
+  $(\tau \beta)_{i,j}$: interaction of Nitrogen and Crop  
+  $e_{i,j,k}$: error between the mean response and the overall mean for each treatment  
+  $i_{1,...,3}$: 3 levels of Nitrogen  
+  $j_{1,...,4}$: 4 levels of Crop  
+  $k_{1,...,48}$: 48 individual observations (3\*4\*4)  
+  
+  c) Design Matrix for Cell Means Model:
+  
+\begin{displaymath}
+  X = 
+    \begin{bmatrix}
+      1 & 0 & 0 & 0 & 1 & 0 & 0  \\
+      1 & 0 & 0 & 0 & 0 & 1 & 0  \\
+      1 & 0 & 0 & 0 & 0 & 0 & 1  \\
+      0 & 1 & 0 & 0 & 1 & 0 & 0  \\
+      0 & 1 & 0 & 0 & 0 & 1 & 0  \\
+      0 & 1 & 0 & 0 & 0 & 0 & 1  \\
+      0 & 0 & 1 & 0 & 1 & 0 & 0  \\
+      0 & 0 & 1 & 0 & 0 & 1 & 0  \\
+      0 & 0 & 1 & 0 & 0 & 0 & 1  \\
+      0 & 0 & 0 & 1 & 1 & 0 & 0  \\
+      0 & 0 & 0 & 1 & 0 & 1 & 0  \\
+      0 & 0 & 0 & 1 & 0 & 0 & 1  \\
+    \end{bmatrix}
+  \beta = 
+    \begin{bmatrix}
+      \mu_{1,1} = 1.735 \\
+      \mu_{1,2} = 1.177 \\
+      \mu_{1,3} = 1.331 \\
+      \mu_{2,1} = 1.826 \\
+      \mu_{2,2} = 1.050 \\
+      \mu_{2,3} = 0.492 \\
+      \mu_{3,1} = 0.646 \\
+      \mu_{3,2} = 1.142 \\
+      \mu_{3,3} = 1.160 \\
+      \mu_{4,1} = 0.602 \\
+      \mu_{4,2} = 0.756 \\
+      \mu_{4,3} = 1.251 \\
+    \end{bmatrix}
+\end{displaymath}
+  
+  
+  d) Design Matrix for Effects Model:
+
+\begin{displaymath}
+  X = 
+    \begin{bmatrix}
+      1 & 0 & 0 & 0 & 1 & 0 & 0  \\
+      1 & 0 & 0 & 0 & 0 & 1 & 0  \\
+      1 & 0 & 0 & 0 & 0 & 0 & 1  \\
+      0 & 1 & 0 & 0 & 1 & 0 & 0  \\
+      0 & 1 & 0 & 0 & 0 & 1 & 0  \\
+      0 & 1 & 0 & 0 & 0 & 0 & 1  \\
+      0 & 0 & 1 & 0 & 1 & 0 & 0  \\
+      0 & 0 & 1 & 0 & 0 & 1 & 0  \\
+      0 & 0 & 1 & 0 & 0 & 0 & 1  \\
+      0 & 0 & 0 & 1 & 1 & 0 & 0  \\
+      0 & 0 & 0 & 1 & 0 & 1 & 0  \\
+      0 & 0 & 0 & 1 & 0 & 0 & 1  \\
+    \end{bmatrix}
+  \beta = 
+    \begin{bmatrix}
+      \mu = 1.098     \\
+      \tau_1 = 1.937  \\
+      \tau_2 = .568   \\
+      \tau_3 = .787   \\
+      \beta_1 = 1.533 \\
+      \beta_2 = .416  \\
+      \beta_3 = .725  \\
+      \beta_4 = 1.716 \\
+      (\tau \beta)_{1,1} = 1.450 \\
+      (\tau \beta)_{1,2} = .700  \\
+      (\tau \beta)_{1,3} = 1.275 \\
+      (\tau \beta)_{1,4} = 4.325 \\
+      (\tau \beta)_{2,1} = 1.600 \\
+      (\tau \beta)_{2,2} = .150  \\
+      (\tau \beta)_{2,3} = .275  \\
+      (\tau \beta)_{2,4} = .250  \\
+      (\tau \beta)_{3,1} = 1.550 \\
+      (\tau \beta)_{3,2} = .400  \\
+      (\tau \beta)_{3,3} = .625  \\
+      (\tau \beta)_{3,4} = .575  \\
+    \end{bmatrix}
+\end{displaymath}
+
+---
+
+5. 
+  
+| U_ijk  | 8 | 4 | 2 | 4 | 4 | 6 | 6 | 2 |
+|:-------|:--|:--|:--|:--|:--|:--|:--|:--|
+| F1     | 1 | 1 | 1 | 1 | 2 | 2 | 2 | 2 |
+| F2     | 1 | 1 | 2 | 2 | 1 | 1 | 2 | 2 |
+| F3     | 1 | 2 | 1 | 2 | 1 | 2 | 1 | 2 |
+
+
+  a) The null hypothesis is that there is not a 3 way interaction when the 2 way interactions between F1*F2 on each level of F3 are equal. Since the two sides are not equal we reject the null and claim that there is a 3 way interaction.
+  
+  $F_1*F_2*F_3$:
+    \begin{align*}
+    (\mu_{ijk} - \mu_{i'jk}) - (\mu_{ij'k} - \mu_{i'j'k}) =& (\mu_{ijk'} - \mu_{i'jk'}) - (\mu_{ij'k'} - \mu_{i'j'k'})  \\
+    (\mu_{111} - \mu_{211}) - (\mu_{121} - \mu_{221}) = & (\mu_{112} - \mu_{212}) - (\mu_{122} - \mu_{222})             \\
+    (8 - 4) - (2 - 6) =& (4 - 6) - (4 - 2)                                                                              \\
+                    8 \ne & -4                                                                                             \\
+  \end{align*}
+  
+  b) The two sides are equal and so there is no interaction between F2 and F3.
+  
+  $F_2 * F_3$:
+  \begin{align*}
+      (\mu_{.11} - \mu_{.12}) =& (\mu_{.21} - \mu_{.22})    \\
+    (.5*(8 + 4) - .5*(4 + 6)) =& (.5*(2 + 6) - .5*(4 + 2))  \\
+                            1 =& 1                          \\  
+  \end{align*}
+
+  
+  c) The main effect for $F_3$ is not 0
+  
+  Main Effect: $F_3$
+  \begin{align*}
+    (\mu_{..1} -& \mu_{..2})                            \\
+    \frac{8 + 2 + 4 + 6}{4} -& \frac{4 + 4 + 6 + 2}{4}  \\
+    5 - & 4 = 1                                         \\
+  \end{align*}
+

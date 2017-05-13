@@ -1,0 +1,189 @@
+---
+output:
+  pdf_document:
+    latex_engine: xelatex
+    highlight: pygments
+mainfont: Calibri Light
+sansfont: Calibri Light
+fontsize: 11pt
+geometry: margin=1in
+---
+
+**Homework 04**  
+**Joseph Blubaugh**  
+jblubau1@tamu.edu  
+**STAT 641-720**  
+
+\newpage
+
+```{r data, echo=FALSE, comment=NA, warning=FALSE}
+small = c(0.42,0.86,0.88,1.11,1.34,1.38,1.42,1.47,1.63, 1.73,2.17,2.42,2.48,2.74,2.74,2.79,2.90,3.12,
+    3.18,3.27,3.30,3.61,3.63,4.13,4.40,5.00,5.20, 5.59,7.04, 7.15,7.25,7.75,8.00,8.84,9.30,9.68,
+    10.32,10.41,10.48,11.29,12.30,12.53,12.69,14.14,14.15, 14.27,14.56,15.84,18.55,19.73,20.00)
+
+large = c(0.94,1.26,1.44,1.49,1.63,1.80,2.00,2.00,2.56, 2.58,3.24,3.39,3.53,3.77,4.36,4.41,4.60,4.67,
+    5.39,6.25,7.02,7.89,7.97,8.00,8.28,8.83,8.91, 8.96,9.92,11.36,12.15,14.40,16.00,18.61,18.75,19.05,
+    21.00,21.41,23.27,24.71,25.00,28.75,30.23,35.45,36.35)
+
+```
+
+I.  
+1) mean = `r round(mean(large),3)`  
+   trimmed mean = `r round(mean(large[5:41]),3)` with $K(\alpha) = 45 - 45(.1) - (45(.1) + 1) - 1 = .1$  
+   This suggests that there are some extreme values in the top 10 percent that are pulling the mean up
+
+2) $Weibull(\gamma, \alpha) = \frac{\gamma}{\alpha} (\frac{x}{\alpha})^{\gamma - 1} e^{-(x/\alpha)^{\gamma}}$  
+  parameter estimates: $\gamma = 1.132, \alpha = 11.498$
+
+```{r q2, echo=FALSE, warning=FALSE, comment=NA}
+large = c(0.94,1.26,1.44,1.49,1.63,1.80,2.00,2.00,2.56,
+    2.58,3.24,3.39,3.53,3.77,4.36,4.41,4.60,4.67,
+    5.39,6.25,7.02,7.89,7.97,8.00,8.28,8.83,8.91,
+    8.96,9.92,11.36,12.15,14.40,16.00,18.61,18.75,19.05,
+    21.00,21.41,23.27,24.71,25.00,28.75,30.23,35.45,36.35)
+
+small = c(0.42,0.86,0.88,1.11,1.34,1.38,1.42,1.47,1.63,
+    1.73,2.17,2.42,2.48,2.74,2.74,2.79,2.90,3.12,
+    3.18,3.27,3.30,3.61,3.63,4.13,4.40,5.00,5.20,
+    5.59,7.04,7.15,7.25,7.75,8.00,8.84,9.30,9.68,
+    10.32,10.41,10.48,11.29,12.30,12.53,12.69,14.14,14.15,
+    14.27,14.56,15.84,18.55,19.73,20.00)
+
+fitdistr(x = large, densfun = "weibull")
+```
+    
+3) Assuming $Weibull(\gamma = 1.1326673, \alpha = 11.4982087)$  
+   P(x > 30) = `r round(1 - pweibull(q = 30, shape = 1.1326673, scale = 11.4982087),4)`  
+
+4)  
+
+```{r q4, echo=FALSE, comment=NA}
+paste("MLE Mean Estimate:", round(mean(rweibull(100000, shape = 1.1326673, scale = 11.4982087)),3),
+      "  MLE Sigma Estimate:", round(sd(rweibull(100000, shape = 1.1326673, scale = 11.4982087)),3))
+
+paste("Distribution Free Mean:", round(mean(large),3), "  Distribution Free Sigma:", round(sd(large),3))
+```
+
+5)
+
+```{r q5, echo=FALSE, comment=NA}
+paste("MLE Median Estimate:", round(median(rweibull(100000, shape = 1.1326673, scale = 11.4982087)),3),
+      "  MLE IQR Estimate:", round(IQR(rweibull(100000, shape = 1.1326673, scale = 11.4982087)),3))
+
+paste("Distribution Free Median:", round(median(large),3), "  Distribution Free IQR:", round(IQR(large),3))
+```
+
+6)  
+
+```{r q6, echo=FALSE, comment=NA}
+paste("Large Mean:", round(mean(large),3), "  Large SD:", round(sd(large),3))
+paste("Small Mean:", round(mean(small),3), "  Small SD:", round(sd(small),3))
+```
+
+7)  
+
+```{r q7, echo=FALSE, comment=NA}
+paste("Large Median:", round(median(large),3), "  Large MAD:", round(mad(large),3))
+paste("Small Mean:", round(median(small),3), "  Small MAD:", round(mad(small),3))
+```
+
+
+8)  Since both distributions are right skewed, median and MAD do the best job at describing the center and spread of the distributions.
+
+
+9)  Large litters on average have higher brain_wt/body_wt based on the centeroid measurements like median and mean, but large litters also have a much larger variation in brain_wt/body_wt where as the small litters brain_wt/body_wt mass is more concentrated.
+
+II.  
+
+1)
+
+```{r q21, echo=FALSE, comment=NA}
+ts = data.frame(dt = c("1989-01-01","1989-02-01","1989-03-01","1989-04-01","1989-05-01",
+                       "1989-06-01","1989-07-01","1989-08-01","1989-09-01","1989-10-01",
+                       "1989-11-01","1989-12-01","1990-01-01","1990-02-01","1990-03-01",
+                       "1990-04-01","1990-05-01","1990-06-01","1990-07-01","1990-08-01",
+                       "1990-09-01","1990-10-01","1990-11-01","1990-12-01","1991-01-01",
+                       "1991-02-01","1991-03-01","1991-04-01","1991-05-01","1991-06-01",
+                       "1991-07-01","1991-08-01","1991-09-01","1991-10-01","1991-11-01",
+                       "1991-12-01","1992-01-01","1992-02-01","1992-03-01","1992-04-01",
+                       "1992-05-01","1992-06-01","1992-07-01","1992-08-01","1992-09-01",
+                       "1992-10-01","1992-11-01","1992-12-01","1993-01-01","1993-02-01",
+                       "1993-03-01","1993-04-01","1993-05-01","1993-06-01","1993-07-01",
+                       "1993-08-01","1993-09-01","1993-10-01","1993-11-01","1993-12-01"),
+                value = c(9.62,9.64,9.80,9.79,9.57,9.10,8.93,8.96,9.01,8.92,8.89,8.96,
+                          8.99,9.22,9.37,9.46,9.47,9.26,9.24,9.41,9.56,9.53,9.30,9.05,
+                          9.04,8.83,8.93,8.86,8.86,9.01,9.00,8.75,8.61,8.55,8.48,8.31,
+                          8.20,8.29,8.35,8.33,8.28,8.22,8.07,7.95,7.92,7.99,8.10,7.98,
+                          7.91,7.71,7.58,7.46,7.43,7.33,7.17,6.85,6.66,6.67,6.93,6.90))
+
+ts$dt = as.Date(ts$dt)
+plot(ts, type = "l", main = "Daily Yields of Moody AAA bonds")
+
+```
+
+2)  You can conclude that there is a strong positive correlation between adjacent values
+
+```{r 22, echo=FALSE, comment=NA}
+acf(ts$value, plot=FALSE)
+```
+
+3)  No, it is easy so see that the mean has been declining over the course of time.   
+
+III.  
+
+1)  
+
+```{r 31, echo=FALSE, warning=FALSE, comment=NA}
+suppressPackageStartupMessages(library(MASS))
+suppressPackageStartupMessages(library(survival))
+
+G1 = data.frame(Time = c(180, 632, 2240, 195, 76, 70, 13, 1990, 18, 700, 210, 1296, 23),
+                Status = c(1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1))
+                  
+G2 = data.frame(Time = c(8, 852, 52, 220, 63, 8, 1976, 1296, 1460, 63, 1328, 365),
+                Status = c(0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1))
+
+
+survive1 = survfit(Surv(G1$Time, G1$Status) ~ 1, conf.type = "log-log")
+survive2 = survfit(Surv(G2$Time, G2$Status) ~ 1, conf.type = "log-log")
+
+print(survive1, print.rmean = TRUE)
+summary(survive1)
+
+print(survive2, print.rmean = TRUE)
+summary(survive2)
+
+plot(survive1, col = "blue", conf.int = FALSE, log = TRUE, xlab = "Treatment 1 (Blue), Treatment 2 (Red)")
+lines(survive2, col = "red", conf.int = FALSE, log = TRUE)
+
+```
+
+2)  Treatment 1: Mean = 657, Median = 202 ; Treatment 2: Mean = 731, Median = 365
+
+3)  Treatment 1 seems to be more effective than treatment 2.
+
+IV.  
+
+1)  Type I censoring, the termination point of the experiment is fixed at 500 psi.  
+
+2)  Left censored, we have complete data because all of the puppies already knew how to swim.
+
+3)  Uncensored, all puppies were able to learn how to swim so all data could be rec
+
+4)  Random censoring, all puppies in this group failed to learn to swim during the time of the study
+
+V.  In this case SIQR = IQR/2
+    
+\begin{align*}
+    r &= \tilde{\mu} - Q(.25)                                    \\
+      &= Q(.75) - \tilde{\mu}                                    \\
+                                                                 \\
+ SIQR &= \frac{r + \tilde{\mu} - \tilde{\mu} - r}{2}             \\
+      &= r                                                       \\
+                                                                 \\
+ P \Big [ Q(.25) \le y \le Q(.75) \Big ] &= .5                   \\
+ P \Big [ \tilde{\mu} - r \le y \le \tilde{\mu} + r \Big ] &= .5 \\
+ P \Big [ -r \le (y - \tilde{\mu} \le r) \Big ] &= .5            \\
+ P \Big [ |(y - \tilde{\mu} | \le r) \Big ] &= .5                \\
+ r = SIQR &= |y - \tilde{\mu}|                                   \\
+\end{align*}

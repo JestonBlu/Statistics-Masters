@@ -1,0 +1,186 @@
+---
+output:
+  pdf_document:
+    fig_height: 4
+    highlight: pygments
+    latex_engine: xelatex
+mainfont: Calibri Light
+sansfont: Calibri Light
+fontsize: 12pt
+geometry: margin=1in
+---
+
+
+**Homework 06**  
+**Joseph Blubaugh**  
+jblubau1@tamu.edu  
+**STAT 642-720**  
+
+\newpage
+
+
+1.
+  a)
+    \begin{align*}
+      Y_{ijkl} =& \tau_i + \gamma_j + (\tau \gamma)_{ij} + \lambda_l + (\tau \lambda)_{ik} + (\gamma \lambda)_{jk} + (\tau \gamma \lambda)_{ijk} + a_{l(i)} + (\gamma a)_{j,l(i)} + (\lambda a)_{k, l(i)} \\
+                                       \\
+      \tau_i =& Signal                 \\
+      \gamma_j =& Traffic              \\
+      \lambda_k =& Measured Device     \\
+      a_l =& Intersection              \\
+    \end{align*}
+    
+  b) **Model AOV**  
+  
+      | Source          | DF | Sum of Squares | Mean Square | F Value | Pr > F |  
+      |:----------------|:--:|---------------:|------------:|--------:|-------:|  
+      | Model           | 20 | 6092.253       | 304.612     | 73.08   | 0.0023 |  
+      | Error           | 3  | 12.505         | 4.168       | .       | .      |  
+      | Corrected Total | 23 | 6104.758       | .           | .       | .      |  
+       
+      | Source | DF | Type I SS| Mean Square | F Value | Pr > F |
+      |:-------|:--:|---------:|------------:|--------:|-------:|
+      | S      | 2  | 3143.023 | 1571.511    | 377.01  | 0.0002 |
+      | T      | 1  | 236.881  | 236.881     | 56.83   | 0.0048 |
+      | I(S)   | 3  | 2053.050 | 684.350     | 164.18  | 0.0008 |
+      | S T    | 2  | 275.773  | 137.886     | 33.08   | 0.0090 |
+      | T I(S) | 3  | 96.370   | 32.123      | 7.71    | 0.0638 |
+      | M      | 1  | 96.000   | 96.000      | 23.03   | 0.0172 |
+      | S M    | 2  | 51.430   | 25.715      | 6.17    | 0.0865 |
+      | M T    | 1  | 31.740   | 31.740      | 7.61    | 0.0702 |
+      | M I(S) | 3  | 96.015   | 32.005      | 7.68    | 0.0641 |
+      | S M T  | 2  | 11.970   | 5.985       | 1.44    | 0.3652 |
+
+  c)   
+      
+      | Source   | DF | Sum of Squares | Mean Square | Expected Mean Square                       |
+      |:---------|:--:|---------------:|------------:|-------------------------------------------:|
+      | S        | 2  | 3143.023       | 1571.511    |  (2053.05 + 3143.0233) / 5 = 1039.215      |
+      | T        | 1  | 236.881        | 236.881     |  (236.88 + (32.12 * 0.46)) / 4 = 62.913    |
+      | S T      | 2  | 275.773        | 137.886     |  (137.88 + (32.12 * 0.54)) / 5 = 31.04     |
+      | M        | 1  | 96.000         | 96.000      |  (96 + (96.015 * .65)) / 4 = 39.60         |
+      | S M      | 2  | 51.430         | 25.715      |  (51.43 + (96.015 * .35)) / 5 = 17.00      | 
+      | M T      | 1  | 31.740         | 31.740      |  (31.74 + (12.505 * .134)) / 4 = 8.35      |
+      | S M T    | 2  | 11.970         | 5.985       |  (11.97 + (12.505 * .05)) / 5 = 2.51       |
+      | I(S)     | 3  | 2053.050       | 684.350     |  (2053.05 + 311.87) / 8.2014 = 288.35      | 
+      | T I(S)   | 3  | 96.370         | 32.123      |  (96.37 + (12.505 * .408)) / 6 = 16.91     |
+      | M I(S)   | 3  | 96.015         | 32.005      |  (96.015 + (12.505 * .406)) / 6 = 16.84    |
+      | Residual | 3  | 12.505         | 4.168       |  .                                         |
+
+  
+  d) With an $\alpha = .05$ the only significant interaction is between the type of signal and the type of traffic. The main effects of Method, Type of Signal, and Type of traffic are all individually significant, as is the specific intersection. Increasing $\alpha$ slightly would make several of the interactions significant.
+  
+  e)
+```{r q1c, echo=FALSE, comment=NA}
+library(scales)
+
+dt = data.frame(
+    Source = c("S", "T", "I(S)", "ST", "TI(S)", "M", "SM", "MT", "MI(S)", "SMT"),
+    SS = c(3143.023, 236.881 ,2053.050, 275.773, 96.370, 96.000, 51.430, 31.740, 96.015, 11.970))
+dt$Var.Prop = percent(round(with(dt, SS/6092.253), 4))
+
+dt
+
+```
+
+
+2.  
+  a)
+    
+    | Source |      DF      |  MS  | Expected Mean Squares                                                                |
+    |:-------|:------------:|-----:|:-------------------------------------------------------------------------------------|
+    |   A    |      3       | 24.5 | $90 \sigma_A^2 + 18 \sigma_{A*B}^2 + 6 \sigma_{A * C(B)}^2 + \sigma_e^2$             |
+    |   B    |      4       | 19.7 | $72 Q_B + 18 \sigma_{A*B}^2 + 24 \sigma_{C(B)}^2 + 6 \sigma_{A*C(B)}^2 + \sigma_e^2$ |
+    |  A B   |     12       | 8.9  | $18 \sigma_{A*B}^2 + 6 \sigma_{A*C(B)}^2 + \sigma_e^2$                               |
+    |  C(B)  |     12       | 7.5  | $24 \sigma_{C(B)}^2 + 6 \sigma_{A*C(B)}^2 + \sigma_e^2$                              |
+    | A C(B) |     36       | 6.8  | $6 \sigma_{A*C(B)}^2 + \sigma_e^2$                                                   |
+    | Error  |    300       | 5.8  | $\sigma_e^2$                                                                         |
+    
+    
+  b)
+    
+    | Source |  DF  |  MS  |       F            | P-value                                       |
+    |:-------|:----:|:----:|:------------------:|:---------------------------------------------:|
+    |  A B   |  12  | 8.9  | 8.9 / 6.8  = 1.308 | 1 - pf(q = 1.308, df1 = 12, df2 = 36) = .256  |   
+  
+  
+  c) Using the Satterthwaite approximation
+  
+    | Source |  DF  |  MS  |                 F                | P-value                                             |
+    |:-------|:----:|:----:|:--------------------------------:|:---------------------------------------------------:|
+    |   B    |   4  | 19.7 | 19.7 / (8.9 + 7.5 - 6.8) = 2.052 | 1 - pf(q = 2.052, df1 = 4, df2 = 11.45332) = .153   |  
+  
+  d)
+  
+\begin{align*}
+  y_{.1..} =& \mu + a_. + \beta_1 + c_{.(1)} + (a \beta)_{.1} + (ac)_{..(1)} + e_{.1..} \\
+  y_{.2..} =& \mu + a_. + \beta_2 + c_{.(2)} + (a \beta)_{.2} + (ac)_{..(2)} + e_{.2..} \\
+  Var[\bar{y}_{.1..} - \bar{y}_{.2..}] =& Var[\bar{c}_{.(1)} - \bar{c}_{.(2)}] + Var[\bar{a \beta}_{.1} - \bar{a \beta}_{.2}] + Var[\bar{ac}_{..(1)} - \bar{ac}_{..(2)}] + Var[\bar{e}_{.1..} - \bar{e}_{.2..} ] \\
+  =& \frac{2 \sigma^2_a}{4} + \frac{2 \sigma^2_{a \beta}}{4} + \frac{2 \sigma^2_{a c(\beta)}}{12} + \frac{2 \sigma^2_e}{72} \\
+  =& \frac{36 \sigma^2_a}{72} + \frac{36 \sigma^2_{a \beta}}{72} + \frac{12 \sigma^2_{a c(\beta)}}{72} + \frac{2 \sigma^2_e}{72} \\
+  =& \frac{1}{18} [18 \sigma^2_a + 18 \sigma^2_{a \beta} + 6 \sigma^2_{a c(\beta)} + \sigma^2_e ] \\
+  =& \frac{1}{18} 19.7 \\
+  Var =& 1.094 \\
+  DF =& 4 \\
+\end{align*}
+  
+  
+  e) 
+  
+  \begin{align*}
+  Tukey HSD = & \frac{qtukey(p = .95, nmeans = 6, df = 4) (\sqrt{1.094})}{\sqrt{2}} \\
+            = & \frac{(6.7064)(1.0459)}{\sqrt{2}} \\
+            = & 4.959 \\
+  \end{align*}
+  
+3.
+  a) 
+    i. Interaction - F1*F2
+    ii. Yes
+  b) 
+    i. Main Effect - F2
+    ii. No - missing values
+  c) 
+    i. Main Effect - F2
+    ii. No - missing values
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  

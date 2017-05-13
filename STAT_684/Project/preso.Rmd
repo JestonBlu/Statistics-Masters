@@ -1,0 +1,43 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+```{r setup}
+rm(list = ls())
+
+library(ggplot2)
+library(plyr)
+library(reshape2)
+library(Hmisc)
+library(multcomp)
+library(nlme)
+library(pander)
+library(lsmeans)
+library(forecast)
+library(knitr)
+
+flies = read.csv("hornflydata.csv")
+
+flies$trt = factor(capitalize(as.character(flies$trt)))
+flies$cty = factor(capitalize(as.character(flies$cty)))
+flies$week = flies$week + 2
+
+
+ggplot(flies, aes(x = week, y = flies, color = trt)) +
+  stat_summary(fun.y = "mean", geom = "point") +
+  stat_summary(fun.y = "mean", geom = "line") +
+  scale_x_continuous("Week") +
+  scale_y_continuous("Fly Count") +
+  scale_color_discrete("Treatment") +
+  ggtitle("Horn Fly Count by Treatment and County") +
+  facet_wrap(~cty) +
+  theme(plot.title = element_text(hjust = .5))
+
+
+x = ddply(na.omit(flies), .(trt, cty), summarise, mean = round(mean(flies), 1))
+x = dcast(x, cty ~ trt, fill = '')
+colnames(x)[1] = "County"
+
+pander(x, caption = "Average Weekly Count by Treatment and County", split.table = Inf)
+```

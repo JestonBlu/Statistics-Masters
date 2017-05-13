@@ -1,0 +1,218 @@
+---
+output:
+  pdf_document:
+    fig_height: 5
+    fig_width: 8
+    highlight: pygments
+    latex_engine: xelatex
+mainfont: Calibri Light
+sansfont: Calibri Light
+fontsize: 12pt
+geometry: margin=1in
+---
+
+**Homework 01**  
+**Joseph Blubaugh**  
+jblubau1@tamu.edu  
+**STAT 636-720**  
+
+\newpage
+
+
+1)
+
+```{r q1, comment=NA}
+
+oxygen = 
+  read.table("C:/Users/Joseph/Projects/learning/Statistics/STAT_636/Data/textbook/T6-12.DAT", 
+             quote="\"", 
+             comment.char="")
+colnames(oxygen) = c("rest_L.min", "rest_mL.kg.min", "strenuous_L.min", 
+                     "strenuous_mL.kg.min", "gender")
+
+## a)
+## Sample Averages
+apply(X = oxygen[, 1:4], MARGIN = 2, FUN = mean)
+
+## Sample Standard Deviations
+apply(X = oxygen[, 1:4], MARGIN = 2, FUN = sd)
+
+## b)
+pairs(oxygen)
+
+## c)
+coplot(rest_L.min ~ strenuous_L.min | gender, data = oxygen)
+
+```
+
+a) The resting oxygen measurement means and standard deviation are lower than that measurements for the strenuous activity. Strenuous mL/kg/min is much higher and has more variation than the Resting mL/kg/min measurement.
+
+b) Resting L/min appears to be positively correlated with both Rest mL/kg/min and Strenuous L/min. Strenuous L/min also appears to be positively correlated with Strenuous mL/kg/min The observations of the female with a resting mL/kg/min of 11.05 appears to be an outlier and shows up as such on several plots.
+
+c) Visually there appears to be no obvious relationship between Rest L/min and Strenuous L/min for females, but the relationship appears to be positively correlated for men.
+
+
+2)
+  a)
+  
+\begin{displaymath}
+x = 
+\begin{bmatrix}
+    x_1 \\
+    x_2 \\
+\end{bmatrix}
+\mu = 
+\begin{bmatrix}
+    \mu_1 \\
+    \mu_2 \\
+\end{bmatrix}
+\Sigma = 
+\begin{bmatrix}
+    \sigma_{11} & \sigma_{12} \\
+    \sigma_{12} & \sigma_{22} \\
+\end{bmatrix}
+\end{displaymath}
+
+\begin{displaymath}
+d(x, \mu) = \sqrt{(x - \mu)' \Sigma^{-1} (x - \mu)} \\
+\end{displaymath}
+
+\begin{displaymath}
+d(x,\mu) = \sqrt{
+\begin{bmatrix}
+    x_1 - \mu_1 & x_2 - \mu_2 \\
+\end{bmatrix}
+\begin{bmatrix}
+    \sigma_{11} & \sigma_{12} \\
+    \sigma_{12} & \sigma_{22} \\
+\end{bmatrix}^{-1}
+\begin{bmatrix}
+    x_1 - \mu_1 \\
+    x_2 - \mu_2 \\
+\end{bmatrix}}
+\end{displaymath}
+
+\begin{displaymath}
+ = \sqrt{\sigma_{11}(x_1 - \mu_1)^2 + 2 \sigma_{12}(x_1 - \mu_1)(x_2 - \mu_2) + \sigma_{22}(x_2 - \mu_2)^2} \\
+\end{displaymath}
+
+\begin{displaymath}
+a_{11} = \sigma_{11}, a_{12} = \sigma_{12}, a_{22} = \sigma{22}
+\end{displaymath}
+
+b i.
+
+```{r q2, comment=NA}
+
+mu = c(1, -1)
+Sigma = matrix(c(1, -1.6, -1.6, 4), nrow = 2)
+
+mvn = function(x) {
+  constant = 1/((2 * pi)^(2/2) * sqrt(det(Sigma)))
+  scalar = exp(-t(x - mu) %*% solve(Sigma) %*% (x - mu)/2)
+  
+  out = constant * scalar
+  
+  return(as.numeric(out))
+}
+
+
+x1 = seq(-2, 4, length = 75)
+x2 = seq(-13, 11, length = 75)
+
+results = matrix(NA, nrow = 75, ncol = 75)
+
+for (i in 1:75) {
+  for (j in 1:75) {
+    results[i, j] = mvn(c(x1[i], x2[j]))
+  }
+}
+
+persp(results, ticktype = "detailed")
+
+
+```
+
+\newpage
+
+ii.
+
+\begin{displaymath}
+\mu = 
+\begin{bmatrix}
+    1 \\
+    -1 \\
+\end{bmatrix}
+\Sigma = 
+\begin{bmatrix}
+    1.0 & -1.6 \\
+    -1.6 & 4 \\
+\end{bmatrix}
+\end{displaymath}
+
+\begin{displaymath}
+d(P,Q) = \sqrt{\sigma_{11}(x_1 - \mu_1)^2 + \sigma_{12}(x_1 - \mu_1)(x_2 - \mu_2) + \sigma_{22}(x_2 - \mu_2)^2}
+\end{displaymath}
+
+\begin{displaymath}
+O = (0, 0),  P = (0, -2)
+\end{displaymath}
+
+**Statistical Distance**
+
+\begin{align*}
+d(O,Q) =& \sqrt{1(0 - 1)^2 - 1.6(0 - 1)(0 + 1) + 4(0 + 1)^2)} \\
+       =& \sqrt{1 + 1.6 + 4} \\
+       =& \sqrt{6.6} = 2.569 \\
+\\
+d(P,Q) =& \sqrt{1(0 - 1)^2 - 1.6(0 - 1)(-2 + 1) + 4(-2 + 1)^2)} \\
+       =& \sqrt{1 - 1.6 + 4} \\
+       =& \sqrt{3.4} = 1.843 \\
+\end{align*}
+
+**Straightline Distance**
+
+\begin{align*}
+d(O,Q) =& \sqrt{(0 - 1)^2 + (0 + 1)^2} \\
+       =& \sqrt(2) \\
+       =& 1.41 \\
+\\
+d(P,Q) =& \sqrt{0 - 1)^2 + (-2 + 1)^2} \\
+       =& \sqrt{2} \\
+       =& 1.41
+\end{align*}
+
+**Conclusion**: Using the straightline distance both P and O are equally distant from Q, but when taking into accoun the variances, P is actually closer to Q than O is.
+
+\newpage
+
+iii.  
+
+For $R_P$, $x_2$ appears to no longer by centered on $P$ and as such will have less volume under the curve than $R_O$ which is centered on $O$ for both $x_1$ and $x_2$, therefore $P(x \in R_O) > P(x \in R_P)$.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
